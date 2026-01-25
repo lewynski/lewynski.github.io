@@ -7,23 +7,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #111827; } /* Gray-900 */
+    body { font-family: 'Inter', sans-serif; background-color: #111827; }
     .card { background: #1F2937; border: 1px solid #374151; }
     
-    /* Result Screen - Now handles both Math and Story */
     .result-screen { 
         font-family: 'Playfair Display', serif; 
-        min-height: 120px; /* Slightly taller to fit story */
+        min-height: 120px; 
         transition: all 0.3s ease;
     }
     
-    /* Buttons Hover Effects */
     .btn-operator:hover, .btn-story:hover:not(:disabled) { 
         transform: translateY(-1px); 
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); 
     }
     
-    /* Loading Spinner */
     .spinner { 
         border: 3px solid rgba(255,255,255,0.1); 
         border-left-color: #4f46e5; 
@@ -34,7 +31,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Scrollbar hidden for aesthetic */
     ::-webkit-scrollbar { width: 0px; background: transparent; }
   </style>
 </head>
@@ -49,7 +45,7 @@
 
     <div id="result-screen" class="result-screen bg-gray-900 rounded-lg p-4 flex flex-col items-center justify-center text-center border border-gray-700 relative">
       
-      <p id="result-text" class="text-gray-300 text-2xl font-bold mb-1">0</p>
+      <p id="result-text" class="text-gray-500 text-lg italic">Enter numbers...</p>
       
       <div id="story-container" class="hidden w-full border-t border-gray-800 mt-2 pt-2">
           <p id="story-text" class="text-teal-400 text-sm italic leading-relaxed"></p>
@@ -71,7 +67,7 @@
     </div>
     
     <button id="story-button" disabled onclick="showStory()" class="btn-story w-full bg-teal-600 hover:bg-teal-500 p-2 rounded-lg text-sm font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition text-white">
-      ✨ Tell me a Story
+      ✨ Reveal Result & Story
     </button>
     
     <p id="error-message" class="text-red-400 text-center text-xs h-3"></p>
@@ -79,11 +75,10 @@
   </div>
 
   <script>
-    /* Javascript Logic */
     const resultText = document.getElementById('result-text');
     const errorMessage = document.getElementById('error-message');
     const storyButton = document.getElementById('story-button');
-    const storyContainer = document.getElementById('story-container'); // New Container inside screen
+    const storyContainer = document.getElementById('story-container');
     const storyText = document.getElementById('story-text');
     const storyLoader = document.getElementById('story-loader');
     
@@ -94,9 +89,8 @@
       const num2Input = document.getElementById('num2');
       errorMessage.textContent = '';
       
-      // Reset UI when new math is done
-      storyButton.disabled = true; 
-      storyContainer.classList.add('hidden'); // Hide old story
+      // Reset Screen
+      storyContainer.classList.add('hidden');
       storyText.textContent = '';
       
       let num1, num2;
@@ -111,10 +105,14 @@
       if (operator === '*') { result = num1 * num2; symbol = '×'; }
       if (operator === '/') { if(num2===0n){errorMessage.textContent='No zero division';return;} result = num1/num2; symbol = '÷'; }
 
-      // Display math result in large font
-      resultText.innerHTML = `${num1} ${symbol} ${num2} = ${result}`;
+      // --- CHANGE 1: DO NOT SHOW RESULT YET ---
+      // Instead, show a "Pending" message
+      resultText.innerHTML = `<span class="text-indigo-300 animate-pulse text-base">Calculation Stored...<br>Click Reveal below!</span>`;
       
+      // Store the result for later
       lastCalculation = { num1: num1.toString(), op: symbol, num2: num2.toString(), res: result.toString() };
+      
+      // Enable the Reveal Button
       storyButton.disabled = false;
     }
     
@@ -123,21 +121,24 @@
         
         storyButton.disabled = true;
         
-        // Show the container inside the result screen
+        // --- CHANGE 2: REVEAL THE MATH RESULT NOW ---
+        resultText.className = "text-white text-2xl font-bold mb-1"; // Make text big and white
+        resultText.innerHTML = `${lastCalculation.num1} ${lastCalculation.op} ${lastCalculation.num2} = ${lastCalculation.res}`;
+
+        // Show Story Box
         storyContainer.classList.remove('hidden');
-        storyText.textContent = ''; // Clear old text
-        storyLoader.classList.remove('hidden'); // Show spinner
+        storyText.textContent = ''; 
+        storyLoader.classList.remove('hidden'); 
         
         try {
             const story = await generateStory(lastCalculation.num1, lastCalculation.op, lastCalculation.num2, lastCalculation.res);
             const words = story.split(' ');
             
-            storyLoader.classList.add('hidden'); // Hide spinner
+            storyLoader.classList.add('hidden'); 
             
-            // Typewriter effect inside the box
             for (const word of words) {
                 storyText.textContent += word + ' ';
-                await new Promise(r => setTimeout(r, 100)); // Typing speed
+                await new Promise(r => setTimeout(r, 100)); 
             }
         } catch (e) { 
             storyText.textContent = 'The numbers are shy today.'; 
@@ -148,13 +149,11 @@
     }
 
     async function generateStory(num1, op, num2, res) {
-      /* AI SIMULATION - Replace with real API key if you want */
       const stories = [
         (a,o,b,r) => `The numbers ${a} and ${b} met under a ${o} sign. Together, they became the legendary ${r}.`,
         (a,o,b,r) => `${a} challenged ${b} to a duel of ${o}. The dust settled, revealing ${r}.`,
         (a,o,b,r) => `Once, ${a} and ${b} combined their powers using ${o} to summon ${r}.`
       ];
-      // Simulate API delay
       await new Promise(r => setTimeout(r, 1000));
       return stories[Math.floor(Math.random()*stories.length)](num1,op,num2,res);
     }
