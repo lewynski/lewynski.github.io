@@ -2,9 +2,9 @@
 :root {
     --primary: #4f46e5; /* Indigo */
     --secondary: #9333ea; /* Purple */
-    --dark: #111827;
+    --dark: #111827;      /* Deep dark background */
     --light: #f3f4f6;
-    --glass: rgba(255, 255, 255, 0.05);
+    --text-gray: #9ca3af;
 }
 
 body {
@@ -12,7 +12,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--dark);
     color: white;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Prevents side scrolling */
 }
 
 /* --- NAVIGATION --- */
@@ -21,7 +21,7 @@ nav {
     justify-content: space-between;
     align-items: center;
     padding: 20px 5%;
-    background: rgba(17, 24, 39, 0.9);
+    background: rgba(17, 24, 39, 0.95); /* Almost solid dark */
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
@@ -32,8 +32,13 @@ nav {
 .logo {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #22c55e; /* Green for Unfiltered */
+    color: #22c55e; /* Green brand color */
     letter-spacing: -1px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
 }
 
 .nav-links a, .dropbtn {
@@ -42,13 +47,17 @@ nav {
     color: #d1d5db;
     font-weight: 500;
     transition: color 0.3s;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
 }
 
 .nav-links a:hover, .dropdown:hover .dropbtn { color: white; }
 
 /* Dropdown Menu */
 .dropdown { display: inline-block; position: relative; }
-.dropbtn { background: none; border: none; font-size: 1rem; cursor: pointer; font-family: inherit; }
 .dropdown-content {
     display: none;
     position: absolute;
@@ -74,9 +83,14 @@ nav {
 /* --- HERO SECTION --- */
 .hero-container {
     text-align: center;
-    padding: 80px 20px;
+    padding: 100px 20px; /* Added padding to ensure it takes space */
     background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.15), transparent 40%),
                 radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.1), transparent 40%);
+    min-height: 80vh; /* Forces it to be tall on all screens */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .profile-frame {
@@ -95,6 +109,7 @@ nav {
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--dark);
+    display: block;
 }
 
 .badge {
@@ -105,12 +120,14 @@ nav {
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 1px;
+    display: inline-block;
 }
 
 h1 {
     font-size: 3.5rem;
     margin: 20px 0;
     line-height: 1.1;
+    color: white;
 }
 
 .gradient-text {
@@ -122,7 +139,7 @@ h1 {
 .bio-text {
     max-width: 700px;
     margin: 0 auto 40px;
-    color: #9ca3af;
+    color: var(--text-gray);
     font-size: 1.1rem;
     line-height: 1.6;
 }
@@ -154,8 +171,8 @@ h1 {
 /* --- SKILLS SECTION --- */
 .skills-section { padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
 .section-title { text-align: center; margin-bottom: 50px; }
-.section-title h2 { font-size: 2.5rem; margin-bottom: 10px; }
-.section-title p { color: #6b7280; }
+.section-title h2 { font-size: 2.5rem; margin-bottom: 10px; color: white; }
+.section-title p { color: var(--text-gray); }
 
 .skills-grid {
     display: grid;
@@ -189,8 +206,8 @@ h1 {
     margin-bottom: 20px;
 }
 
-.skill-card h3 { font-size: 1.25rem; margin-bottom: 10px; }
-.skill-card p { color: #9ca3af; font-size: 0.9rem; margin-bottom: 20px; }
+.skill-card h3 { font-size: 1.25rem; margin-bottom: 10px; color: white; }
+.skill-card p { color: var(--text-gray); font-size: 0.9rem; margin-bottom: 20px; }
 
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .tags span {
@@ -220,40 +237,48 @@ footer {
 }
 .social-links a:hover { color: white; }
 
-/* Mobile Response */
+/* --- MOBILE RESPONSE --- */
 @media (max-width: 768px) {
-    /* 1. Stack the Logo and Menu vertically */
+    /* 1. Stack Navigation */
     nav {
         flex-direction: column;
         gap: 15px;
         padding: 15px;
     }
 
-    /* 2. UN-HIDE the links and center them */
-    .nav-links { 
-        display: flex;       /* This brings them back! */
-        flex-direction: column; /* Stacks links nicely */
+    /* 2. Show Menu Links */
+    .nav-links {
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 15px;
         width: 100%;
+        gap: 15px;
     }
 
     .nav-links a, .dropbtn {
-        margin: 0;          /* Remove side margins for cleaner look */
-        font-size: 1.1rem;  /* Make text slightly bigger for tapping */
+        margin: 0;
+        font-size: 1.1rem;
     }
-    
-    /* 3. Make the dropdown easier to use on phone */
+
+    /* 3. Handle Dropdown for Mobile */
+    .dropdown { width: 100%; text-align: center; }
     .dropdown-content {
-        position: relative; /* Stacks inside the menu instead of floating */
+        position: relative;
         width: 100%;
         text-align: center;
         box-shadow: none;
         border: 1px solid rgba(255,255,255,0.05);
         background: #111827;
     }
-
-    /* 4. Adjust Hero Text size */
-    h1 { font-size: 2.5rem; }
-    .cta-buttons { flex-direction: column; }
+    
+    /* 4. Adjust Text Sizes */
+    h1 { font-size: 2.2rem; }
+    .cta-buttons { flex-direction: column; width: 100%; }
+    .btn-primary, .btn-secondary { width: 100%; text-align: center; box-sizing: border-box; }
+    
+    /* 5. Ensure Top Section is Visible */
+    .hero-container {
+        padding-top: 30px;
+        min-height: auto;
+    }
 }
