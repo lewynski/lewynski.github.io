@@ -54,9 +54,11 @@ nav {
     color: #2ecc71;
 }
 
-/* 3. The Dropdown (The Fix!) */
+/* =========================================
+   3. The Aesthetic Dropdown (UPGRADED)
+   ========================================= */
 .dropdown {
-    position: relative; /* This is the anchor */
+    position: relative;
 }
 
 .dropbtn {
@@ -64,46 +66,103 @@ nav {
     border: none;
     cursor: pointer;
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 600; /* Slightly bolder */
     color: #555;
     font-family: inherit;
     padding: 10px 0;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Space between text and arrow */
 }
 
-/* The Hidden Menu Box */
+/* Rotate the little arrow when hovering */
+.dropdown:hover .dropbtn {
+    color: #2ecc71;
+}
+
+/* The Floating Menu Box */
 .dropdown-content {
-    display: none; /* HIDDEN by default */
+    display: none;
     position: absolute;
-    top: 100%; /* Appears directly below the word "Projects" */
-    right: 0; /* Aligns to the right edge */
-    background-color: white;
-    min-width: 200px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Floating effect */
-    border-radius: 12px;
-    padding: 10px 0;
+    top: 120%; /* Pushes it down slightly for a "floating" gap */
+    right: 0;
+    background-color: #ffffff;
+    min-width: 240px; /* Slightly wider */
     
+    /* AESTHETIC UPGRADE: Softer, multi-layered shadow */
+    box-shadow: 
+        0 10px 30px -10px rgba(46, 204, 113, 0.3), /* Greenish glow */
+        0 5px 15px rgba(0,0,0,0.05); /* subtle depth */
+        
+    border-radius: 16px; /* Very round corners */
+    padding: 12px 0; /* Padding top/bottom of the list */
+    z-index: 1000;
+    border: 1px solid rgba(46, 204, 113, 0.1); /* Subtle green border */
+
     /* Scroll Logic */
-    max-height: 300px;
+    max-height: 320px;
     overflow-y: auto;
+    
+    /* Animation for appearing */
+    animation: fadeInY 0.3s ease forwards;
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Animation Keyframes */
+@keyframes fadeInY {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Links inside the dropdown */
 .dropdown-content a {
     display: block;
-    padding: 12px 20px;
-    color: #333;
+    padding: 14px 24px; /* More spacious padding */
+    color: #444;
     font-size: 0.9rem;
-    white-space: nowrap; /* Prevents text wrapping */
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out; /* Smooth transition */
+    border-left: 3px solid transparent; /* Invisible border for hover effect */
 }
 
+/* AESTHETIC UPGRADE: The Hover Effect */
 .dropdown-content a:hover {
-    background-color: #f5fcf8; /* Light green background on hover */
-    color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.08); /* Very pale green tint */
+    color: #2ecc71; /* Green text */
+    border-left: 3px solid #2ecc71; /* The green accent bar appears */
+    padding-left: 30px; /* Slight nudge to the right */
 }
 
 /* Show menu when hovering */
 .dropdown:hover .dropdown-content {
     display: block;
+}
+
+/* =========================================
+   Custom Scrollbar Styling (The Magic Touch)
+   Works mostly in Chrome/Edge/Safari
+   ========================================= */
+.dropdown-content::-webkit-scrollbar {
+    width: 6px; /* Very thin */
+}
+
+.dropdown-content::-webkit-scrollbar-track {
+    background: transparent; /* hidden track */
+    margin: 10px 0; /* padding top and bottom */
+}
+
+.dropdown-content::-webkit-scrollbar-thumb {
+    background-color: rgba(46, 204, 113, 0.3); /* Semi-transparent green */
+    border-radius: 20px; /* Round pill shape */
+}
+
+.dropdown-content::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(46, 204, 113, 0.8); /* Darker green when you grab it */
 }
 
 /* 4. Hero Section (Centered & Clean) */
