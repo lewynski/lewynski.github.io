@@ -1,6 +1,6 @@
-/* style.css - Clean & Aesthetic Version */
-
-/* 1. Global Reset (Makes everything consistent) */
+/* =========================================
+   1. GLOBAL RESET & TYPOGRAPHY
+   ========================================= */
 * {
     margin: 0;
     padding: 0;
@@ -14,12 +14,14 @@ body {
     line-height: 1.6;
 }
 
-/* 2. The Navigation Bar (Clean & White) */
+/* =========================================
+   2. NAVIGATION BAR
+   ========================================= */
 nav {
     display: flex;
     justify-content: space-between; /* Logo left, Links right */
     align-items: center;
-    padding: 20px 5%; /* 5% padding on sides looks professional */
+    padding: 20px 5%; /* 5% padding on sides */
     background-color: #ffffff;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Very subtle shadow */
     position: sticky; /* Keeps nav at top when scrolling */
@@ -41,7 +43,7 @@ nav {
     gap: 30px; /* Space between "Home", "Projects", "GitHub" */
 }
 
-/* Standard Links */
+/* Standard Links (Home, GitHub) */
 .nav-links a {
     text-decoration: none;
     color: #555;
@@ -55,62 +57,62 @@ nav {
 }
 
 /* =========================================
-   3. The Aesthetic Dropdown (UPGRADED)
+   3. AESTHETIC DROPDOWN MENU
    ========================================= */
 .dropdown {
     position: relative;
 }
 
+/* The "My Projects" Text */
 .dropbtn {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 0.95rem;
-    font-weight: 600; /* Slightly bolder */
+    font-weight: 600;
     color: #555;
     font-family: inherit;
     padding: 10px 0;
     transition: color 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 5px; /* Space between text and arrow */
+    gap: 5px; 
 }
 
-/* Rotate the little arrow when hovering */
+/* Hover effect for the main button */
 .dropdown:hover .dropbtn {
     color: #2ecc71;
 }
 
-/* The Floating Menu Box */
+/* The Floating Menu Card */
 .dropdown-content {
-    display: none;
+    display: none; /* Hidden by default */
     position: absolute;
-    top: 120%; /* Pushes it down slightly for a "floating" gap */
+    top: 140%; /* Pushes it down slightly */
     right: 0;
     background-color: #ffffff;
-    min-width: 240px; /* Slightly wider */
+    min-width: 240px;
     
-    /* AESTHETIC UPGRADE: Softer, multi-layered shadow */
+    /* Soft Shadow & Border */
     box-shadow: 
         0 10px 30px -10px rgba(46, 204, 113, 0.3), /* Greenish glow */
-        0 5px 15px rgba(0,0,0,0.05); /* subtle depth */
-        
-    border-radius: 16px; /* Very round corners */
-    padding: 12px 0; /* Padding top/bottom of the list */
+        0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid rgba(46, 204, 113, 0.1);
+    border-radius: 16px;
+    
+    padding: 12px 0;
     z-index: 1000;
-    border: 1px solid rgba(46, 204, 113, 0.1); /* Subtle green border */
 
     /* Scroll Logic */
     max-height: 320px;
     overflow-y: auto;
     
-    /* Animation for appearing */
+    /* Smooth Entry Animation */
     animation: fadeInY 0.3s ease forwards;
     opacity: 0;
     transform: translateY(-10px);
 }
 
-/* Animation Keyframes */
 @keyframes fadeInY {
     to {
         opacity: 1;
@@ -121,21 +123,21 @@ nav {
 /* Links inside the dropdown */
 .dropdown-content a {
     display: block;
-    padding: 14px 24px; /* More spacious padding */
+    padding: 14px 24px;
     color: #444;
     font-size: 0.9rem;
     font-weight: 500;
     text-decoration: none;
-    transition: all 0.2s ease-in-out; /* Smooth transition */
-    border-left: 3px solid transparent; /* Invisible border for hover effect */
+    transition: all 0.2s ease-in-out;
+    border-left: 3px solid transparent;
 }
 
-/* AESTHETIC UPGRADE: The Hover Effect */
+/* Hover Effect on Items */
 .dropdown-content a:hover {
-    background-color: rgba(46, 204, 113, 0.08); /* Very pale green tint */
-    color: #2ecc71; /* Green text */
-    border-left: 3px solid #2ecc71; /* The green accent bar appears */
-    padding-left: 30px; /* Slight nudge to the right */
+    background-color: rgba(46, 204, 113, 0.08); /* Pale green tint */
+    color: #2ecc71;
+    border-left: 3px solid #2ecc71; /* Green accent bar */
+    padding-left: 30px; /* Slight nudge right */
 }
 
 /* Show menu when hovering */
@@ -143,32 +145,28 @@ nav {
     display: block;
 }
 
-/* =========================================
-   Custom Scrollbar Styling (The Magic Touch)
-   Works mostly in Chrome/Edge/Safari
-   ========================================= */
+/* --- Custom Green Scrollbar (Chrome/Edge/Safari) --- */
 .dropdown-content::-webkit-scrollbar {
-    width: 6px; /* Very thin */
+    width: 6px;
 }
-
 .dropdown-content::-webkit-scrollbar-track {
-    background: transparent; /* hidden track */
-    margin: 10px 0; /* padding top and bottom */
+    background: transparent;
+    margin: 10px 0;
 }
-
 .dropdown-content::-webkit-scrollbar-thumb {
-    background-color: rgba(46, 204, 113, 0.3); /* Semi-transparent green */
-    border-radius: 20px; /* Round pill shape */
+    background-color: rgba(46, 204, 113, 0.3);
+    border-radius: 20px;
 }
-
 .dropdown-content::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(46, 204, 113, 0.8); /* Darker green when you grab it */
+    background-color: rgba(46, 204, 113, 0.8);
 }
 
-/* 4. Hero Section (Centered & Clean) */
+/* =========================================
+   4. HERO / PROFILE SECTION
+   ========================================= */
 .container {
     max-width: 1000px;
-    margin: 80px auto; /* Centered with space from top */
+    margin: 80px auto;
     padding: 0 20px;
     display: flex;
     align-items: center;
@@ -225,4 +223,19 @@ nav {
     color: #555;
     border: 1px solid #eee;
     margin-left: 15px;
+}
+
+/* =========================================
+   5. CODE BOX (For Project Pages)
+   ========================================= */
+.code-box {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    font-family: 'Consolas', monospace;
+    overflow-x: auto;
+    margin-top: 30px;
+    border-left: 4px solid #2ecc71;
+    color: #334155;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
