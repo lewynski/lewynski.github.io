@@ -1,33 +1,52 @@
-/* style.css */
-body {
-    font-family: 'Segoe UI', sans-serif;
+/* style.css - Clean & Aesthetic Version */
+
+/* 1. Global Reset (Makes everything consistent) */
+* {
     margin: 0;
     padding: 0;
-    color: #333;
-    background-color: #fff;
+    box-sizing: border-box;
 }
 
-/* Navigation Bar */
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif; /* Modern Font */
+    color: #333;
+    background-color: #ffffff;
+    line-height: 1.6;
+}
+
+/* 2. The Navigation Bar (Clean & White) */
 nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Logo left, Links right */
     align-items: center;
-    padding: 20px 50px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 20px 5%; /* 5% padding on sides looks professional */
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Very subtle shadow */
+    position: sticky; /* Keeps nav at top when scrolling */
+    top: 0;
+    z-index: 1000;
 }
 
 .logo {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: #2ecc71; /* Green accent */
+    font-weight: 800; /* Extra bold */
+    font-size: 1.5rem;
+    color: #2ecc71; /* Your Green Brand Color */
+    letter-spacing: -1px;
 }
 
+/* Container for all links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Space between "Home", "Projects", "GitHub" */
+}
+
+/* Standard Links */
 .nav-links a {
     text-decoration: none;
     color: #555;
-    margin-left: 30px;
-    font-size: 0.9rem;
+    font-weight: 500;
+    font-size: 0.95rem;
     transition: color 0.3s;
 }
 
@@ -35,139 +54,116 @@ nav {
     color: #2ecc71;
 }
 
-/* Main Layout */
+/* 3. The Dropdown (The Fix!) */
+.dropdown {
+    position: relative; /* This is the anchor */
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #555;
+    font-family: inherit;
+    padding: 10px 0;
+}
+
+/* The Hidden Menu Box */
+.dropdown-content {
+    display: none; /* HIDDEN by default */
+    position: absolute;
+    top: 100%; /* Appears directly below the word "Projects" */
+    right: 0; /* Aligns to the right edge */
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Floating effect */
+    border-radius: 12px;
+    padding: 10px 0;
+    
+    /* Scroll Logic */
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    font-size: 0.9rem;
+    white-space: nowrap; /* Prevents text wrapping */
+}
+
+.dropdown-content a:hover {
+    background-color: #f5fcf8; /* Light green background on hover */
+    color: #2ecc71;
+}
+
+/* Show menu when hovering */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* 4. Hero Section (Centered & Clean) */
 .container {
     max-width: 1000px;
-    margin: 0 auto;
-    padding: 50px 20px;
+    margin: 80px auto; /* Centered with space from top */
+    padding: 0 20px;
     display: flex;
     align-items: center;
-    gap: 50px;
+    gap: 60px;
 }
 
-/* Profile Section */
 .profile-img {
-    width: 300px;
-    height: 300px;
+    width: 280px;
+    height: 280px;
     border-radius: 50%;
     object-fit: cover;
-    border: 5px solid #f0f0f0;
+    box-shadow: 20px 20px 0px #f0fdf4; /* Aesthetic offset circle */
 }
 
-.content {
-    max-width: 500px;
-}
-
-h1 {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    color: #222;
+.content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    color: #111;
+    line-height: 1.1;
 }
 
 .subtitle {
-    color: #888;
+    color: #2ecc71;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-}
-
-p {
-    line-height: 1.6;
-    color: #666;
-    margin-bottom: 30px;
 }
 
 /* Buttons */
 .btn {
-    padding: 12px 30px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: bold;
     display: inline-block;
+    padding: 14px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 25px;
+    transition: transform 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
 }
 
 .btn-primary {
     background-color: #2ecc71;
     color: white;
-    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 10px 20px rgba(46, 204, 113, 0.2);
 }
 
 .btn-secondary {
-    border: 2px solid #ddd;
+    background-color: white;
     color: #555;
-    margin-left: 10px;
-}
-
-/* Code Block Styling */
-.code-box {
-    background: #f4f4f4;
-    padding: 20px;
-    border-radius: 8px;
-    font-family: monospace;
-    overflow-x: auto;
-    margin-top: 20px;
-    border-left: 4px solid #2ecc71;
-}
-
-/* --- SCROLLABLE DROPDOWN MENU --- */
-
-/* The container for the dropdown */
-.dropdown {
-    position: relative;
-    display: inline-block;
-    margin-left: 30px; /* Matches your other links */
-}
-
-/* The button that opens the menu */
-.dropbtn {
-    background-color: transparent;
-    color: #555;
-    padding: 10px;
-    font-size: 0.9rem;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: inherit; /* Keeps your font style */
-}
-
-/* Change color when hovered */
-.dropdown:hover .dropbtn {
-    color: #2ecc71;
-}
-
-/* The list of links (Hidden by default) */
-.dropdown-content {
-    display: none; /* Hidden */
-    position: absolute;
-    right: 0; /* Aligns to the right side */
-    background-color: #ffffff;
-    min-width: 220px; /* Width of the menu */
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* Nice shadow */
-    z-index: 1000;
-    border-radius: 8px;
-    
-    /* THE SCROLL MAGIC IS HERE */
-    max-height: 300px; /* Maximum height before scrolling */
-    overflow-y: auto;  /* Adds vertical scrollbar if needed */
-}
-
-/* Links inside the dropdown */
-.dropdown-content a {
-    color: #333;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    margin-left: 0; /* Reset margin */
-    border-bottom: 1px solid #f1f1f1;
-}
-
-.dropdown-content a:hover {
-    background-color: #f9f9f9;
-    color: #2ecc71;
-}
-
-/* Show the menu when hovering */
-.dropdown:hover .dropdown-content {
-    display: block;
+    border: 1px solid #eee;
+    margin-left: 15px;
 }
