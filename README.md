@@ -1,4 +1,4 @@
-# ⚡ Unfiltered: The Digital Portfolio
+# ⚡ Unfiltered: The Digital Website Biography
 
 [![Website Status](https://img.shields.io/website?url=https%3A%2F%2Flewynski.github.io&style=flat-square&label=Live%20Site&logo=github&color=2ecc71)](https://lewynski.github.io)
 [![Developer](https://img.shields.io/badge/Developer-Lewynski-blue?style=flat-square&logo=visualstudiocode)](https://github.com/lewynski)
