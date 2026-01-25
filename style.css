@@ -222,7 +222,38 @@ footer {
 
 /* Mobile Response */
 @media (max-width: 768px) {
+    /* 1. Stack the Logo and Menu vertically */
+    nav {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    /* 2. UN-HIDE the links and center them */
+    .nav-links { 
+        display: flex;       /* This brings them back! */
+        flex-direction: column; /* Stacks links nicely */
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .nav-links a, .dropbtn {
+        margin: 0;          /* Remove side margins for cleaner look */
+        font-size: 1.1rem;  /* Make text slightly bigger for tapping */
+    }
+    
+    /* 3. Make the dropdown easier to use on phone */
+    .dropdown-content {
+        position: relative; /* Stacks inside the menu instead of floating */
+        width: 100%;
+        text-align: center;
+        box-shadow: none;
+        border: 1px solid rgba(255,255,255,0.05);
+        background: #111827;
+    }
+
+    /* 4. Adjust Hero Text size */
     h1 { font-size: 2.5rem; }
-    .nav-links { display: none; } /* Simplified nav for mobile */
     .cta-buttons { flex-direction: column; }
 }
