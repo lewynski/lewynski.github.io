@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Determinant Calculator - Project</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* --- Split View Styles --- */
+        body { background-color: #ffffff; } 
+        
+        .split-container {
+            display: flex;
+            gap: 30px;
+            /* Tall enough for the 5x5 grid */
+            height: 900px; 
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* LEFT SIDE: The Code Snippet */
+        .code-view {
+            flex: 1;
+            background: #1e1e1e; /* VS Code Dark Theme */
+            color: #d4d4d4;
+            padding: 25px;
+            border-radius: 16px;
+            overflow: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Syntax Highlighting */
+        .k { color: #569cd6; font-weight: bold; } /* Keyword */
+        .f { color: #dcdcaa; } /* Function */
+        .c { color: #6a9955; font-style: italic; } /* Comment */
+        .n { color: #b5cea8; } /* Number */
+
+        /* RIGHT SIDE: The Live App */
+        .output-view {
+            flex: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background: #111827; /* Match the calculator bg */
+        }
+
+        /* The Iframe */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* --- MOBILE RESPONSIVE FIX --- */
+        @media (max-width: 1000px) {
+            .split-container {
+                /* Stack: Code on Top, Calc on Bottom */
+                flex-direction: column; 
+                height: auto;
+                gap: 40px;
+            }
+
+            .code-view { 
+                height: 450px; 
+            }
+
+            .output-view { 
+                /* Height for mobile calc */
+                height: 850px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Unfiltered</div>
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
+            <a href="https://discord.com/users/879936602414133288" target="_blank">Discord</a>
+            
+            <div class="dropdown">
+                <button class="dropbtn">Projects ▾</button>
+                <div class="dropdown-content">
+                    <a href="calc-splainer.html">Calculator Splainer</a>
+                    <a href="determinants.html">Determinant Calc</a>
+                    <a href="crout.html">Crout Solver</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="display: block; max-width: 1200px;">
+        
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 3rem; color: #111827; font-weight: 800;">Matrix Determinant Calculator</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; max-width: 700px; margin: 10px auto;">A powerful tool designed to compute determinants for matrices ranging from 2x2 to 5x5 using recursive cofactor expansion.</p>
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <span style="background:#e0e7ff; color:#4338ca; padding:6px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">JavaScript (Recursion)</span>
+                <span style="background:#d1fae5; color:#065f46; padding:6px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">Dynamic DOM</span>
+                <span style="background:#f3e8ff; color:#7e22ce; padding:6px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold;">Linear Algebra</span>
+            </div>
+        </div>
+
+        <div class="split-container">
+            
+            <div class="code-view">
+<pre>
+<span class="c">// --- The Recursive Core ---</span>
+<span class="c">// Computes determinant for an N x N matrix</span>
+
+<span class="k">function</span> <span class="f">getDeterminant</span>(m) {
+    <span class="c">// Base Case: 2x2 Matrix (ad - bc)</span>
+    <span class="k">if</span> (m.length === <span class="n">2</span>) {
+        <span class="k">return</span> m[<span class="n">0</span>][<span class="n">0</span>] * m[<span class="n">1</span>][<span class="n">1</span>] - m[<span class="n">0</span>][<span class="n">1</span>] * m[<span class="n">1</span>][<span class="n">0</span>];
+    }
+
+    <span class="c">// Recursive Step: Cofactor Expansion</span>
+    <span class="c">// Expand along the first row (row 0)</span>
+    let det = <span class="n">0</span>;
+    <span class="k">for</span> (let col = <span class="n">0</span>; col < m.length; col++) {
+        <span class="c">// Alternate signs (+ - + -)</span>
+        let sign = Math.pow(-<span class="n">1</span>, col);
+        
+        <span class="c">// Get the element at current position</span>
+        let element = m[<span class="n">0</span>][col];
+        
+        <span class="c">// Get the sub-matrix (minor) by removing</span>
+        <span class="c">// current row 0 and current column 'col'</span>
+        let subMatrix = <span class="f">getMinor</span>(m, <span class="n">0</span>, col);
+        
+        <span class="c">// Add to total: sign * element * det(subMatrix)</span>
+        det += sign * element * <span class="f">getDeterminant</span>(subMatrix);
+    }
+    <span class="k">return</span> det;
+}
+
+<span class="c">// Helper: Creates the sub-matrix</span>
+<span class="k">function</span> <span class="f">getMinor</span>(m, rowToRemove, colToRemove) {
+    <span class="c">// Filter out the specified row and column</span>
+    <span class="k">return</span> m.filter((_, r) => r !== rowToRemove)
+            .map(row => row.filter((_, c) => c !== colToRemove));
+}
+</pre>
+            </div>
+
+            <div class="output-view">
+                <iframe src="determinant-calc.html?v=1"></iframe>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
