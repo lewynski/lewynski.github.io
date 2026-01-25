@@ -3,195 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Bibliography</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    
-    <style>
-        /* --- CSS STYLES (The Design) --- */
-        :root {
-            --bg-color: #0f172a;       /* Dark Blue/Black background */
-            --card-bg: #1e293b;        /* Slightly lighter for cards */
-            --text-main: #e2e8f0;      /* White-ish text */
-            --text-muted: #94a3b8;     /* Grey text */
-            --accent: #38bdf8;         /* Cyan accent color */
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        /* The Main Container */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        /* Header Section */
-        header {
-            margin-bottom: 60px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 40px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin: 0;
-            letter-spacing: -1px;
-        }
-
-        .tagline {
-            font-family: 'Roboto Mono', monospace; /* Code-like font */
-            color: var(--accent);
-            font-size: 1.1rem;
-            margin-top: 10px;
-        }
-
-        .bio-text {
-            margin-top: 20px;
-            color: var(--text-muted);
-            max-width: 600px;
-        }
-
-        /* Section Titles */
-        h2 {
-            font-size: 1.5rem;
-            border-left: 4px solid var(--accent);
-            padding-left: 15px;
-            margin-top: 50px;
-            margin-bottom: 30px;
-        }
-
-        /* Project/Bibliography Cards */
-        .project-card {
-            background-color: var(--card-bg);
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-        }
-
-        .project-card:hover {
-            transform: translateY(-5px); /* Moves up slightly when hovered */
-            border: 1px solid var(--accent);
-        }
-
-        .project-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0 0 10px 0;
-        }
-
-        .tags {
-            margin-top: 15px;
-        }
-
-        .tag {
-            background-color: rgba(56, 189, 248, 0.1);
-            color: var(--accent);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-family: 'Roboto Mono', monospace;
-            margin-right: 8px;
-        }
-
-        /* Button Style */
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: var(--accent);
-            color: #000;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 4px;
-        }
-        
-        footer {
-            margin-top: 80px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
+    <title>My Portfolio</title>
+    <link rel="stylesheet" href="style.css"> </head>
 <body>
 
+    <nav>
+        <div class="logo">LEITUSXNM</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="projects/determinant.html">Determinant Calc</a>
+            <a href="projects/crout.html">Crout Solver</a>
+        </div>
+    </nav>
+
     <div class="container">
-        <header>
-            <h1>Your Name</h1>
-            <div class="tagline">&lt;ECE Student / Developer / Researcher&gt;</div>
-            <p class="bio-text">
-                I am an Electronics Engineering student specializing in Signal Processing and Electromagnetics. 
-                I build tools to solve complex math problems and research antenna propagation theories.
+        <img src="https://via.placeholder.com/300" alt="Profile Picture" class="profile-img">
+        
+        <div class="content">
+            <div class="subtitle">ECE Student & Developer</div>
+            <h1>Hello, I'm Your Name</h1>
+            <p>
+                I am an Electronics Engineering student specializing in computational tools. 
+                I build Python applications for solving complex mathematical matrices like Crout's Method.
             </p>
-            <a href="#" class="btn">Download Resume (PDF)</a>
-        </header>
-
-        <section id="about">
-            <h2>Education & Focus</h2>
-            <p><strong>B.S. Electronics Engineering</strong><br>
-            <span style="color: var(--text-muted);">PUP Sto. Tomas (Current)</span></p>
-            <p>My academic focus lies in the intersection of hardware and software, specifically:</p>
-            <ul style="color: var(--text-muted);">
-                <li>Digital Signal Processing (DSP) & Z-Transforms</li>
-                <li>Antenna Theory & Line of Sight Analysis</li>
-                <li>Mobile App Development (Python/Kivy) for Engineering Tools</li>
-            </ul>
-        </section>
-
-        <section id="portfolio">
-            <h2>Selected Works & Bibliography</h2>
-
-            <div class="project-card">
-                <h3 class="project-title">Crout's Method Calculator App</h3>
-                <p style="color: var(--text-muted);">
-                    Developed an Android application using Python and KivyMD to solve linear equations using Crout's matrix decomposition method. 
-                    Includes a custom UI for inputting matrix data.
-                </p>
-                <div class="tags">
-                    <span class="tag">Python</span>
-                    <span class="tag">KivyMD</span>
-                    <span class="tag">Numerical Methods</span>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <h3 class="project-title">Research: Slot Antenna Propagation</h3>
-                <p style="color: var(--text-muted);">
-                    A study on the efficiency and characteristics of slot antennas. 
-                    Utilized Google Earth for Line of Sight (LOS) calculations and terrain analysis.
-                </p>
-                <div class="tags">
-                    <span class="tag">Electromagnetics</span>
-                    <span class="tag">Research Paper</span>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <h3 class="project-title">Automatic Sorting Machine</h3>
-                <p style="color: var(--text-muted);">
-                    Designed a prototype for an automated sorting system using optical feedback sensors 
-                    to detect and categorize objects on a conveyor belt.
-                </p>
-                <div class="tags">
-                    <span class="tag">Arduino</span>
-                    <span class="tag">Control Systems</span>
-                </div>
-            </div>
-
-        </section>
-
-        <footer>
-            <p>&copy; 2026 Your Name. Hosted on GitHub Pages.</p>
-        </footer>
+            <a href="projects/determinant.html" class="btn btn-primary">See My Work</a>
+            <a href="https://github.com/leitusxnm" class="btn btn-secondary">GitHub Profile</a>
+        </div>
     </div>
 
 </body>
