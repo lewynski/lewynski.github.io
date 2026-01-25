@@ -8,7 +8,7 @@
 }
 
 body {
-    font-family: 'Inter', 'Segoe UI', sans-serif; /* Modern Font */
+    font-family: 'Inter', 'Segoe UI', sans-serif;
     color: #333;
     background-color: #ffffff;
     line-height: 1.6;
@@ -19,31 +19,29 @@ body {
    ========================================= */
 nav {
     display: flex;
-    justify-content: space-between; /* Logo left, Links right */
+    justify-content: space-between;
     align-items: center;
-    padding: 20px 5%; /* 5% padding on sides */
+    padding: 20px 5%;
     background-color: #ffffff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Very subtle shadow */
-    position: sticky; /* Keeps nav at top when scrolling */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
     top: 0;
     z-index: 1000;
 }
 
 .logo {
-    font-weight: 800; /* Extra bold */
+    font-weight: 800;
     font-size: 1.5rem;
-    color: #2ecc71; /* Your Green Brand Color */
+    color: #2ecc71; /* Green Brand Color */
     letter-spacing: -1px;
 }
 
-/* Container for all links */
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 30px; /* Space between "Home", "Projects", "GitHub" */
+    gap: 30px;
 }
 
-/* Standard Links (Home, GitHub) */
 .nav-links a {
     text-decoration: none;
     color: #555;
@@ -57,13 +55,12 @@ nav {
 }
 
 /* =========================================
-   3. AESTHETIC DROPDOWN MENU
+   3. DROPDOWN MENU
    ========================================= */
 .dropdown {
     position: relative;
 }
 
-/* The "My Projects" Text */
 .dropbtn {
     background: none;
     border: none;
@@ -73,96 +70,50 @@ nav {
     color: #555;
     font-family: inherit;
     padding: 10px 0;
-    transition: color 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 5px; 
+    gap: 5px;
 }
 
-/* Hover effect for the main button */
 .dropdown:hover .dropbtn {
     color: #2ecc71;
 }
 
-/* The Floating Menu Card */
 .dropdown-content {
-    display: none; /* Hidden by default */
+    display: none;
     position: absolute;
-    top: 140%; /* Pushes it down slightly */
+    top: 100%;
     right: 0;
     background-color: #ffffff;
-    min-width: 240px;
-    
-    /* Soft Shadow & Border */
-    box-shadow: 
-        0 10px 30px -10px rgba(46, 204, 113, 0.3), /* Greenish glow */
-        0 5px 15px rgba(0,0,0,0.05);
-    border: 1px solid rgba(46, 204, 113, 0.1);
-    border-radius: 16px;
-    
-    padding: 12px 0;
+    min-width: 220px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    padding: 10px 0;
     z-index: 1000;
-
-    /* Scroll Logic */
-    max-height: 320px;
-    overflow-y: auto;
-    
-    /* Smooth Entry Animation */
-    animation: fadeInY 0.3s ease forwards;
-    opacity: 0;
-    transform: translateY(-10px);
+    border: 1px solid rgba(46, 204, 113, 0.1);
 }
 
-@keyframes fadeInY {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Links inside the dropdown */
 .dropdown-content a {
     display: block;
-    padding: 14px 24px;
+    padding: 12px 20px;
     color: #444;
     font-size: 0.9rem;
-    font-weight: 500;
     text-decoration: none;
-    transition: all 0.2s ease-in-out;
     border-left: 3px solid transparent;
 }
 
-/* Hover Effect on Items */
 .dropdown-content a:hover {
-    background-color: rgba(46, 204, 113, 0.08); /* Pale green tint */
+    background-color: #f0fdf4;
     color: #2ecc71;
-    border-left: 3px solid #2ecc71; /* Green accent bar */
-    padding-left: 30px; /* Slight nudge right */
+    border-left: 3px solid #2ecc71;
 }
 
-/* Show menu when hovering */
 .dropdown:hover .dropdown-content {
     display: block;
 }
 
-/* --- Custom Green Scrollbar (Chrome/Edge/Safari) --- */
-.dropdown-content::-webkit-scrollbar {
-    width: 6px;
-}
-.dropdown-content::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 10px 0;
-}
-.dropdown-content::-webkit-scrollbar-thumb {
-    background-color: rgba(46, 204, 113, 0.3);
-    border-radius: 20px;
-}
-.dropdown-content::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(46, 204, 113, 0.8);
-}
-
 /* =========================================
-   4. HERO / PROFILE SECTION
+   4. HERO & PROFILE
    ========================================= */
 .container {
     max-width: 1000px;
@@ -178,7 +129,7 @@ nav {
     height: 280px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 20px 20px 0px #f0fdf4; /* Aesthetic offset circle */
+    box-shadow: 20px 20px 0px #f0fdf4;
 }
 
 .content h1 {
@@ -197,7 +148,6 @@ nav {
     text-transform: uppercase;
 }
 
-/* Buttons */
 .btn {
     display: inline-block;
     padding: 14px 35px;
@@ -205,11 +155,6 @@ nav {
     text-decoration: none;
     font-weight: 600;
     margin-top: 25px;
-    transition: transform 0.2s;
-}
-
-.btn:hover {
-    transform: translateY(-3px);
 }
 
 .btn-primary {
@@ -223,19 +168,4 @@ nav {
     color: #555;
     border: 1px solid #eee;
     margin-left: 15px;
-}
-
-/* =========================================
-   5. CODE BOX (For Project Pages)
-   ========================================= */
-.code-box {
-    background: #f8fafc;
-    padding: 20px;
-    border-radius: 12px;
-    font-family: 'Consolas', monospace;
-    overflow-x: auto;
-    margin-top: 30px;
-    border-left: 4px solid #2ecc71;
-    color: #334155;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
