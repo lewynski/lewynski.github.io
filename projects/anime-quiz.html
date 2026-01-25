@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Quiz - Project</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Shared split-view styles */
+        body { background-color: #ffffff; }
+        
+        .split-container {
+            display: flex; 
+            gap: 30px; 
+            /* Slightly taller to accommodate 4 quiz buttons comfortably */
+            height: 850px; 
+            margin-top: 30px; 
+            margin-bottom: 50px;
+        }
+
+        /* LEFT SIDE: The Code Snippet */
+        .code-view {
+            flex: 1; 
+            background: #1e1e1e; 
+            color: #d4d4d4; 
+            padding: 25px;
+            border-radius: 16px; 
+            overflow: auto; 
+            font-family: 'Consolas', monospace;
+            border: 1px solid #333; 
+            font-size: 0.9rem;
+        }
+
+        /* RIGHT SIDE: The Live App */
+        .output-view {
+            flex: 1; 
+            border-radius: 16px; 
+            overflow: hidden;
+            border: 1px solid #e5e7eb; 
+            /* The app has its own dark background, so this doesn't matter much here */
+            background: #0f0c29;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        /* Syntax Colors */
+        .k { color: #c586c0; font-weight: bold; } /* Keyword (purple for async) */
+        .f { color: #dcdcaa; } /* Function */
+        .c { color: #6a9955; font-style: italic; } /* Comment */
+        .s { color: #ce9178; } /* String */
+
+        /* MOBILE FIX: Stack Code first, then Output */
+        @media (max-width: 1000px) {
+            .split-container { 
+                flex-direction: column; 
+                height: auto; 
+            }
+            .code-view { height: 450px; }
+            /* Tall enough for quiz results screen */
+            .output-view { height: 800px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Unfiltered</div>
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
+            
+            <div class="dropdown">
+                <button class="dropbtn">Projects ▾</button>
+                <div class="dropdown-content">
+                    <a href="calc-splainer.html">Calc Splainer</a>
+                    <a href="determinants.html">Determinant Calc</a>
+                    <a href="matrix-ops.html">Matrix Ops</a>
+                    </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="display: block; max-width: 1200px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Anime Trivia Ultimate</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A dynamic quiz app that fetches unique questions from the OpenTDB API. Features async data loading and state management.</p>
+        </div>
+
+        <div class="split-container">
+            <div class="code-view">
+<pre>
+<span class="c">// --- Async Data Fetching ---</span>
+<span class="c">// Fetches fresh questions from the Open Trivia DB API</span>
+
+<span class="k">const</span> API_URL = <span class="s">"https://opentdb.com/api.php?amount=10&category=31&type=multiple"</span>;
+
+<span class="k">async function</span> <span class="f">startQuiz</span>() {
+    <span class="c">// 1. Set UI to loading state</span>
+    loadingScreen.classList.remove(<span class="s">'hidden'</span>);
+    quizArea.classList.add(<span class="s">'hidden'</span>);
+    
+    score = 0;
+    currentQuestionIndex = 0;
+
+    <span class="k">try</span> {
+        <span class="c">// 2. Wait for API response</span>
+        <span class="k">const</span> response = <span class="k">await</span> <span class="f">fetch</span>(API_URL);
+        <span class="k">const</span> data = <span class="k">await</span> response.<span class="f">json</span>();
+
+        <span class="c">// 3. Check for API specific errors</span>
+        <span class="k">if</span>(data.response_code !== 0) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"API Error"</span>);
+        
+        <span class="c">// 4. Store data and start game</span>
+        questions = data.results;
+        <span class="f">loadNextQuestion</span>();
+        
+        <span class="c">// 5. Hide loader, show quiz</span>
+        loadingScreen.classList.add(<span class="s">'hidden'</span>);
+        quizArea.classList.remove(<span class="s">'hidden'</span>);
+
+    } <span class="k">catch</span> (error) {
+        console.<span class="f">error</span>(<span class="s">"Failed to fetch questions"</span>);
+        // Handle error in UI...
+    }
+}
+</pre>
+            </div>
+
+            <div class="output-view">
+                <iframe src="anime-quiz-app.html?v=1"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
