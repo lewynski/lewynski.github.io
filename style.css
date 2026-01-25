@@ -239,46 +239,48 @@ footer {
 
 /* --- MOBILE RESPONSE --- */
 @media (max-width: 768px) {
-    /* 1. Stack Logo on Top, Links Below */
+    /* 1. Main Nav Bar: Horizontal Layout */
     nav {
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px 15px;
+        flex-direction: row;       /* Keeps Logo and Links on the same line */
+        justify-content: space-between; /* Pushes Logo left, Links right */
+        align-items: center;
+        padding: 15px 20px;        /* Standard padding */
     }
 
-    /* 2. MAKE LINKS A ROW (Horizontal) */
+    /* 2. Links Section: Horizontal Row */
     .nav-links {
         display: flex;
-        flex-direction: row;  /* <--- This forces them into a row */
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        gap: 20px; /* Space between Home, GitHub, Projects */
+        flex-direction: row;       /* Links side-by-side */
+        gap: 15px;                 /* Space between words */
+        width: auto;               /* Only take necessary space */
     }
 
+    /* 3. Resize Text to fit on Phone Screen */
     .nav-links a, .dropbtn {
         margin: 0;
-        font-size: 0.9rem; /* Slightly smaller to fit 3 items in a row */
-    }
-
-    /* 3. Dropdown Menu Adjustments */
-    .dropdown {
-        position: relative;
+        font-size: 0.85rem;        /* Smaller font so it fits */
     }
     
+    .logo {
+        font-size: 1.2rem;         /* Smaller logo to save space */
+    }
+
+    /* 4. Dropdown Menu - Align to Right Edge */
+    .dropdown { position: relative; }
     .dropdown-content {
-        position: absolute; /* Floating instead of pushing content */
-        left: 50%;
-        transform: translateX(-50%); /* Centers the dropdown under "Projects" */
-        min-width: 150px;
+        position: absolute;
+        right: 0;                  /* Aligns dropdown to the right edge of screen */
+        left: auto;                /* Overrides any centering */
+        transform: none;
+        min-width: 160px;
+        text-align: left;          /* Standard text alignment */
         background: #1f2937;
-        text-align: center;
         z-index: 1000;
     }
 
-    /* 4. Ensure Hero Section is Visible */
+    /* 5. Hero Section Fixes */
     .hero-container {
-        padding-top: 20px;
+        padding-top: 30px;
         min-height: auto;
     }
     
