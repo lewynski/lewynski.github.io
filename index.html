@@ -3,51 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lewyn.http</title>
+    <title>Unfiltered | Jon Lewyn</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <nav>
         <div class="logo">Unfiltered</div>
-        
         <div class="nav-links">
             <a href="index.html">Home</a>
-            
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
-
-            <a href="https://discord.com/users/879936602414133288" target="_blank">Discord</a>
             
             <div class="dropdown">
                 <button class="dropbtn">Projects ▾</button>
                 <div class="dropdown-content">
-                    <a href="projects/calc-splainer.html">Calculator Splainer</a>
+                    <a href="projects/calc-splainer.html">Calc Splainer</a>
                     <a href="projects/determinants.html">Determinant Calc</a>
                     <a href="projects/matrix-ops.html">Matrix Operations</a>
                     <a href="projects/anime-quiz.html">Anime Quiz</a>
-                    
-                    
-                    
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <img src="me.jpg" alt="Profile Picture" class="profile-img">
-        
-        <div class="content">
-            <div class="subtitle">ECE Student & Developer</div>
-            <h1>Hello, I'm Jon Lewyn Villaram Tanggaro</h1>
-            <p>
-                I am an Electronics Engineering student specializing in computational tools. 
-                I build Python applications for solving complex mathematical matrices like Crout's Method.
+    <header class="hero-container">
+        <div class="hero-content">
+            <div class="profile-frame">
+                <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
+            </div>
+            <span class="badge">ECE STUDENT & DEVELOPER</span>
+            <h1>Hello, I'm <span class="gradient-text">Jon Lewyn</span></h1>
+            <p class="bio-text">
+                An Electronics Engineering student at <strong>PUP Sto. Tomas</strong> with a passion for bridging the gap between hardware and software. 
+                I specialize in building computational tools, embedded systems, and full-stack web applications.
             </p>
-            
-            <a href="projects/determinants.html" class="btn btn-primary">See My Work</a>
-            <a href="https://github.com/lewynski" class="btn btn-secondary">GitHub Profile</a>
+            <div class="cta-buttons">
+                <a href="#skills" class="btn-primary">View My Tech Stack</a>
+                <a href="https://github.com/lewynski" target="_blank" class="btn-secondary"><i class="fab fa-github"></i> GitHub Profile</a>
+            </div>
         </div>
-    </div>
+    </header>
+
+    <section id="skills" class="skills-section">
+        <div class="section-title">
+            <h2>Technical Arsenal</h2>
+            <p>My toolkit for solving engineering problems.</p>
+        </div>
+
+        <div class="skills-grid">
+            <div class="skill-card">
+                <div class="icon-box"><i class="fas fa-code"></i></div>
+                <h3>Programming</h3>
+                <p>Developing robust logic and efficient algorithms.</p>
+                <div class="tags">
+                    <span>Python</span>
+                    <span>JavaScript</span>
+                    <span>Java</span>
+                    <span>C++</span>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <div class="icon-box"><i class="fas fa-microchip"></i></div>
+                <h3>Embedded Systems</h3>
+                <p>Bringing code to the physical world.</p>
+                <div class="tags">
+                    <span>Arduino</span>
+                    <span>FPGA</span>
+                    <span>TinkerCAD</span>
+                    <span>Proto Boarding</span>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <div class="icon-box"><i class="fas fa-drafting-compass"></i></div>
+                <h3>Simulation & Design</h3>
+                <p>Modeling complex circuits and blueprints.</p>
+                <div class="tags">
+                    <span>AutoCAD</span>
+                    <span>MATLAB</span>
+                    <span>Multisim</span>
+                    <span>Proteus</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Unfiltered Portfolio. Built by Jon Lewyn Villaram Tanggaro.</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/lewynski"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fas fa-envelope"></i></a>
+        </div>
+    </footer>
 
 </body>
 </html>
