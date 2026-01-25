@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="../style.css">
     <style>
         /* --- Split View Styles --- */
-        body { background-color: #ffffff; } /* Keep main background clean */
+        body { background-color: #ffffff; } 
         
         .split-container {
             display: flex;
             gap: 20px;
-            height: 850px; /* Height of the showcase window */
+            height: 850px; /* Default height for Desktop */
             margin-top: 30px;
             margin-bottom: 50px;
         }
@@ -32,8 +32,8 @@
         }
 
         /* Syntax Highlighting Colors (Manual) */
-        .k { color: #569cd6; } /* Keyword (function, const) */
-        .f { color: #dcdcaa; } /* Function name */
+        .k { color: #569cd6; } /* Keyword */
+        .f { color: #dcdcaa; } /* Function */
         .s { color: #ce9178; } /* String */
         .c { color: #6a9955; } /* Comment */
         .n { color: #b5cea8; } /* Number */
@@ -55,14 +55,23 @@
             border: none;
         }
 
-        /* Mobile Responsive */
+        /* --- MOBILE RESPONSIVE FIX --- */
         @media (max-width: 900px) {
             .split-container {
-                flex-direction: column;
+                /* IMPORTANT: This flips the order so Calculator is TOP, Code is BOTTOM */
+                flex-direction: column-reverse; 
                 height: auto;
             }
-            .code-view { height: 400px; }
-            .output-view { height: 700px; }
+
+            .output-view { 
+                /* Make it tall enough so the Story Box fits inside without scrolling */
+                height: 800px; 
+            }
+
+            .code-view { 
+                height: 400px; 
+                margin-top: 30px; /* Adds space between the calc and the code */
+            }
         }
     </style>
 </head>
@@ -107,7 +116,7 @@
 <span class="k">async function</span> <span class="f">showStory</span>() {
     <span class="k">if</span> (!lastCalculation) <span class="k">return</span>;
 
-    <span class="c">// 1. Prepare UI</span>
+    <span class="c">// 1. Disable UI while thinking</span>
     storyButton.disabled = <span class="k">true</span>;
     storyBox.classList.<span class="f">remove</span>(<span class="s">'hidden'</span>);
     
