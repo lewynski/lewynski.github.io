@@ -109,3 +109,65 @@ p {
     margin-top: 20px;
     border-left: 4px solid #2ecc71;
 }
+
+/* --- SCROLLABLE DROPDOWN MENU --- */
+
+/* The container for the dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: 30px; /* Matches your other links */
+}
+
+/* The button that opens the menu */
+.dropbtn {
+    background-color: transparent;
+    color: #555;
+    padding: 10px;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: inherit; /* Keeps your font style */
+}
+
+/* Change color when hovered */
+.dropdown:hover .dropbtn {
+    color: #2ecc71;
+}
+
+/* The list of links (Hidden by default) */
+.dropdown-content {
+    display: none; /* Hidden */
+    position: absolute;
+    right: 0; /* Aligns to the right side */
+    background-color: #ffffff;
+    min-width: 220px; /* Width of the menu */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* Nice shadow */
+    z-index: 1000;
+    border-radius: 8px;
+    
+    /* THE SCROLL MAGIC IS HERE */
+    max-height: 300px; /* Maximum height before scrolling */
+    overflow-y: auto;  /* Adds vertical scrollbar if needed */
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    margin-left: 0; /* Reset margin */
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.dropdown-content a:hover {
+    background-color: #f9f9f9;
+    color: #2ecc71;
+}
+
+/* Show the menu when hovering */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
