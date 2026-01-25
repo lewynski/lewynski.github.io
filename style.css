@@ -239,46 +239,49 @@ footer {
 
 /* --- MOBILE RESPONSE --- */
 @media (max-width: 768px) {
-    /* 1. Stack Navigation */
+    /* 1. Stack Logo on Top, Links Below */
     nav {
         flex-direction: column;
-        gap: 15px;
-        padding: 15px;
+        gap: 10px;
+        padding: 10px 15px;
     }
 
-    /* 2. Show Menu Links */
+    /* 2. MAKE LINKS A ROW (Horizontal) */
     .nav-links {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;  /* <--- This forces them into a row */
+        justify-content: center;
         align-items: center;
         width: 100%;
-        gap: 15px;
+        gap: 20px; /* Space between Home, GitHub, Projects */
     }
 
     .nav-links a, .dropbtn {
         margin: 0;
-        font-size: 1.1rem;
+        font-size: 0.9rem; /* Slightly smaller to fit 3 items in a row */
     }
 
-    /* 3. Handle Dropdown for Mobile */
-    .dropdown { width: 100%; text-align: center; }
-    .dropdown-content {
+    /* 3. Dropdown Menu Adjustments */
+    .dropdown {
         position: relative;
-        width: 100%;
-        text-align: center;
-        box-shadow: none;
-        border: 1px solid rgba(255,255,255,0.05);
-        background: #111827;
     }
     
-    /* 4. Adjust Text Sizes */
-    h1 { font-size: 2.2rem; }
-    .cta-buttons { flex-direction: column; width: 100%; }
-    .btn-primary, .btn-secondary { width: 100%; text-align: center; box-sizing: border-box; }
-    
-    /* 5. Ensure Top Section is Visible */
+    .dropdown-content {
+        position: absolute; /* Floating instead of pushing content */
+        left: 50%;
+        transform: translateX(-50%); /* Centers the dropdown under "Projects" */
+        min-width: 150px;
+        background: #1f2937;
+        text-align: center;
+        z-index: 1000;
+    }
+
+    /* 4. Ensure Hero Section is Visible */
     .hero-container {
-        padding-top: 30px;
+        padding-top: 20px;
         min-height: auto;
     }
+    
+    h1 { font-size: 2rem; }
+    .cta-buttons { flex-direction: column; width: 100%; }
 }
