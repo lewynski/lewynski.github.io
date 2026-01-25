@@ -169,3 +169,65 @@ nav {
     border: 1px solid #eee;
     margin-left: 15px;
 }
+
+/* =========================================
+   6. MOBILE RESPONSIVENESS (Phone View)
+   ========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Stack the Navigation Bar */
+    nav {
+        flex-direction: column; /* Stack Logo on top of Links */
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .nav-links {
+        gap: 15px; /* Smaller gap between links */
+        flex-wrap: wrap; /* Allow links to wrap to two lines */
+        justify-content: center; /* Center them */
+    }
+    
+    /* 2. Stack the Main Content (Image Top, Text Bottom) */
+    .container {
+        flex-direction: column; /* The magic fix! Stacks vertical */
+        text-align: center; /* Center all text */
+        margin-top: 40px; /* Less top margin */
+        gap: 30px;
+    }
+
+    /* 3. Resize Profile Image */
+    .profile-img {
+        width: 200px; /* Smaller image for phone */
+        height: 200px;
+        margin: 0 auto; /* Force centering */
+    }
+
+    /* 4. Resize Text */
+    .content h1 {
+        font-size: 2.2rem; /* Smaller headline so it fits */
+    }
+    
+    .subtitle {
+        font-size: 0.8rem;
+    }
+
+    /* 5. Stack the Buttons */
+    .btn {
+        width: 100%; /* Make buttons full width (easier to tap) */
+        display: block; /* Stack them */
+        margin: 10px 0; /* Add space between them */
+    }
+    
+    .btn-secondary {
+        margin-left: 0; /* Remove side margin since they are stacked */
+    }
+    
+    /* 6. Fix Dropdown for Touch */
+    .dropdown-content {
+        min-width: 180px;
+        left: 50%; /* Center dropdown relative to finger tap */
+        transform: translateX(-50%); /* Center alignment fix */
+        text-align: left; /* Keep menu text readable */
+    }
+}
