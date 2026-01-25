@@ -31,7 +31,7 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* Syntax Highlighting Colors (Manual) */
+        /* Syntax Highlighting Colors */
         .k { color: #569cd6; } /* Keyword */
         .f { color: #dcdcaa; } /* Function */
         .s { color: #ce9178; } /* String */
@@ -58,19 +58,19 @@
         /* --- MOBILE RESPONSIVE FIX --- */
         @media (max-width: 900px) {
             .split-container {
-                /* IMPORTANT: This flips the order so Calculator is TOP, Code is BOTTOM */
-                flex-direction: column-reverse; 
+                /* FIX: 'column' puts the first item (Code) on TOP */
+                flex-direction: column; 
                 height: auto;
-            }
-
-            .output-view { 
-                /* Make it tall enough so the Story Box fits inside without scrolling */
-                height: 800px; 
             }
 
             .code-view { 
                 height: 400px; 
-                margin-top: 30px; /* Adds space between the calc and the code */
+                margin-bottom: 30px; /* Adds space between Code and Calculator */
+            }
+
+            .output-view { 
+                /* Tall enough for the calculator + story box */
+                height: 800px; 
             }
         }
     </style>
@@ -150,7 +150,7 @@
             </div>
 
             <div class="output-view">
-                <iframe src="calc.html"></iframe>
+                <iframe src="calc.html?v=2"></iframe>
             </div>
 
         </div>
