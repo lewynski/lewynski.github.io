@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 - Project</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Shared split-view styles */
+        body { background-color: #ffffff; }
+        
+        .split-container {
+            display: flex; gap: 30px; height: 850px; 
+            margin-top: 30px; margin-bottom: 50px;
+        }
+
+        .code-view {
+            flex: 1; background: #1e1e1e; color: #d4d4d4; padding: 25px;
+            border-radius: 16px; overflow: auto; font-family: 'Consolas', monospace;
+            border: 1px solid #333; font-size: 0.9rem;
+        }
+
+        .output-view {
+            flex: 1; border-radius: 16px; overflow: hidden;
+            border: 1px solid #e5e7eb; background: #0f172a;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        .k { color: #569cd6; font-weight: bold; } 
+        .c { color: #6a9955; font-style: italic; } 
+        .n { color: #b5cea8; }
+        .f { color: #dcdcaa; }
+
+        @media (max-width: 1000px) {
+            .split-container { flex-direction: column; height: auto; }
+            .code-view { height: 450px; }
+            .output-view { height: 800px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Unfiltered</div>
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
+            
+            <div class="dropdown">
+                <button class="dropbtn">Projects ▾</button>
+                <div class="dropdown-content">
+                    <a href="calc-splainer.html">Calc Splainer</a>
+                    <a href="determinants.html">Determinant Calc</a>
+                    <a href="matrix-ops.html">Matrix Ops</a>
+                    <a href="anime-quiz.html">Anime Quiz</a>
+                    <a href="mlbb-quiz.html">MLBB Quiz</a>
+                    <a href="snake-game.html">Snake Game</a>
+                    <a href="flappy-bird.html">Neon Flap</a>
+                    <a href="tic-tac-toe.html">Minimax AI</a>
+                    <a href="2048.html">2048 Puzzle</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="display: block; max-width: 1200px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #facc15, #fb923c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Neon 2048</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">The addicting logic puzzle built with JavaScript. Features array filtering and matrix manipulation to handle tile merging.</p>
+        </div>
+
+        <div class="split-container">
+            <div class="code-view">
+<pre>
+<span class="c">// --- Core Logic: Slide & Merge ---</span>
+<span class="c">// This function handles a single row update</span>
+
+<span class="k">function</span> <span class="f">combine</span>(row) {
+    <span class="c">// 1. Iterate through the row (size 4)</span>
+    <span class="k">for</span> (let i = <span class="n">0</span>; i < <span class="n">3</span>; i++) {
+        
+        <span class="c">// 2. Check for adjacent equal numbers</span>
+        <span class="k">if</span> (row[i] !== <span class="n">0</span> && row[i] === row[i + <span class="n">1</span>]) {
+            
+            <span class="c">// 3. Merge them (Double the value)</span>
+            row[i] *= <span class="n">2</span>;
+            row[i + <span class="n">1</span>] = <span class="n">0</span>;
+            
+            <span class="c">// 4. Update Score</span>
+            score += row[i];
+        }
+    }
+    <span class="k">return</span> row;
+}
+
+<span class="k">function</span> <span class="f">slide</span>(row) {
+    <span class="c">// Filter out zeros to "slide" numbers to the left</span>
+    let arr = row.<span class="f">filter</span>(val => val);
+    
+    <span class="c">// Pad the rest with zeros</span>
+    let missing = <span class="n">4</span> - arr.length;
+    let zeros = <span class="f">Array</span>(missing).<span class="f">fill</span>(<span class="n">0</span>);
+    
+    <span class="k">return</span> arr.<span class="f">concat</span>(zeros);
+}
+</pre>
+            </div>
+
+            <div class="output-view">
+                <iframe src="2048-app.html?v=1"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
