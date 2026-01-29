@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon 2048</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #0f172a; font-family: 'Inter', sans-serif; touch-action: none; }
+    
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        gap: 10px;
+        background: #1e293b;
+        border: 4px solid #334155;
+        border-radius: 12px;
+        padding: 10px;
+        width: 320px;
+        height: 320px;
+        position: relative;
+    }
+
+    .tile {
+        width: 100%;
+        height: 100%;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 800;
+        transition: all 0.15s ease-in-out;
+        color: #1e293b;
+    }
+
+    /* Tile Colors */
+    .t-0 { background: #334155; border: 1px solid #475569; } /* Empty */
+    .t-2 { background: #e2e8f0; color: #0f172a; }
+    .t-4 { background: #fef08a; color: #0f172a; }
+    .t-8 { background: #facc15; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .t-16 { background: #fb923c; color: #fff; }
+    .t-32 { background: #f97316; color: #fff; }
+    .t-64 { background: #ea580c; color: #fff; box-shadow: 0 0 10px rgba(234, 88, 12, 0.4); }
+    .t-128 { background: #ef4444; color: #fff; font-size: 20px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+    .t-256 { background: #ec4899; color: #fff; font-size: 20px; box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+    .t-512 { background: #d946ef; color: #fff; font-size: 20px; box-shadow: 0 0 20px rgba(217, 70, 239, 0.6); }
+    .t-1024 { background: #a855f7; color: #fff; font-size: 16px; box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
+    .t-2048 { background: #22c55e; color: #fff; font-size: 16px; box-shadow: 0 0 30px #22c55e; animation: pulse 2s infinite; }
+
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+
+    .score-box { background: #334155; padding: 5px 15px; border-radius: 6px; text-align: center; min-width: 80px; }
+    .score-label { font-size: 10px; color: #94a3b8; uppercase; letter-spacing: 1px; }
+    .score-val { font-size: 18px; font-weight: bold; color: white; }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen text-white p-4">
+
+  <div class="flex justify-between items-center w-[320px] mb-6">
+      <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">2048</h1>
+      
+      <div class="flex gap-2">
+          <div class="score-box">
+              <div class="score-label">SCORE</div>
+              <div class="score-val" id="score">0</div>
+          </div>
+          <div class="score-box">
+              <div class="score-label">BEST</div>
+              <div class="score-val" id="best">0</div>
+          </div>
+      </div>
+  </div>
+
+  <div class="flex justify-between w-[320px] mb-4 text-xs text-gray-400">
+      <p>Join the numbers to get <strong>2048!</strong></p>
+      <button onclick="initGame()" class="text-orange-400 hover:text-orange-300 font-bold underline">New Game</button>
+  </div>
+
+  <div class="grid-container" id="grid">
+      </div>
+
+  <p class="mt-6 text-xs text-gray-500">Use <strong>Arrow Keys</strong> or <strong>Swipe</strong> to move</p>
+
+  <div id="game-over" class="hidden fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center">
+      <h2 class="text-4xl font-bold text-white mb-2">Game Over!</h2>
+      <button onclick="initGame()" class="mt-4 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg shadow-lg transition-transform hover:scale-105">Try Again</button>
+  </div>
+
+  <script>
+    const gridEl = document.getElementById('grid');
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+    const gameOverScreen = document.getElementById('game-over');
+    
+    let board = [];
+    let score = 0;
+    let best = localStorage.getItem('2048best') || 0;
+    bestEl.innerText = best;
+
+    function initGame() {
+        board = Array(16).fill(0);
+        score = 0;
+        scoreEl.innerText = 0;
+        gameOverScreen.classList.add('hidden');
+        spawnTile();
+        spawnTile();
+        updateView();
+    }
+
+    function spawnTile() {
+        let empty = board.map((val, idx) => val === 0 ? idx : null).filter(val => val !== null);
+        if (empty.length === 0) return;
+        let randomIdx = empty[Math.floor(Math.random() * empty.length)];
+        board[randomIdx] = Math.random() > 0.9 ? 4 : 2;
+    }
+
+    function updateView() {
+        gridEl.innerHTML = '';
+        board.forEach(val => {
+            const tile = document.createElement('div');
+            tile.className = `tile t-${val}`;
+            tile.innerText = val > 0 ? val : '';
+            gridEl.appendChild(tile);
+        });
+    }
+
+    // --- GAME LOGIC (The Hard Part) ---
+
+    // Shift non-zero numbers to start of array [2,0,2,0] -> [2,2,0,0]
+    function slide(row) {
+        let arr = row.filter(val => val); // Get non-zeros
+        let missing = 4 - arr.length;
+        let zeros = Array(missing).fill(0);
+        return arr.concat(zeros);
+    }
+
+    // Merge adjacent numbers [2,2,0,0] -> [4,0,0,0]
+    function combine(row) {
+        for (let i = 0; i < 3; i++) {
+            if (row[i] !== 0 && row[i] === row[i + 1]) {
+                row[i] *= 2;
+                row[i + 1] = 0;
+                score += row[i];
+            }
+        }
+        return row;
+    }
+
+    function move(direction) {
+        let oldBoard = [...board];
+        let moved = false;
+
+        // Convert 1D array to 4x4 rows/cols logic based on direction
+        // This simulates rotating the board so we always just "slide left"
+        if (direction === 'left' || direction === 'right') {
+            for (let i = 0; i < 16; i += 4) {
+                let row = [board[i], board[i+1], board[i+2], board[i+3]];
+                if (direction === 'right') row.reverse();
+                
+                row = slide(row);
+                row = combine(row);
+                row = slide(row); // Slide again after combine
+
+                if (direction === 'right') row.reverse();
+                for (let j = 0; j < 4; j++) board[i + j] = row[j];
+            }
+        } else if (direction === 'up' || direction === 'down') {
+            for (let i = 0; i < 4; i++) {
+                let col = [board[i], board[i+4], board[i+8], board[i+12]];
+                if (direction === 'down') col.reverse();
+                
+                col = slide(col);
+                col = combine(col);
+                col = slide(col);
+
+                if (direction === 'down') col.reverse();
+                for (let j = 0; j < 4; j++) board[i + (j*4)] = col[j];
+            }
+        }
+
+        scoreEl.innerText = score;
+        if (score > best) {
+            best = score;
+            localStorage.setItem('2048best', best);
+            bestEl.innerText = best;
+        }
+
+        // Check if anything changed
+        if (JSON.stringify(oldBoard) !== JSON.stringify(board)) {
+            spawnTile();
+            updateView();
+            checkGameOver();
+        }
+    }
+
+    function checkGameOver() {
+        if (board.includes(0)) return; // Still have space
+        // Check for possible merges
+        for (let i = 0; i < 16; i++) {
+            if ((i % 4 !== 3 && board[i] === board[i+1]) || // Check Right
+                (i < 12 && board[i] === board[i+4])) {     // Check Down
+                return;
+            }
+        }
+        gameOverScreen.classList.remove('hidden');
+    }
+
+    // --- CONTROLS ---
+    document.addEventListener('keydown', e => {
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+            e.preventDefault(); // Stop scroll
+            move(e.key.replace('Arrow', '').toLowerCase());
+        }
+    });
+
+    // Touch Support
+    let touchStartClientX, touchStartClientY;
+    document.addEventListener('touchstart', e => {
+        touchStartClientX = e.changedTouches[0].clientX;
+        touchStartClientY = e.changedTouches[0].clientY;
+    }, {passive: false});
+
+    document.addEventListener('touchend', e => {
+        let dx = e.changedTouches[0].clientX - touchStartClientX;
+        let dy = e.changedTouches[0].clientY - touchStartClientY;
+        
+        if (Math.abs(dx) > Math.abs(dy)) {
+            if (Math.abs(dx) > 20) move(dx > 0 ? 'right' : 'left');
+        } else {
+            if (Math.abs(dy) > 20) move(dy > 0 ? 'down' : 'up');
+        }
+    }, {passive: false});
+
+    initGame();
+  </script>
+</body>
+</html>
