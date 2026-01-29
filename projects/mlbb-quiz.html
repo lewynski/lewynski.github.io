@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLBB Quiz - Project</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Shared split-view styles */
+        body { background-color: #ffffff; }
+        
+        .split-container {
+            display: flex; gap: 30px; height: 850px; 
+            margin-top: 30px; margin-bottom: 50px;
+        }
+
+        .code-view {
+            flex: 1; background: #1e1e1e; color: #d4d4d4; padding: 25px;
+            border-radius: 16px; overflow: auto; font-family: 'Consolas', monospace;
+            border: 1px solid #333; font-size: 0.9rem;
+        }
+
+        .output-view {
+            flex: 1; border-radius: 16px; overflow: hidden;
+            border: 1px solid #e5e7eb; background: #0b1120;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        /* Syntax Colors */
+        .k { color: #569cd6; font-weight: bold; } /* Keyword */
+        .f { color: #dcdcaa; } /* Function */
+        .c { color: #6a9955; font-style: italic; } /* Comment */
+        .s { color: #ce9178; } /* String */
+
+        @media (max-width: 1000px) {
+            .split-container { flex-direction: column; height: auto; }
+            .code-view { height: 450px; }
+            .output-view { height: 800px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Unfiltered</div>
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
+            
+            <div class="dropdown">
+                <button class="dropbtn">Projects ▾</button>
+                <div class="dropdown-content">
+                    <a href="calc-splainer.html">Calc Splainer</a>
+                    <a href="determinants.html">Determinant Calc</a>
+                    <a href="matrix-ops.html">Matrix Ops</a>
+                    <a href="anime-quiz.html">Anime Quiz</a>
+                    <a href="mlbb-quiz.html">MLBB Quiz</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="display: block; max-width: 1200px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #fbbf24, #1e3a8a); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Mobile Legends Quiz</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">Test your game knowledge on the road to Mythic. Features a Mock API implementation to simulate async data loading.</p>
+        </div>
+
+        <div class="split-container">
+            <div class="code-view">
+<pre>
+<span class="c">// --- Mock API Simulation ---</span>
+<span class="c">// Since MLBB has no public quiz API, we simulate</span>
+<span class="c">// a server fetch using Promises and setTimeout.</span>
+
+<span class="k">function</span> <span class="f">fetchQuestionsMock</span>() {
+    <span class="k">return new</span> <span class="f">Promise</span>((resolve) => {
+        
+        <span class="c">// 1. Simulate Network Latency (1.5s)</span>
+        <span class="f">setTimeout</span>(() => {
+            
+            <span class="c">// 2. Shuffle the master database</span>
+            <span class="k">const</span> shuffled = [...MLBB_DATA]
+                .<span class="f">sort</span>(() => <span class="n">0.5</span> - Math.<span class="f">random</span>());
+
+            <span class="c">// 3. Return random subset (10 questions)</span>
+            <span class="f">resolve</span>(shuffled.<span class="f">slice</span>(<span class="n">0</span>, <span class="n">10</span>));
+            
+        }, <span class="n">1500</span>);
+        
+    });
+}
+
+<span class="c">// --- Async Game Initialization ---</span>
+<span class="k">async function</span> <span class="f">initGame</span>() {
+    <span class="f">showLoadingScreen</span>();
+    
+    <span class="c">// The app waits here, just like a real API call</span>
+    <span class="k">const</span> questions = <span class="k">await</span> <span class="f">fetchQuestionsMock</span>();
+    
+    <span class="f">hideLoadingScreen</span>();
+    <span class="f">startGame</span>(questions);
+}
+</pre>
+            </div>
+
+            <div class="output-view">
+                <iframe src="mlbb-quiz-app.html?v=1"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
