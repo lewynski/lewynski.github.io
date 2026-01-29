@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unbeatable Tic-Tac-Toe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #0f172a; font-family: 'Space Mono', monospace; }
+    
+    .cell {
+        background: #1e293b;
+        border: 2px solid #334155;
+        font-size: 2.5rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .cell:hover:not(.taken) { background: #334155; }
+    .taken { cursor: not-allowed; }
+    
+    .x-mark { color: #22c55e; text-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
+    .o-mark { color: #ef4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+
+    .glow-box { box-shadow: 0 0 40px rgba(56, 189, 248, 0.15); }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen text-white p-4">
+
+  <div class="w-full max-w-[350px] bg-slate-900 p-6 rounded-2xl border border-slate-700 glow-box">
+      
+    <div class="text-center mb-6">
+        <h1 class="text-xl font-bold text-sky-400 mb-1">UNBEATABLE AI</h1>
+        <p class="text-xs text-gray-500">Algorithm: Minimax (Depth First)</p>
+    </div>
+
+    <div id="status" class="bg-slate-800 text-center py-2 px-4 rounded-lg mb-4 text-sm font-bold text-gray-300 border border-slate-700">
+        Your Turn (X)
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-6 aspect-square">
+        <div class="cell" onclick="userMove(0)"></div>
+        <div class="cell" onclick="userMove(1)"></div>
+        <div class="cell" onclick="userMove(2)"></div>
+        <div class="cell" onclick="userMove(3)"></div>
+        <div class="cell" onclick="userMove(4)"></div>
+        <div class="cell" onclick="userMove(5)"></div>
+        <div class="cell" onclick="userMove(6)"></div>
+        <div class="cell" onclick="userMove(7)"></div>
+        <div class="cell" onclick="userMove(8)"></div>
+    </div>
+
+    <button onclick="resetGame()" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-lg transition-all shadow-lg active:scale-95">
+        RESTART GAME
+    </button>
+
+  </div>
+
+  <script>
+    /* --- CONFIG & STATE --- */
+    const cells = document.querySelectorAll('.cell');
+    const statusEl = document.getElementById('status');
+    let board = Array(9).fill(null);
+    let isGameActive = true;
+    const HUMAN = 'X';
+    const AI = 'O';
+
+    /* --- GAME LOGIC --- */
+    function userMove(index) {
+        if (!isGameActive || board[index]) return;
+        
+        makeMove(index, HUMAN);
+        
+        if (checkWin(board, HUMAN)) endGame("You Won? Impossible!");
+        else if (isDraw(board)) endGame("It's a Draw!");
+        else {
+            statusEl.innerText = "AI is thinking...";
+            statusEl.className = "bg-slate-800 text-center py-2 px-4 rounded-lg mb-4 text-sm font-bold text-yellow-400 border border-slate-700 animate-pulse";
+            setTimeout(aiMove, 500); // Artificial delay for realism
+        }
+    }
+
+    function aiMove() {
+        if (!isGameActive) return;
+
+        // Call the Minimax function to find the best spot
+        let bestScore = -Infinity;
+        let move;
+        
+        for (let i = 0; i < 9; i++) {
+            if (!board[i]) {
+                board[i] = AI;
+                let score = minimax(board, 0, false);
+                board[i] = null; // Undo move
+                if (score > bestScore) {
+                    bestScore = score;
+                    move = i;
+                }
+            }
+        }
+        
+        makeMove(move, AI);
+
+        if (checkWin(board, AI)) endGame("AI Wins! (As expected)");
+        else if (isDraw(board)) endGame("It's a Draw!");
+        else {
+            statusEl.innerText = "Your Turn (X)";
+            statusEl.className = "bg-slate-800 text-center py-2 px-4 rounded-lg mb-4 text-sm font-bold text-gray-300 border border-slate-700";
+        }
+    }
+
+    /* --- THE MINIMAX ALGORITHM --- */
+    // This recursive function predicts the outcome of every possible game
+    function minimax(currentBoard, depth, isMaximizing) {
+        if (checkWin(currentBoard, AI)) return 10 - depth;
+        if (checkWin(currentBoard, HUMAN)) return depth - 10;
+        if (isDraw(currentBoard)) return 0;
+
+        if (isMaximizing) {
+            let bestScore = -Infinity;
+            for (let i = 0; i < 9; i++) {
+                if (!currentBoard[i]) {
+                    currentBoard[i] = AI;
+                    let score = minimax(currentBoard, depth + 1, false);
+                    currentBoard[i] = null;
+                    bestScore = Math.max(score, bestScore);
+                }
+            }
+            return bestScore;
+        } else {
+            let bestScore = Infinity;
+            for (let i = 0; i < 9; i++) {
+                if (!currentBoard[i]) {
+                    currentBoard[i] = HUMAN;
+                    let score = minimax(currentBoard, depth + 1, true);
+                    currentBoard[i] = null;
+                    bestScore = Math.min(score, bestScore);
+                }
+            }
+            return bestScore;
+        }
+    }
+
+    /* --- HELPERS --- */
+    function makeMove(index, player) {
+        board[index] = player;
+        cells[index].innerText = player;
+        cells[index].classList.add('taken', player === HUMAN ? 'x-mark' : 'o-mark');
+    }
+
+    function checkWin(b, player) {
+        const wins = [
+            [0,1,2], [3,4,5], [6,7,8], // Rows
+            [0,3,6], [1,4,7], [2,5,8], // Cols
+            [0,4,8], [2,4,6]           // Diagonals
+        ];
+        return wins.some(combo => combo.every(i => b[i] === player));
+    }
+
+    function isDraw(b) {
+        return b.every(cell => cell !== null);
+    }
+
+    function endGame(message) {
+        isGameActive = false;
+        statusEl.innerText = message;
+        let color = message.includes("AI") ? "text-red-400" : (message.includes("Draw") ? "text-gray-300" : "text-green-400");
+        statusEl.className = `bg-slate-800 text-center py-2 px-4 rounded-lg mb-4 text-sm font-bold border border-slate-700 ${color}`;
+    }
+
+    function resetGame() {
+        board.fill(null);
+        cells.forEach(c => {
+            c.innerText = '';
+            c.className = 'cell';
+        });
+        isGameActive = true;
+        statusEl.innerText = "Your Turn (X)";
+        statusEl.className = "bg-slate-800 text-center py-2 px-4 rounded-lg mb-4 text-sm font-bold text-gray-300 border border-slate-700";
+    }
+  </script>
+</body>
+</html>
