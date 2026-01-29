@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimax AI - Project</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Shared split-view styles */
+        body { background-color: #ffffff; }
+        
+        .split-container {
+            display: flex; gap: 30px; height: 850px; 
+            margin-top: 30px; margin-bottom: 50px;
+        }
+
+        .code-view {
+            flex: 1; background: #1e1e1e; color: #d4d4d4; padding: 25px;
+            border-radius: 16px; overflow: auto; font-family: 'Consolas', monospace;
+            border: 1px solid #333; font-size: 0.9rem;
+        }
+
+        .output-view {
+            flex: 1; border-radius: 16px; overflow: hidden;
+            border: 1px solid #e5e7eb; background: #0f172a;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        .k { color: #569cd6; font-weight: bold; } 
+        .c { color: #6a9955; font-style: italic; } 
+        .n { color: #b5cea8; }
+        .f { color: #dcdcaa; }
+
+        @media (max-width: 1000px) {
+            .split-container { flex-direction: column; height: auto; }
+            .code-view { height: 450px; }
+            .output-view { height: 750px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Unfiltered</div>
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
+            
+            <div class="dropdown">
+                <button class="dropbtn">Projects ▾</button>
+                <div class="dropdown-content">
+                    <a href="calc-splainer.html">Calc Splainer</a>
+                    <a href="determinants.html">Determinant Calc</a>
+                    <a href="matrix-ops.html">Matrix Ops</a>
+                    <a href="anime-quiz.html">Anime Quiz</a>
+                    <a href="mlbb-quiz.html">MLBB Quiz</a>
+                    <a href="snake-game.html">Snake Game</a>
+                    <a href="flappy-bird.html">Neon Flap</a>
+                    <a href="tic-tac-toe.html">Minimax AI</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="display: block; max-width: 1200px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Unbeatable AI</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A Tic-Tac-Toe engine powered by the Minimax Algorithm. It recursively calculates every possible future outcome to ensure it never loses.</p>
+        </div>
+
+        <div class="split-container">
+            <div class="code-view">
+<pre>
+<span class="c">// --- The Minimax Algorithm ---</span>
+<span class="c">// Recursively checks every future board state</span>
+
+<span class="k">function</span> <span class="f">minimax</span>(board, depth, isMaximizing) {
+    
+    <span class="c">// 1. Base Cases (Game Over conditions)</span>
+    <span class="k">if</span> (<span class="f">checkWin</span>(board, AI)) <span class="k">return</span> <span class="n">10</span> - depth;
+    <span class="k">if</span> (<span class="f">checkWin</span>(board, HUMAN)) <span class="k">return</span> depth - <span class="n">10</span>;
+    <span class="k">if</span> (<span class="f">isDraw</span>(board)) <span class="k">return</span> <span class="n">0</span>;
+
+    <span class="c">// 2. Recursive Step</span>
+    <span class="k">if</span> (isMaximizing) {
+        let bestScore = -Infinity;
+        <span class="k">for</span> (let i = <span class="n">0</span>; i < <span class="n">9</span>; i++) {
+            <span class="k">if</span> (!board[i]) {
+                board[i] = AI;
+                <span class="c">// Call self to check resulting state</span>
+                let score = <span class="f">minimax</span>(board, depth + <span class="n">1</span>, <span class="k">false</span>);
+                board[i] = <span class="k">null</span>; <span class="c">// Backtrack</span>
+                bestScore = Math.<span class="f">max</span>(score, bestScore);
+            }
+        }
+        <span class="k">return</span> bestScore;
+    } 
+    <span class="c">// ... (Minimizing logic omitted for brevity)</span>
+}
+</pre>
+            </div>
+
+            <div class="output-view">
+                <iframe src="tic-tac-toe-app.html?v=1"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
