@@ -27,10 +27,7 @@ An interactive calculator that doesn't just give you the answer—it uses AI log
 
 ### 🧮 [Determinant & Crout Solver](https://lewynski.github.io/projects/crout.html)
 High-precision mathematical tools designed for ECE students to solve complex linear algebra problems instantly.
-* **Features:** Step-by-step matrix decomposition, Error handling for singular matrices.
-
-### 📡 **Antenna & Sorting Research**
-Research-backed implementations for **Automatic Sorting Machines** with optical feedback and **Antenna Design** simulations.
+* **Features:** Step-by-step matrix decomposition, Error handling for singular matrices
 
 ---
 
