@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Snake - Project</title>
+    <title>Cyber Viper - Project</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         /* Shared split-view styles */
@@ -23,16 +23,16 @@
         .output-view {
             flex: 1; border-radius: 16px; overflow: hidden;
             border: 1px solid #e5e7eb; background: #050505;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center;
         }
 
         iframe { width: 100%; height: 100%; border: none; }
         
-        /* Syntax Colors */
         .k { color: #569cd6; font-weight: bold; } 
-        .f { color: #dcdcaa; } 
         .c { color: #6a9955; font-style: italic; } 
         .n { color: #b5cea8; }
+        .f { color: #dcdcaa; }
 
         @media (max-width: 1000px) {
             .split-container { flex-direction: column; height: auto; }
@@ -58,6 +58,10 @@
                     <a href="anime-quiz.html">Anime Quiz</a>
                     <a href="mlbb-quiz.html">MLBB Quiz</a>
                     <a href="snake-game.html">Snake Game</a>
+                    <a href="flappy-bird.html">Neon Flap</a>
+                    <a href="tic-tac-toe.html">Minimax AI</a>
+                    <a href="2048.html">2048 Puzzle</a>
+                    <a href="rpg-game.html">RPG Engine</a>
                 </div>
             </div>
         </div>
@@ -65,47 +69,45 @@
 
     <div class="container" style="display: block; max-width: 1200px;">
         <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #4ade80, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Neon Snake</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A classic arcade game rebuilt with HTML5 Canvas. Features array-based movement logic and collision detection.</p>
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #4ade80, #facc15); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Cyber Viper</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A modernized snake game with dynamic speed scaling, particle effects, and a "Boost" risk-reward mechanic.</p>
         </div>
 
         <div class="split-container">
             <div class="code-view">
 <pre>
-<span class="c">// --- Game Loop: Update Logic ---</span>
-<span class="c">// Runs 10 times per second</span>
+<span class="c">// --- Dynamic Speed & Game Loop ---</span>
+<span class="c">// Controls the difficulty ramping and boost mechanic</span>
+
+<span class="k">function</span> <span class="f">gameLoop</span>() {
+    <span class="k">if</span> (!isRunning) <span class="k">return</span>;
+
+    <span class="f">update</span>();
+    <span class="f">draw</span>();
+
+    <span class="c">// 1. Determine Delay (Speed)</span>
+    <span class="c">// If 'isBoosting' is true, cut delay in half (Double Speed)</span>
+    let delay = isBoosting ? currentSpeed / <span class="n">2</span> : currentSpeed;
+
+    <span class="c">// 2. Recursive Timeout for variable speed</span>
+    <span class="f">setTimeout</span>(gameLoop, delay);
+}
 
 <span class="k">function</span> <span class="f">update</span>() {
-    <span class="c">// 1. Calculate new head position</span>
-    <span class="k">const</span> head = { 
-        x: snake[<span class="n">0</span>].x + dx, 
-        y: snake[<span class="n">0</span>].y + dy 
-    };
+    <span class="c">// ... movement logic ...</span>
 
-    <span class="c">// 2. Check for Wall Collision</span>
-    <span class="k">if</span> (head.x < <span class="n">0</span> || head.x >= TILE_COUNT || 
-        head.y < <span class="n">0</span> || head.y >= TILE_COUNT) {
-        <span class="f">gameOver</span>();
-        <span class="k">return</span>;
-    }
-
-    <span class="c">// 3. Move Snake (Add Head)</span>
-    snake.<span class="f">unshift</span>(head);
-
-    <span class="c">// 4. Eat Food logic</span>
-    <span class="k">if</span> (head.x === food.x && head.y === food.y) {
-        score += <span class="n">10</span>;
-        <span class="f">placeFood</span>();
-        <span class="c">// Don't pop tail (snake grows)</span>
-    } <span class="k">else</span> {
-        snake.<span class="f">pop</span>(); <span class="c">// Remove tail to maintain size</span>
+    <span class="c">// 3. Difficulty Ramping</span>
+    <span class="c">// Every 50 points (5 apples), increase base speed</span>
+    <span class="k">if</span> (score % <span class="n">50</span> === <span class="n">0</span> && baseSpeed > <span class="n">40</span>) {
+        baseSpeed -= <span class="n">5</span>;
+        currentSpeed = baseSpeed;
     }
 }
 </pre>
             </div>
 
             <div class="output-view">
-                <iframe src="snake-game-app.html?v=1"></iframe>
+                <iframe src="snake-game-app.html?v=2"></iframe>
             </div>
         </div>
     </div>
