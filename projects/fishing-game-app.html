@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Angler</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body { 
+        background-color: #020617; 
+        font-family: 'Press Start 2P', cursive; 
+        touch-action: none; 
+        overflow: hidden;
+    }
+    
+    #game-container {
+        position: relative;
+        box-shadow: 0 0 50px rgba(6, 182, 212, 0.2);
+        border: 2px solid #1e293b;
+    }
+
+    /* Underwater Gradient */
+    canvas { 
+        display: block; 
+        background: linear-gradient(to bottom, #0f172a 0%, #020617 100%);
+    }
+
+    .ui-text { text-shadow: 2px 2px 0px #000; }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center h-screen text-white p-2">
+
+  <div class="flex justify-between w-full max-w-[400px] mb-2 px-2 text-[0.6rem] ui-text">
+      <div class="text-cyan-400">SCORE: <span id="score">0</span></div>
+      <div class="text-yellow-400">TIME: <span id="time">60</span>s</div>
+  </div>
+
+  <div id="game-container" class="rounded-lg overflow-hidden relative">
+      <canvas id="gameCanvas" width="400" height="500"></canvas>
+      
+      <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-10 backdrop-blur-sm">
+          <h1 class="text-2xl text-cyan-400 mb-4 text-center leading-relaxed drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">NEON<br>ANGLER</h1>
+          <p class="text-[0.6rem] text-gray-300 mb-6 text-center">
+              Click/Tap to Cast.<br>Catch glowing fish.<br>Don't run out of time!
+          </p>
+          <button onclick="startGame()" class="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white text-xs rounded shadow-lg transition-all">
+              START DIVE
+          </button>
+      </div>
+
+      <div id="game-over-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-20">
+          <h2 class="text-red-500 text-xl mb-2">OXYGEN DEPLETED</h2>
+          <p class="text-xs text-gray-300 mb-6">Catch Value: <span id="final-score" class="text-white">0</span></p>
+          <button onclick="startGame()" class="px-6 py-3 border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-900/50 text-xs rounded transition-all">
+              RE-CAST
+          </button>
+      </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // --- CONFIG ---
+    const GAME_WIDTH = 400;
+    const GAME_HEIGHT = 500;
+    
+    // --- STATE ---
+    let score = 0;
+    let timeLeft = 60;
+    let isRunning = false;
+    let gameInterval;
+    let timerInterval;
+
+    // --- GAME OBJECTS ---
+    const boat = { x: GAME_WIDTH/2, y: 40, w: 60, h: 20 };
+    
+    const hook = {
+        x: GAME_WIDTH/2, 
+        y: 40, 
+        dy: 0,
+        state: 'IDLE', // IDLE, CASTING, REELING
+        speed: 5,
+        target: null // The fish we caught
+    };
+
+    let fishList = [];
+    const fishTypes = [
+        { color: '#4ade80', score: 10, speed: 1.5, size: 20, prob: 0.6 }, // Common (Green)
+        { color: '#a855f7', score: 30, speed: 2.5, size: 15, prob: 0.3 }, // Rare (Purple)
+        { color: '#facc15', score: 100, speed: 4.0, size: 12, prob: 0.1 } // Legendary (Gold)
+    ];
+
+    // --- CLASSES ---
+    class Fish {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            // Pick rarity
+            let rand = Math.random();
+            let type = fishTypes[0];
+            if(rand > 0.9) type = fishTypes[2];
+            else if(rand > 0.6) type = fishTypes[1];
+
+            this.type = type;
+            this.y = 100 + Math.random() * (GAME_HEIGHT - 150);
+            this.direction = Math.random() > 0.5 ? 1 : -1;
+            
+            // Start off screen
+            this.x = this.direction === 1 ? -50 : GAME_WIDTH + 50;
+            this.w = type.size * 1.5;
+            this.h = type.size;
+            this.caught = false;
+        }
+
+        update() {
+            if(this.caught) return; // Hook handles movement if caught
+            
+            this.x += this.type.speed * this.direction;
+
+            // Reset if off screen
+            if((this.direction === 1 && this.x > GAME_WIDTH + 50) || 
+               (this.direction === -1 && this.x < -50)) {
+                this.reset();
+            }
+        }
+
+        draw() {
+            ctx.fillStyle = this.type.color;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = this.type.color;
+            
+            // Draw Fish Body (Ellipse)
+            ctx.beginPath();
+            ctx.ellipse(this.x, this.y, this.w/2, this.h/2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Tail
+            ctx.beginPath();
+            let tailX = this.direction === 1 ? this.x - this.w/2 : this.x + this.w/2;
+            ctx.moveTo(tailX, this.y);
+            ctx.lineTo(tailX - (10 * this.direction), this.y - 5);
+            ctx.lineTo(tailX - (10 * this.direction), this.y + 5);
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    // --- GAME LOGIC ---
+    function startGame() {
+        score = 0;
+        timeLeft = 60;
+        isRunning = true;
+        hook.state = 'IDLE';
+        hook.y = boat.y;
+        hook.target = null;
+        
+        // Spawn Fish
+        fishList = [];
+        for(let i=0; i<8; i++) fishList.push(new Fish());
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-over-screen').classList.add('hidden');
+        updateHUD();
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateHUD();
+            if(timeLeft <= 0) gameOver();
+        }, 1000);
+
+        requestAnimationFrame(loop);
+    }
+
+    function loop() {
+        if(!isRunning) return;
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function update() {
+        // 1. Update Fish
+        fishList.forEach(f => f.update());
+
+        // 2. Hook Logic
+        if(hook.state === 'CASTING') {
+            hook.y += hook.speed;
+            
+            // Hit bottom?
+            if(hook.y >= GAME_HEIGHT) {
+                hook.state = 'REELING';
+            }
+
+            // Check Collision
+            fishList.forEach(f => {
+                if(!f.caught && 
+                   Math.abs(hook.x - f.x) < 20 && 
+                   Math.abs(hook.y - f.y) < 20) {
+                    // CATCH!
+                    hook.state = 'REELING';
+                    hook.target = f;
+                    f.caught = true;
+                }
+            });
+        } 
+        else if(hook.state === 'REELING') {
+            hook.y -= hook.speed;
+            
+            // If we have a fish, drag it
+            if(hook.target) {
+                hook.target.x = hook.x;
+                hook.target.y = hook.y + 10; // Hang below hook
+            }
+
+            // Back at boat?
+            if(hook.y <= boat.y) {
+                hook.state = 'IDLE';
+                if(hook.target) {
+                    score += hook.target.type.score;
+                    // Float text effect could go here
+                    hook.target.reset(); // Respawn fish
+                    hook.target = null;
+                }
+                updateHUD();
+            }
+        }
+    }
+
+    function draw() {
+        // Clear
+        ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+        // Draw Line
+        ctx.strokeStyle = '#67e8f9'; // Cyan line
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(boat.x, boat.y);
+        ctx.lineTo(hook.x, hook.y);
+        ctx.stroke();
+
+        // Draw Fish
+        fishList.forEach(f => f.draw());
+
+        // Draw Hook
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(hook.x - 3, hook.y, 6, 8);
+        // Hook Curve
+        ctx.beginPath();
+        ctx.arc(hook.x, hook.y + 8, 4, 0, Math.PI, false);
+        ctx.stroke();
+
+        // Draw Boat
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(boat.x - 30, boat.y - 20, 60, 20);
+        ctx.fillStyle = '#0ea5e9'; // Trim
+        ctx.fillRect(boat.x - 30, boat.y, 60, 5);
+    }
+
+    function gameOver() {
+        isRunning = false;
+        clearInterval(timerInterval);
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('game-over-screen').classList.remove('hidden');
+    }
+
+    function updateHUD() {
+        document.getElementById('score').innerText = score;
+        document.getElementById('time').innerText = timeLeft;
+    }
+
+    // Input
+    function cast() {
+        if(hook.state === 'IDLE') {
+            hook.state = 'CASTING';
+        } else if(hook.state === 'CASTING') {
+            // Player canceled cast, reel back early
+            hook.state = 'REELING';
+        }
+    }
+
+    window.addEventListener('mousedown', cast);
+    window.addEventListener('touchstart', (e) => { e.preventDefault(); cast(); });
+    window.addEventListener('keydown', (e) => {
+        if(e.code === 'Space') cast();
+    });
+
+  </script>
+</body>
+</html>
