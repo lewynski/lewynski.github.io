@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Engine - Project</title>
+    <title>Neon RPG - Project</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         /* Shared split-view styles */
@@ -22,8 +22,8 @@
 
         .output-view {
             flex: 1; border-radius: 16px; overflow: hidden;
-            border: 1px solid #e5e7eb; background: #0f172a;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            border: 1px solid #e5e7eb; background: #000;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
             display: flex; justify-content: center; align-items: center;
         }
 
@@ -44,7 +44,7 @@
 <body>
 
     <nav>
-        <div class="logo">RPG Game</div>
+        <div class="logo">Unfiltered</div>
         <div class="nav-links">
             <a href="../index.html">Home</a>
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
@@ -69,45 +69,48 @@
 
     <div class="container" style="display: block; max-width: 1200px;">
         <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #3b82f6, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Neon RPG Engine</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A tile-based RPG prototype featuring grid movement, collision detection, random encounters, and a turn-based battle system with leveling logic.</p>
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Neon Rogue</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A turn-based RPG with Cyberpunk aesthetics. Features a custom particle system, screen shake effects, and resource management combat.</p>
         </div>
 
         <div class="split-container">
             <div class="code-view">
 <pre>
-<span class="c">// --- Game State & Movement Logic ---</span>
-<span class="c">// Controls player exploration and triggers battles</span>
+<span class="c">// --- Visual FX: Particle System ---</span>
+<span class="c">// Adds "juice" to the combat and exploration</span>
 
-let gameState = <span class="s">'EXPLORING'</span>; <span class="c">// or 'BATTLING'</span>
+let particles = [];
 
-<span class="k">function</span> <span class="f">movePlayer</span>(dx, dy) {
-    <span class="c">// 1. Prevent movement during battle</span>
-    <span class="k">if</span> (gameState !== <span class="s">'EXPLORING'</span>) <span class="k">return</span>;
-
-    <span class="k">const</span> newX = player.x + dx;
-    <span class="k">const</span> newY = player.y + dy;
-
-    <span class="c">// 2. Collision Detection against Map Walls (Tile ID 1)</span>
-    <span class="k">if</span> (newX >= <span class="n">0</span> && newX < COLS && 
-        newY >= <span class="n">0</span> && newY < ROWS && 
-        map[newY][newX] !== <span class="n">1</span>) {
-        
-        <span class="c">// Valid move: Update position</span>
-        player.x = newX;
-        player.y = newY;
-        
-        <span class="c">// 3. Check for Random Encounter</span>
-        <span class="k">if</span> (Math.<span class="f">random</span>() < ENCOUNTER_CHANCE) {
-            <span class="f">startBattle</span>(); <span class="c">// Switches gameState to 'BATTLING'</span>
-        }
+<span class="k">function</span> <span class="f">spawnParticles</span>(x, y, color, count) {
+    <span class="k">for</span>(let i=<span class="n">0</span>; i<count; i++) {
+        particles.<span class="f">push</span>({
+            x: x, 
+            y: y,
+            <span class="c">// Random explosive velocity</span>
+            vx: (Math.<span class="f">random</span>() - <span class="n">0.5</span>) * <span class="n">8</span>,
+            vy: (Math.<span class="f">random</span>() - <span class="n">0.5</span>) * <span class="n">8</span>,
+            life: <span class="n">20</span> + Math.<span class="f">random</span>() * <span class="n">10</span>,
+            color: color,
+            size: <span class="n">2</span> + Math.<span class="f">random</span>() * <span class="n">3</span>
+        });
     }
+}
+
+<span class="k">function</span> <span class="f">update</span>() {
+    <span class="c">// Screen Shake Logic</span>
+    <span class="k">if</span>(shakeDuration > <span class="n">0</span>) {
+        let offset = Math.<span class="f">random</span>()*<span class="n">4</span> - <span class="n">2</span>;
+        gameContainer.style.transform = 
+            `translate(${offset}px, ${offset}px)`;
+        shakeDuration--;
+    }
+    <span class="c">// ... particle updates ...</span>
 }
 </pre>
             </div>
 
             <div class="output-view">
-                <iframe src="rpg-game-app.html?v=1"></iframe>
+                <iframe src="rpg-game-app.html?v=2"></iframe>
             </div>
         </div>
     </div>
