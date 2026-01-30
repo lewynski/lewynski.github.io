@@ -29,10 +29,12 @@
 
         iframe { width: 100%; height: 100%; border: none; }
         
-        .k { color: #569cd6; font-weight: bold; } 
-        .c { color: #6a9955; font-style: italic; } 
-        .n { color: #b5cea8; }
-        .f { color: #dcdcaa; }
+        /* Syntax Highlighting */
+        .k { color: #569cd6; font-weight: bold; } /* Keywords */
+        .c { color: #6a9955; font-style: italic; } /* Comments */
+        .n { color: #b5cea8; } /* Numbers */
+        .f { color: #dcdcaa; } /* Functions */
+        .s { color: #ce9178; } /* Strings */
 
         @media (max-width: 1000px) {
             .split-container { flex-direction: column; height: auto; }
@@ -73,42 +75,44 @@
     <div class="container" style="display: block; max-width: 1200px;">
         <div style="text-align: center; margin-bottom: 40px;">
             <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #3b82f6, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Eiji Assistant</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A conversational interface powered by simple keyword logic and the browser's native <strong>Text-to-Speech API</strong>.</p>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A conversational interface powered by Google's Gemini API and the browser's native <strong>Text-to-Speech API</strong>.</p>
         </div>
 
         <div class="split-container">
             <div class="code-view">
 <pre>
-<span class="c">// --- Text-to-Speech Logic ---</span>
-<span class="c">// Uses the Web Speech API to make Eiji talk</span>
+<span class="c">// --- Gemini API Integration ---</span>
+<span class="c">// Sends user prompt to Google's AI model</span>
 
-<span class="k">function</span> <span class="f">speak</span>(text) {
-    <span class="c">// 1. Check Browser Support</span>
-    <span class="k">if</span> (!window.speechSynthesis) <span class="k">return</span>;
-
-    <span class="c">// 2. Create Utterance Object</span>
-    <span class="k">const</span> utterance = <span class="k">new</span> <span class="f">SpeechSynthesisUtterance</span>(text);
+<span class="k">async function</span> <span class="f">sendMessage</span>(text) {
     
-    utterance.pitch = <span class="n">1</span>; <span class="c">// Normal tone</span>
-    utterance.rate = <span class="n">1</span>;  <span class="c">// Normal speed</span>
+    <span class="c">// 1. Prepare Payload</span>
+    <span class="k">const</span> url = <span class="s">`https://generativelanguage.googleapis.com
+        /v1beta/models/gemini-1.5-flash:generateContent
+        ?key=${API_KEY}`</span>;
+        
+    <span class="c">// 2. Send Request</span>
+    <span class="k">const</span> response = <span class="k">await</span> <span class="f">fetch</span>(url, {
+        method: <span class="s">"POST"</span>,
+        headers: { <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span> },
+        body: JSON.<span class="f">stringify</span>({
+            contents: [{
+                parts: [{ text: text }]
+            }]
+        })
+    });
 
-    <span class="c">// 3. Handle Events (Visual Feedback)</span>
-    utterance.onstart = () => {
-        aiRing.classList.<span class="f">remove</span>(<span class="s">'hidden'</span>); <span class="c">// Show animation</span>
-    };
-
-    utterance.onend = () => {
-        aiRing.classList.<span class="f">add</span>(<span class="s">'hidden'</span>); <span class="c">// Hide animation</span>
-    };
-
-    <span class="c">// 4. Speak!</span>
-    window.speechSynthesis.<span class="f">speak</span>(utterance);
+    <span class="c">// 3. Parse Result</span>
+    <span class="k">const</span> data = <span class="k">await</span> response.<span class="f">json</span>();
+    
+    <span class="c">// 4. Extract AI Text</span>
+    <span class="k">return</span> data.candidates[<span class="n">0</span>].content.parts[<span class="n">0</span>].text;
 }
 </pre>
             </div>
 
             <div class="output-view">
-                <iframe src="eiji-ai-app.html?v=1"></iframe>
+                <iframe src="eiji-ai-app.html?v=2"></iframe>
             </div>
         </div>
     </div>
