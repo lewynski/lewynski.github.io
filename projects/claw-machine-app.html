@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Catch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { 
+        background-color: #050505; 
+        font-family: 'Orbitron', sans-serif; 
+        touch-action: none; 
+        overflow: hidden;
+    }
+    
+    #game-container {
+        position: relative;
+        box-shadow: 0 0 50px rgba(236, 72, 153, 0.2); /* Pink Glow */
+        border: 2px solid #333;
+        background: radial-gradient(circle at center bottom, #1f1f1f 0%, #000 70%);
+    }
+
+    canvas { display: block; }
+
+    .btn-control {
+        background: #1f2937;
+        border: 1px solid #374151;
+        color: #e5e7eb;
+        border-radius: 8px;
+        transition: all 0.1s;
+    }
+    .btn-control:active { background: #ec4899; color: black; transform: translateY(2px); }
+    
+    .drop-btn {
+        background: #be185d;
+        color: white;
+        border-color: #ec4899;
+        box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+    }
+    .drop-btn:active { background: #db2777; }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center h-screen text-white p-2">
+
+  <div class="flex justify-between w-full max-w-[400px] mb-2 px-2 text-xs tracking-widest">
+      <div class="text-pink-500">CREDITS: <span id="credits">3</span></div>
+      <div class="text-cyan-400">SCORE: <span id="score">0</span></div>
+  </div>
+
+  <div id="game-container" class="rounded-lg overflow-hidden relative">
+      <canvas id="gameCanvas" width="400" height="500"></canvas>
+      
+      <div id="game-over-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-20">
+          <h2 class="text-pink-500 text-2xl mb-2">OUT OF CREDITS</h2>
+          <p class="text-xs text-gray-300 mb-6">Total Haul: <span id="final-score" class="text-white">0</span></p>
+          <button onclick="startGame()" class="px-6 py-3 border-2 border-pink-500 text-pink-400 hover:bg-pink-900/50 text-xs rounded transition-all">
+              INSERT COIN
+          </button>
+      </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-2 mt-4 w-[300px]">
+      <button class="btn-control h-14 text-2xl" onmousedown="moveLeft(true)" onmouseup="moveLeft(false)" ontouchstart="moveLeft(true)" ontouchend="moveLeft(false)">◀</button>
+      <button class="btn-control drop-btn h-14 text-sm font-bold" onclick="dropClaw()">DROP</button>
+      <button class="btn-control h-14 text-2xl" onmousedown="moveRight(true)" onmouseup="moveRight(false)" ontouchstart="moveRight(true)" ontouchend="moveRight(false)">▶</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // --- CONFIG ---
+    const WIDTH = 400;
+    const HEIGHT = 500;
+    const CLAW_SPEED_X = 4;
+    const CLAW_SPEED_Y = 5;
+    const FLOOR_Y = 450;
+    
+    // --- STATE ---
+    let score = 0;
+    let credits = 3;
+    let isRunning = false;
+    let leftPressed = false;
+    let rightPressed = false;
+
+    // --- OBJECTS ---
+    const claw = {
+        x: WIDTH / 2,
+        y: 60,
+        state: 'IDLE', // IDLE, DROPPING, GRABBING, RETRACTING
+        width: 40,
+        grabbedItem: null
+    };
+
+    let prizes = [];
+    const prizeTypes = [
+        { color: '#22d3ee', score: 100, radius: 15 }, // Cyan (Small)
+        { color: '#a855f7', score: 50, radius: 20 },  // Purple (Med)
+        { color: '#facc15', score: 20, radius: 25 }   // Gold (Large/Easy)
+    ];
+
+    // --- GAME LOGIC ---
+    function initPrizes() {
+        prizes = [];
+        for(let i=0; i<12; i++) {
+            prizes.push({
+                x: 40 + Math.random() * (WIDTH - 80),
+                y: FLOOR_Y - 10 - Math.random() * 30, // Pile them at bottom
+                type: prizeTypes[Math.floor(Math.random() * prizeTypes.length)],
+                rotation: Math.random() * Math.PI
+            });
+        }
+    }
+
+    function startGame() {
+        score = 0;
+        credits = 3;
+        isRunning = true;
+        claw.state = 'IDLE';
+        claw.y = 60;
+        claw.grabbedItem = null;
+        
+        initPrizes();
+        document.getElementById('game-over-screen').classList.add('hidden');
+        updateHUD();
+        loop();
+    }
+
+    function loop() {
+        if(!isRunning) return;
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function update() {
+        // 1. Horizontal Movement (Only when IDLE)
+        if (claw.state === 'IDLE') {
+            if (leftPressed && claw.x > 30) claw.x -= CLAW_SPEED_X;
+            if (rightPressed && claw.x < WIDTH - 30) claw.x += CLAW_SPEED_X;
+        }
+
+        // 2. Vertical Logic
+        if (claw.state === 'DROPPING') {
+            claw.y += CLAW_SPEED_Y;
+            // Hit floor?
+            if (claw.y >= FLOOR_Y - 20) {
+                claw.state = 'GRABBING';
+                setTimeout(attemptGrab, 500); // Pause briefly at bottom
+            }
+        } 
+        else if (claw.state === 'RETRACTING') {
+            claw.y -= CLAW_SPEED_Y;
+            
+            // Carry Prize
+            if (claw.grabbedItem) {
+                claw.grabbedItem.x = claw.x;
+                claw.grabbedItem.y = claw.y + 20;
+            }
+
+            // Back at top?
+            if (claw.y <= 60) {
+                if (claw.grabbedItem) {
+                    // Success!
+                    score += claw.grabbedItem.type.score;
+                    claw.grabbedItem = null; // Consume item
+                    updateHUD();
+                }
+                
+                credits--;
+                updateHUD();
+                
+                if (credits <= 0) gameOver();
+                else claw.state = 'IDLE';
+            }
+        }
+    }
+
+    function attemptGrab() {
+        let bestDist = 1000;
+        let chosenIndex = -1;
+
+        // Find closest prize
+        prizes.forEach((p, index) => {
+            let dx = claw.x - p.x;
+            let dy = (claw.y + 20) - p.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+
+            if (dist < p.type.radius + 15 && dist < bestDist) {
+                bestDist = dist;
+                chosenIndex = index;
+            }
+        });
+
+        if (chosenIndex !== -1) {
+            // GRAB SUCCESS (Maybe add RNG for slip later)
+            claw.grabbedItem = prizes[chosenIndex];
+            prizes.splice(chosenIndex, 1); // Remove from floor
+        }
+
+        claw.state = 'RETRACTING';
+    }
+
+    function draw() {
+        // Clear
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        // Draw Rail
+        ctx.fillStyle = '#333';
+        ctx.fillRect(0, 20, WIDTH, 10);
+
+        // Draw Rope
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(claw.x, 30);
+        ctx.lineTo(claw.x, claw.y);
+        ctx.stroke();
+
+        // Draw Claw Machine Arm
+        ctx.fillStyle = '#ec4899'; // Neon Pink
+        ctx.shadowBlur = 15; ctx.shadowColor = '#ec4899';
+        
+        ctx.fillRect(claw.x - 20, claw.y, 40, 10); // Base
+        
+        // Pincers (Animate based on state)
+        let openAmount = (claw.state === 'IDLE' || claw.state === 'DROPPING') ? 25 : 10;
+        
+        ctx.beginPath();
+        ctx.moveTo(claw.x - 15, claw.y + 10);
+        ctx.lineTo(claw.x - openAmount, claw.y + 35); // Left finger
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(claw.x + 15, claw.y + 10);
+        ctx.lineTo(claw.x + openAmount, claw.y + 35); // Right finger
+        ctx.stroke();
+        
+        ctx.shadowBlur = 0;
+
+        // Draw Prizes
+        prizes.forEach(p => drawPrize(p));
+
+        // Draw Grabbed Prize (on top)
+        if (claw.grabbedItem) drawPrize(claw.grabbedItem);
+    }
+
+    function drawPrize(p) {
+        ctx.fillStyle = p.type.color;
+        ctx.shadowBlur = 10; ctx.shadowColor = p.type.color;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.type.radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Shine
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.beginPath();
+        ctx.arc(p.x - 5, p.y - 5, p.type.radius / 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+    }
+
+    function dropClaw() {
+        if (claw.state === 'IDLE') claw.state = 'DROPPING';
+    }
+
+    function moveLeft(pressed) { leftPressed = pressed; }
+    function moveRight(pressed) { rightPressed = pressed; }
+    
+    // Keyboard Support
+    window.addEventListener('keydown', e => {
+        if(e.code === 'ArrowLeft') leftPressed = true;
+        if(e.code === 'ArrowRight') rightPressed = true;
+        if(e.code === 'Space') dropClaw();
+    });
+    window.addEventListener('keyup', e => {
+        if(e.code === 'ArrowLeft') leftPressed = false;
+        if(e.code === 'ArrowRight') rightPressed = false;
+    });
+
+    function gameOver() {
+        isRunning = false;
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('game-over-screen').classList.remove('hidden');
+    }
+
+    function updateHUD() {
+        document.getElementById('score').innerText = score;
+        document.getElementById('credits').innerText = credits;
+    }
+    
+    // Start immediately
+    startGame();
+  </script>
+</body>
+</html>
