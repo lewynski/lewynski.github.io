@@ -3,215 +3,173 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neon Rogue: System Shock</title>
+  <title>Cyber Viper</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     body { 
         background-color: #050505; 
         font-family: 'Press Start 2P', cursive; 
-        color: white; 
+        touch-action: none; 
         overflow: hidden;
-        user-select: none;
-    }
-
-    /* --- CRT SCANLINE EFFECT --- */
-    .crt-overlay {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-        background-size: 100% 2px, 3px 100%;
-        pointer-events: none; /* Let clicks pass through */
-        z-index: 50;
     }
     
+    /* Cyber Grid Background */
     #game-wrapper {
         position: relative;
-        width: 480px; height: 480px;
-        box-shadow: 0 0 50px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 0 40px rgba(34, 197, 94, 0.2);
         border: 2px solid #333;
+        background-image: 
+            linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #0a0a0a;
     }
 
-    canvas { display: block; background: #0f172a; }
+    canvas { display: block; }
 
-    /* --- BATTLE UI --- */
-    #battle-ui {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(10, 10, 20, 0.95);
-        display: flex; flex-direction: column;
-        justify-content: space-between;
-        padding: 20px;
-        z-index: 10;
-        backdrop-filter: blur(4px);
+    /* Button Styles */
+    .d-btn {
+        background: #111;
+        border: 1px solid #333;
+        color: #4ade80;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        transition: all 0.1s;
+        box-shadow: 0 4px 0 #222;
     }
-
-    /* Tech Borders */
-    .tech-border {
-        border: 1px solid #3b82f6;
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
-        position: relative;
+    .d-btn:active { 
+        background: #222; 
+        transform: translateY(4px); 
+        box-shadow: 0 0 0 #222; 
     }
-    .tech-border::after {
-        content: ''; position: absolute; top: -2px; left: -2px;
-        width: 6px; height: 6px; background: #3b82f6;
-    }
-    .tech-border::before {
-        content: ''; position: absolute; bottom: -2px; right: -2px;
-        width: 6px; height: 6px; background: #3b82f6;
-    }
-
-    /* Bars */
-    .bar-container { height: 12px; background: #1e293b; border: 1px solid #475569; position: relative; }
-    .bar-fill { height: 100%; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .hp-fill { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
-    .ep-fill { background: #eab308; box-shadow: 0 0 10px #eab308; }
     
-    .enemy-hp-fill { background: #a855f7; box-shadow: 0 0 10px #a855f7; }
-
-    /* Animations */
-    @keyframes shake {
-        0% { transform: translate(1px, 1px) rotate(0deg); }
-        10% { transform: translate(-1px, -2px) rotate(-1deg); }
-        20% { transform: translate(-3px, 0px) rotate(1deg); }
-        30% { transform: translate(3px, 2px) rotate(0deg); }
-        40% { transform: translate(1px, -1px) rotate(1deg); }
-        50% { transform: translate(-1px, 2px) rotate(-1deg); }
-        60% { transform: translate(-3px, 1px) rotate(0deg); }
-        70% { transform: translate(3px, 1px) rotate(-1deg); }
-        80% { transform: translate(-1px, -1px) rotate(1deg); }
-        90% { transform: translate(1px, 2px) rotate(0deg); }
-        100% { transform: translate(1px, -2px) rotate(-1deg); }
+    .boost-btn {
+        border-color: #f59e0b;
+        color: #f59e0b;
+        box-shadow: 0 4px 0 #78350f;
     }
-    .shaking { animation: shake 0.5s; }
 
-    .btn-action {
-        background: #1e293b; border: 1px solid #475569; color: #94a3b8;
-        padding: 12px; font-size: 0.7rem; cursor: pointer; transition: all 0.2s;
-        text-transform: uppercase; letter-spacing: 1px;
-    }
-    .btn-action:hover:not(:disabled) {
-        background: #334155; color: white; border-color: #60a5fa;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-    }
-    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+    .glow-text { text-shadow: 0 0 10px rgba(34, 197, 94, 0.8); }
 
-    .hidden { display: none !important; }
+    /* Shake Animation for Game Over */
+    @keyframes glitch {
+        0% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); filter: hue-rotate(-90deg); }
+        100% { transform: translate(0); }
+    }
+    .glitching { animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite; }
   </style>
 </head>
-<body class="flex flex-col items-center justify-center h-screen bg-black">
+<body class="flex flex-col items-center justify-center h-screen text-white p-2">
 
-  <div id="game-wrapper">
-      <div class="crt-overlay"></div>
-      <canvas id="gameCanvas" width="480" height="480"></canvas>
+  <div class="flex justify-between w-full max-w-[400px] mb-2 px-2 text-xs">
+      <div class="text-green-400">SCORE: <span id="score">0</span></div>
+      <div class="text-yellow-500">SPD: <span id="speed-lvl">1x</span></div>
+      <div class="text-gray-500">HI: <span id="high-score">0</span></div>
+  </div>
+
+  <div id="game-wrapper" class="rounded-lg">
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
       
-      <div id="battle-ui" class="hidden">
-          
-          <div class="text-center mt-4">
-              <h2 id="enemy-name" class="text-fuchsia-400 text-lg mb-2 drop-shadow-[0_0_5px_rgba(192,38,211,0.8)]">GLITCH</h2>
-              <div class="w-64 mx-auto">
-                  <div class="bar-container"><div id="enemy-hp-bar" class="bar-fill enemy-hp-fill" style="width: 100%;"></div></div>
-              </div>
-          </div>
-          
-          <div class="flex-1 flex flex-col justify-center items-center relative">
-              <p id="battle-log" class="text-xs text-blue-300 text-center px-8 leading-6 min-h-[50px]">
-                  ENCOUNTER DETECTED.
-              </p>
-          </div>
+      <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-black/85 z-10 backdrop-blur-sm">
+          <h1 class="text-3xl text-green-500 glow-text mb-4 text-center leading-relaxed">CYBER<br>VIPER</h1>
+          <p class="text-[0.6rem] text-gray-400 mb-6 text-center leading-relaxed">
+              ARROWS to Move<br>SPACE to Boost<br><span class="text-yellow-500">Speed increases every 5 pts</span>
+          </p>
+          <button onclick="startGame()" class="px-6 py-3 bg-green-600 hover:bg-green-500 text-black font-bold text-xs rounded shadow-[0_0_15px_rgba(34,197,94,0.6)] transition-all">
+              INITIALIZE
+          </button>
+      </div>
 
-          <div class="tech-border bg-slate-900/80 p-4 m-2">
-              <div class="flex justify-between items-end mb-3">
-                  <div>
-                      <h3 class="text-blue-400 text-sm">UNIT_01</h3>
-                      <p class="text-[0.6rem] text-gray-500">LVL <span id="player-lvl">1</span></p>
-                  </div>
-                  <div class="text-right w-32">
-                      <div class="flex justify-between text-[0.5rem] mb-1"><span>HP</span><span id="player-hp-text">100</span></div>
-                      <div class="bar-container mb-2 h-2"><div id="player-hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div></div>
-                      
-                      <div class="flex justify-between text-[0.5rem] mb-1"><span>EP</span><span id="player-ep-text">50</span></div>
-                      <div class="bar-container h-2"><div id="player-ep-bar" class="bar-fill ep-fill" style="width: 100%;"></div></div>
-                  </div>
-              </div>
-
-              <div class="grid grid-cols-3 gap-2">
-                  <button id="btn-attack" onclick="playerAction('ATTACK')" class="btn-action border-blue-500/50 text-blue-300">
-                      Slash
-                  </button>
-                  <button id="btn-heavy" onclick="playerAction('HEAVY')" class="btn-action border-yellow-500/50 text-yellow-300">
-                      Smash<br><span class="text-[0.5rem]">-20 EP</span>
-                  </button>
-                  <button id="btn-heal" onclick="playerAction('HEAL')" class="btn-action border-green-500/50 text-green-300">
-                      Repair<br><span class="text-[0.5rem]">-30 EP</span>
-                  </button>
-              </div>
-          </div>
+      <div id="game-over-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-20">
+          <h2 class="text-red-500 text-2xl mb-2 glitch-text">CRITICAL FAILURE</h2>
+          <p class="text-xs text-gray-300 mb-6">Final Score: <span id="final-score" class="text-white">0</span></p>
+          <button onclick="startGame()" class="px-6 py-3 border-2 border-green-500 text-green-500 hover:bg-green-500/20 text-xs rounded font-bold transition-all">
+              REBOOT SYSTEM
+          </button>
       </div>
   </div>
-  
-  <p class="mt-4 text-[0.6rem] text-gray-600 font-mono">ARROWS to Move. SPACE to Interact.</p>
+
+  <div class="flex gap-4 mt-4 w-full max-w-[400px] justify-center items-end">
+      <div class="grid grid-cols-3 gap-1 w-[140px]">
+          <div></div>
+          <button class="d-btn h-10" onclick="handleInput('up')">▲</button>
+          <div></div>
+          <button class="d-btn h-10" onclick="handleInput('left')">◀</button>
+          <button class="d-btn h-10" onclick="handleInput('down')">▼</button>
+          <button class="d-btn h-10" onclick="handleInput('right')">▶</button>
+      </div>
+
+      <button class="d-btn boost-btn h-14 w-20 text-[0.6rem] font-bold" 
+              ontouchstart="boost(true)" ontouchend="boost(false)" 
+              onmousedown="boost(true)" onmouseup="boost(false)">
+          BOOST
+      </button>
+  </div>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const gameWrapper = document.getElementById('game-wrapper');
+    const wrapper = document.getElementById('game-wrapper');
     
-    // --- CONFIG ---
-    const TILE_SIZE = 32;
-    const COLS = 15;
-    const ROWS = 15;
-    const ENCOUNTER_CHANCE = 0.15;
-
-    // --- STATE ---
-    let gameState = 'EXPLORING';
+    // Config
+    const GRID_SIZE = 20;
+    const TILE_COUNT = canvas.width / GRID_SIZE;
+    
+    // State
+    let snake = [];
+    let food = { x: 15, y: 15 };
     let particles = [];
-    let shakeDuration = 0;
+    let dx = 0;
+    let dy = 0;
+    
+    let score = 0;
+    let highScore = localStorage.getItem('snakeHi') || 0;
+    
+    let baseSpeed = 100; // ms per frame
+    let currentSpeed = 100;
+    let isBoosting = false;
+    let gameTimeout;
+    let isRunning = false;
 
-    // --- MAP (1=Wall, 0=Floor, 2=Exit, 3=HealStation) ---
-    const map = [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,1,0,0,0,0,0,1,0,3,0,1],
-        [1,0,1,0,1,0,1,1,1,0,1,1,1,0,1],
-        [1,0,1,0,0,0,0,0,1,0,0,0,1,0,1],
-        [1,0,1,1,1,1,1,0,1,1,1,0,1,0,1],
-        [1,0,0,0,0,0,1,0,0,0,0,0,1,0,1],
-        [1,1,1,1,1,0,1,1,1,0,1,1,1,0,1],
-        [1,3,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],
-        [1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
-        [1,0,1,0,1,1,1,0,1,1,1,1,1,0,1],
-        [1,0,1,0,0,0,1,0,0,0,0,0,1,0,1],
-        [1,0,1,1,1,0,1,0,1,1,1,0,1,0,1],
-        [1,0,0,0,0,0,1,0,0,0,0,0,0,2,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    ];
+    document.getElementById('high-score').innerText = highScore;
 
-    // --- PLAYER & ENEMIES ---
-    const player = {
-        x: 1, y: 1,
-        lvl: 1, xp: 0, xpNext: 100,
-        hp: 100, maxHp: 100,
-        ep: 50, maxEp: 50, // Energy Points
-        atk: 12, def: 5
-    };
+    function startGame() {
+        // Reset
+        snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
+        score = 0;
+        baseSpeed = 120; // Starting speed (slower)
+        currentSpeed = baseSpeed;
+        particles = [];
+        dx = 1; dy = 0; // Move right initially
+        
+        isRunning = true;
+        wrapper.classList.remove('glitching');
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-over-screen').classList.add('hidden');
+        updateHUD();
+        
+        clearTimeout(gameTimeout);
+        gameLoop();
+    }
 
-    let currentEnemy = null;
-    const enemies = [
-        { name: "VIRUS_V1", hp: 45, atk: 10, xp: 25, color: '#f87171' },
-        { name: "CYBER_HOUND", hp: 70, atk: 15, xp: 45, color: '#c084fc' },
-        { name: "FIREWALL_GOLEM", hp: 120, atk: 22, xp: 90, color: '#fb923c' }
-    ];
+    function gameLoop() {
+        if(!isRunning) return;
 
-    // --- GAME LOOP ---
-    function loop() {
         update();
         draw();
-        requestAnimationFrame(loop);
+
+        // Dynamic Speed: Boost cuts delay in half
+        let delay = isBoosting ? currentSpeed / 2 : currentSpeed;
+        gameTimeout = setTimeout(gameLoop, delay);
     }
 
     function update() {
-        // Particles
+        // Update Particles
         for(let i=particles.length-1; i>=0; i--) {
             particles[i].life--;
             particles[i].x += particles[i].vx;
@@ -219,280 +177,158 @@
             if(particles[i].life <= 0) particles.splice(i, 1);
         }
 
-        // Screen Shake
-        if(shakeDuration > 0) {
-            gameWrapper.style.transform = `translate(${Math.random()*4-2}px, ${Math.random()*4-2}px)`;
-            shakeDuration--;
+        // Move Head
+        const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+        // Wall Collision
+        if (head.x < 0 || head.x >= TILE_COUNT || head.y < 0 || head.y >= TILE_COUNT) {
+            gameOver();
+            return;
+        }
+
+        // Self Collision
+        for (let part of snake) {
+            if (part.x === head.x && part.y === head.y) {
+                gameOver();
+                return;
+            }
+        }
+
+        snake.unshift(head);
+
+        // Eat Food
+        if (head.x === food.x && head.y === food.y) {
+            score += 10;
+            spawnParticles(head.x * GRID_SIZE + 10, head.y * GRID_SIZE + 10, '#facc15');
+            placeFood();
+            
+            // Speed Up every 50 points (5 apples)
+            if(score % 50 === 0 && baseSpeed > 40) {
+                baseSpeed -= 5;
+                currentSpeed = baseSpeed;
+            }
+            updateHUD();
         } else {
-            gameWrapper.style.transform = 'translate(0,0)';
+            snake.pop();
         }
     }
 
     function draw() {
         // Clear
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if(gameState === 'EXPLORING') {
-            drawMap();
-            drawPlayer();
-        }
+        // Draw Food (Pulsing)
+        ctx.fillStyle = '#facc15';
+        ctx.shadowBlur = 15; ctx.shadowColor = "#facc15";
+        ctx.beginPath();
+        ctx.arc(food.x * GRID_SIZE + 10, food.y * GRID_SIZE + 10, 8, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
 
-        // Draw Particles (on top of everything)
+        // Draw Snake
+        snake.forEach((part, index) => {
+            let x = part.x * GRID_SIZE;
+            let y = part.y * GRID_SIZE;
+            
+            if(index === 0) {
+                // Head
+                ctx.fillStyle = isBoosting ? '#bef264' : '#4ade80'; // Lighter if boosting
+                ctx.shadowBlur = 15; 
+                ctx.shadowColor = isBoosting ? '#bef264' : '#22c55e';
+                ctx.fillRect(x, y, GRID_SIZE, GRID_SIZE);
+                
+                // Eyes
+                ctx.fillStyle = '#000';
+                ctx.fillRect(x + 4, y + 4, 4, 4);
+                ctx.fillRect(x + 12, y + 4, 4, 4);
+                ctx.shadowBlur = 0;
+            } else {
+                // Body
+                ctx.fillStyle = '#15803d'; // Darker Green
+                ctx.fillRect(x+1, y+1, GRID_SIZE-2, GRID_SIZE-2);
+            }
+        });
+
+        // Draw Particles
         particles.forEach(p => {
             ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life / 20;
             ctx.fillRect(p.x, p.y, p.size, p.size);
+            ctx.globalAlpha = 1.0;
         });
     }
 
-    // --- RENDERERS ---
-    function drawMap() {
-        for(let r=0; r<ROWS; r++) {
-            for(let c=0; c<COLS; c++) {
-                let t = map[r][c];
-                let x = c*TILE_SIZE;
-                let y = r*TILE_SIZE;
-
-                if(t===1) { // Wall
-                    ctx.fillStyle = '#1e293b';
-                    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                    // Neon edge
-                    ctx.strokeStyle = '#334155';
-                    ctx.strokeRect(x+4, y+4, TILE_SIZE-8, TILE_SIZE-8);
-                } else if(t===2) { // Exit
-                    ctx.fillStyle = '#2563eb';
-                    ctx.shadowBlur = 15; ctx.shadowColor = '#2563eb';
-                    ctx.fillRect(x+8, y+8, TILE_SIZE-16, TILE_SIZE-16);
-                    ctx.shadowBlur = 0;
-                } else if(t===3) { // Heal
-                    ctx.fillStyle = '#22c55e';
-                    ctx.fillRect(x+10, y+10, TILE_SIZE-20, TILE_SIZE-20);
-                } else {
-                    // Floor Grid
-                    ctx.strokeStyle = '#1e293b';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-                }
-            }
-        }
-    }
-
-    function drawPlayer() {
-        let x = player.x * TILE_SIZE;
-        let y = player.y * TILE_SIZE;
-        
-        ctx.fillStyle = '#60a5fa'; // Blue
-        ctx.shadowBlur = 20; ctx.shadowColor = '#60a5fa';
-        ctx.fillRect(x+6, y+6, TILE_SIZE-12, TILE_SIZE-12);
-        ctx.shadowBlur = 0;
-        
-        // Inner core
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x+12, y+12, TILE_SIZE-24, TILE_SIZE-24);
-    }
-
-    // --- PARTICLE SYSTEM ---
-    function spawnParticles(x, y, color, count=10) {
-        for(let i=0; i<count; i++) {
+    function spawnParticles(x, y, color) {
+        for(let i=0; i<8; i++) {
             particles.push({
                 x: x, y: y,
                 vx: (Math.random() - 0.5) * 8,
                 vy: (Math.random() - 0.5) * 8,
                 life: 20 + Math.random() * 10,
                 color: color,
-                size: 2 + Math.random() * 3
+                size: 3 + Math.random() * 4
             });
         }
     }
 
-    // --- EXPLORATION LOGIC ---
-    function movePlayer(dx, dy) {
-        if(gameState !== 'EXPLORING') return;
-
-        let nx = player.x + dx;
-        let ny = player.y + dy;
-
-        // Bounds & Wall check
-        if(nx>=0 && nx<COLS && ny>=0 && ny<ROWS && map[ny][nx] !== 1) {
-            player.x = nx;
-            player.y = ny;
-
-            // Heal Station
-            if(map[ny][nx] === 3) {
-                player.hp = player.maxHp;
-                player.ep = player.maxEp;
-                updateStatsUI();
-                spawnParticles(player.x*TILE_SIZE+16, player.y*TILE_SIZE+16, '#22c55e', 20);
-                alert("SYSTEM RESTORED. HP/EP Full.");
-                return;
-            }
-
-            // Exit
-            if(map[ny][nx] === 2) {
-                alert("ROOT ACCESS GRANTED. YOU WIN!");
-                resetGame();
-                return;
-            }
-
-            // Random Encounter
-            if(Math.random() < ENCOUNTER_CHANCE) startBattle();
-        }
-    }
-
-    // --- COMBAT LOGIC ---
-    function startBattle() {
-        gameState = 'BATTLING';
-        document.getElementById('battle-ui').classList.remove('hidden');
-        
-        // Enemy Scaling: Random enemy based on level
-        let idx = Math.min(Math.floor(Math.random() * (player.lvl + 1)), enemies.length-1);
-        let base = enemies[idx];
-        
-        // Scale enemy stats slightly with RNG
-        currentEnemy = {
-            ...base,
-            hp: base.hp + Math.floor(Math.random()*20),
-            maxHp: base.hp + Math.floor(Math.random()*20)
+    function placeFood() {
+        food = {
+            x: Math.floor(Math.random() * TILE_COUNT),
+            y: Math.floor(Math.random() * TILE_COUNT)
         };
-
-        document.getElementById('enemy-name').innerText = currentEnemy.name;
-        document.getElementById('enemy-name').style.color = currentEnemy.color;
-        updateStatsUI();
-        log("HOSTILE DETECTED. COMBAT INITIATED.");
-    }
-
-    function playerAction(type) {
-        const btns = document.querySelectorAll('.btn-action');
-        btns.forEach(b => b.disabled = true);
-
-        if(type === 'ATTACK') {
-            // Basic Attack
-            let dmg = Math.max(1, player.atk - 2 + Math.floor(Math.random()*4));
-            dealDamageToEnemy(dmg);
-            spawnParticles(240, 100, '#60a5fa', 15); // Hit Enemy visual
-        } 
-        else if(type === 'HEAVY') {
-            // Heavy Attack (Costs EP)
-            if(player.ep >= 20) {
-                player.ep -= 20;
-                let dmg = Math.floor(player.atk * 2.5);
-                dealDamageToEnemy(dmg);
-                shakeDuration = 10; // Big Shake
-                spawnParticles(240, 100, '#facc15', 30);
-            } else {
-                log("INSUFFICIENT ENERGY!");
-                btns.forEach(b => b.disabled = false);
-                return;
-            }
-        } 
-        else if(type === 'HEAL') {
-            // Repair (Costs EP)
-            if(player.ep >= 30) {
-                player.ep -= 30;
-                let heal = 40;
-                player.hp = Math.min(player.maxHp, player.hp + heal);
-                log(`SYSTEM REPAIRED +${heal} HP`);
-                spawnParticles(240, 400, '#22c55e', 20); // Heal Visual
-                updateStatsUI();
-                setTimeout(enemyTurn, 1000);
-            } else {
-                log("INSUFFICIENT ENERGY!");
-                btns.forEach(b => b.disabled = false);
-                return;
-            }
+        // Don't spawn on snake
+        for(let part of snake) {
+            if(part.x === food.x && part.y === food.y) placeFood();
         }
     }
 
-    function dealDamageToEnemy(amount) {
-        currentEnemy.hp -= amount;
-        log(`YOU HIT FOR ${amount} DMG!`);
-        updateStatsUI();
+    function gameOver() {
+        isRunning = false;
+        clearTimeout(gameTimeout);
+        wrapper.classList.add('glitching'); // Visual Effect
 
-        if(currentEnemy.hp <= 0) {
-            setTimeout(winBattle, 1000);
-        } else {
-            setTimeout(enemyTurn, 1000);
-        }
-    }
-
-    function enemyTurn() {
-        // Enemy Logic
-        let dmg = Math.max(5, currentEnemy.atk - player.def + Math.floor(Math.random()*5));
-        
-        player.hp -= dmg;
-        log(`${currentEnemy.name} HITS YOU FOR ${dmg}!`);
-        shakeDuration = 5; // Small shake
-        spawnParticles(240, 400, '#ef4444', 15); // Hit Player visual
-        updateStatsUI();
-
-        if(player.hp <= 0) {
-            setTimeout(() => {
-                alert("CRITICAL FAILURE. SYSTEM RESET.");
-                location.reload();
-            }, 500);
-        } else {
-            // Unlock buttons
-            document.querySelectorAll('.btn-action').forEach(b => b.disabled = false);
-        }
-    }
-
-    function winBattle() {
-        log(`TARGET ELIMINATED. +${currentEnemy.xp} XP`);
-        player.xp += currentEnemy.xp;
-        
-        // Level Up
-        if(player.xp >= player.xpNext) {
-            player.lvl++;
-            player.xp -= player.xpNext;
-            player.xpNext = Math.floor(player.xpNext * 1.5);
-            player.maxHp += 20;
-            player.maxEp += 10;
-            player.atk += 4;
-            player.hp = player.maxHp;
-            player.ep = player.maxEp; // Full refresh on Level Up
-            log(`LEVEL UP! STATS INCREASED.`);
+        if(score > highScore) {
+            highScore = score;
+            localStorage.setItem('snakeHi', highScore);
         }
 
-        setTimeout(() => {
-            gameState = 'EXPLORING';
-            document.getElementById('battle-ui').classList.add('hidden');
-            // Regen a tiny bit of EP after battle
-            player.ep = Math.min(player.maxEp, player.ep + 5);
-            // Unlock buttons for next time
-            document.querySelectorAll('.btn-action').forEach(b => b.disabled = false);
-        }, 1500);
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('game-over-screen').classList.remove('hidden');
     }
 
-    function log(msg) {
-        document.getElementById('battle-log').innerText = msg;
+    function updateHUD() {
+        document.getElementById('score').innerText = score;
+        document.getElementById('high-score').innerText = highScore;
+        // Calculate speed level roughly
+        let lvl = Math.floor((120 - baseSpeed) / 5) + 1;
+        document.getElementById('speed-lvl').innerText = lvl + "x";
     }
 
-    function updateStatsUI() {
-        // Player UI
-        document.getElementById('player-hp-text').innerText = Math.max(0, player.hp);
-        document.getElementById('player-hp-bar').style.width = `${Math.max(0, (player.hp/player.maxHp)*100)}%`;
-        
-        document.getElementById('player-ep-text').innerText = Math.max(0, player.ep);
-        document.getElementById('player-ep-bar').style.width = `${Math.max(0, (player.ep/player.maxEp)*100)}%`;
-        
-        document.getElementById('player-lvl').innerText = player.lvl;
-
-        // Enemy UI
-        if(currentEnemy) {
-            let pct = Math.max(0, (currentEnemy.hp/currentEnemy.maxHp)*100);
-            document.getElementById('enemy-hp-bar').style.width = `${pct}%`;
-        }
+    // Input
+    function handleInput(dir) {
+        if(dir === 'up' && dy === 0) { dx = 0; dy = -1; }
+        if(dir === 'down' && dy === 0) { dx = 0; dy = 1; }
+        if(dir === 'left' && dx === 0) { dx = -1; dy = 0; }
+        if(dir === 'right' && dx === 0) { dx = 1; dy = 0; }
     }
 
-    // --- CONTROLS ---
-    window.addEventListener('keydown', e => {
-        if(e.key === 'ArrowUp') movePlayer(0, -1);
-        if(e.key === 'ArrowDown') movePlayer(0, 1);
-        if(e.key === 'ArrowLeft') movePlayer(-1, 0);
-        if(e.key === 'ArrowRight') movePlayer(1, 0);
+    function boost(active) {
+        isBoosting = active;
+    }
+
+    // Keyboard
+    document.addEventListener('keydown', e => {
+        if(e.code === 'ArrowUp') handleInput('up');
+        if(e.code === 'ArrowDown') handleInput('down');
+        if(e.code === 'ArrowLeft') handleInput('left');
+        if(e.code === 'ArrowRight') handleInput('right');
+        if(e.code === 'Space') boost(true);
+    });
+    
+    document.addEventListener('keyup', e => {
+        if(e.code === 'Space') boost(false);
     });
 
-    loop();
   </script>
 </body>
 </html>
