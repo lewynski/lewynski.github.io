@@ -22,7 +22,7 @@ Welcome to **Unfiltered**. I am an **Electronics Engineering (ECE)** student and
 
 ### 🧙‍♂️ [Storytelling Calculator (Calc-splainer)](https://lewynski.github.io/projects/calc-splainer.html)
 > *Winner of the "Most Creative" concept in my repo.*
-An interactive calculator that doesn't just give you the answer—it uses AI logic to **narrate a whimsical story** about how the numbers met and interacted.
+An interactive calculator that doesn't just give you the answer it uses AI logic to **narrate a whimsical story** about how the numbers met and interacted.
 * **Tech:** JavaScript (BigInt), Tailwind CSS, Gemini API Logic.
 
 ### 🧮 [Determinant & Crout Solver](https://lewynski.github.io/projects/crout.html)
