@@ -10,7 +10,7 @@
 
 ## 👨‍💻 About Me
 
-Welcome to **Unfiltered**. I am an **Electronics Engineering (ECE)** student and developer with a passion for building computational tools. My work focuses on translating complex mathematical concepts—like Matrix Operations and Signal Processing—into interactive, user-friendly web applications.
+Welcome to **Unfiltered**. I am an **Electronics Engineering (ECE)** student and developer with a passion for building computational tools. My work focuses on translating complex mathematical concepts like Matrix Operations and Signal Processing into interactive, user-friendly web applications.
 
 * 🔭 **Currently working on:** Advanced matrix solvers & AI-integrated tools.
 * 🌱 **Learning:** Embedded Systems & Modern Web Frameworks.
