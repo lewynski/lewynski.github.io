@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Catch - Project</title>
+    <title>Toy Kingdom - Project</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         /* Shared split-view styles */
@@ -22,8 +22,8 @@
 
         .output-view {
             flex: 1; border-radius: 16px; overflow: hidden;
-            border: 1px solid #e5e7eb; background: #000;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+            border: 1px solid #e5e7eb; background: #fef3c7;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
             display: flex; justify-content: center; align-items: center;
         }
 
@@ -63,7 +63,7 @@
                     <a href="2048.html">2048 Puzzle</a>
                     <a href="rpg-game.html">RPG Engine</a>
                     <a href="fishing-game.html">Neon Angler</a>
-                    <a href="claw-machine.html">Cyber Catch</a>
+                    <a href="claw-machine.html">Toy Kingdom</a>
                 </div>
             </div>
         </div>
@@ -71,52 +71,42 @@
 
     <div class="container" style="display: block; max-width: 1200px;">
         <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #ec4899, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Cyber Catch</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A virtual claw machine featuring a 4-stage state machine (Idle, Drop, Grab, Retract) and proximity-based collision detection.</p>
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #ef4444, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Toy Kingdom</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A physics-based claw machine game. Features collision detection and a "Slippage" difficulty mechanic that randomly drops items in Hard Mode.</p>
         </div>
 
         <div class="split-container">
             <div class="code-view">
 <pre>
-<span class="c">// --- Logic: The Grab Check ---</span>
-<span class="c">// Determines if the claw caught an item</span>
+<span class="c">// --- Difficulty Logic: The "Slip" ---</span>
+<span class="c">// In Hard Mode, the claw might drop the prize!</span>
 
-<span class="k">function</span> <span class="f">attemptGrab</span>() {
-    let bestDist = <span class="n">1000</span>;
-    let chosenIndex = -<span class="n">1</span>;
-
-    <span class="c">// 1. Iterate through all prizes on floor</span>
-    prizes.<span class="f">forEach</span>((p, index) => {
+<span class="k">if</span> (claw.state === <span class="s">'RETRACTING'</span>) {
+    
+    <span class="c">// 1. Pull claw up</span>
+    claw.y -= CLAW_SPEED_Y;
+    
+    <span class="c">// 2. Check if holding item</span>
+    <span class="k">if</span> (claw.grabbedItem) {
         
-        <span class="c">// Calculate distance (Hypotenuse)</span>
-        let dx = claw.x - p.x;
-        let dy = (claw.y + <span class="n">20</span>) - p.y;
-        let dist = Math.<span class="f">sqrt</span>(dx*dx + dy*dy);
-
-        <span class="c">// 2. Check if close enough</span>
-        <span class="k">if</span> (dist < p.type.radius + <span class="n">15</span> && 
-            dist < bestDist) {
-            bestDist = dist;
-            chosenIndex = index;
+        <span class="c">// 3. RNG Check for Slippage</span>
+        <span class="k">if</span> (difficulty === <span class="s">'HARD'</span> && 
+            Math.<span class="f">random</span>() < SLIP_CHANCE) {
+            
+            <span class="c">// OOPS! Drop the item back to floor</span>
+            claw.grabbedItem.y = FLOOR_Y;
+            prizes.<span class="f">push</span>(claw.grabbedItem);
+            
+            <span class="c">// Reset Claw Grip</span>
+            claw.grabbedItem = <span class="k">null</span>; 
         }
-    });
-
-    <span class="c">// 3. Attach Prize to Claw</span>
-    <span class="k">if</span> (chosenIndex !== -<span class="n">1</span>) {
-        claw.grabbedItem = prizes[chosenIndex];
-        
-        <span class="c">// Remove from floor array</span>
-        prizes.<span class="f">splice</span>(chosenIndex, <span class="n">1</span>); 
     }
-
-    <span class="c">// 4. Retract upwards</span>
-    claw.state = <span class="s">'RETRACTING'</span>;
 }
 </pre>
             </div>
 
             <div class="output-view">
-                <iframe src="claw-machine-app.html?v=1"></iframe>
+                <iframe src="claw-machine-app.html?v=2"></iframe>
             </div>
         </div>
     </div>
