@@ -1,331 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neon RPG Protocol</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    body { 
-        background-color: #0f172a; 
-        font-family: 'Press Start 2P', cursive; 
-        color: white; 
-        overflow: hidden;
-        touch-action: none; /* Prevent mobile scroll */
-    }
-    #game-container {
-        position: relative;
-        width: 480px;
-        height: 480px;
-        border: 4px solid #334155;
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        background: #000;
-    }
-    canvas { display: block; }
-    
-    /* Battle UI Overlay */
-    #battle-ui {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        display: flex; flex-direction: column;
-        justify-content: space-between;
-        padding: 20px;
-        border: 4px solid #ef4444;
-    }
-    .health-bar { height: 10px; background: #333; margin-top: 5px; }
-    .health-fill { height: 100%; background: #22c55e; transition: width 0.3s; }
-    .enemy-health-fill { background: #ef4444; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon RPG - Project</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Shared split-view styles */
+        body { background-color: #ffffff; }
+        
+        .split-container {
+            display: flex; gap: 30px; height: 850px; 
+            margin-top: 30px; margin-bottom: 50px;
+        }
 
-    /* Helper classes */
-    .hidden { display: none !important; }
-    .text-xs { font-size: 0.6rem; }
-    .text-sm { font-size: 0.8rem; }
-  </style>
+        .code-view {
+            flex: 1; background: #1e1e1e; color: #d4d4d4; padding: 25px;
+            border-radius: 16px; overflow: auto; font-family: 'Consolas', monospace;
+            border: 1px solid #333; font-size: 0.9rem;
+        }
+
+        .output-view {
+            flex: 1; border-radius: 16px; overflow: hidden;
+            border: 1px solid #e5e7eb; background: #000;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        .k { color: #569cd6; font-weight: bold; } 
+        .c { color: #6a9955; font-style: italic; } 
+        .n { color: #b5cea8; }
+        .f { color: #dcdcaa; }
+
+        @media (max-width: 1000px) {
+            .split-container { flex-direction: column; height: auto; }
+            .code-view { height: 450px; }
+            .output-view { height: 800px; }
+        }
+    </style>
 </head>
-<body class="flex flex-col items-center justify-center h-screen p-4">
+<body>
 
-  <div id="game-container">
-      <canvas id="gameCanvas" width="480" height="480"></canvas>
-      
-      <div id="battle-ui" class="hidden">
-          <div class="text-center">
-              <h2 id="enemy-name" class="text-red-500 mb-2">CYBER-RAT</h2>
-              <div class="w-32 mx-auto"><div class="health-bar"><div id="enemy-hp-bar" class="health-fill enemy-health-fill" style="width: 100%;"></div></div></div>
-              <p class="text-xs mt-1">HP: <span id="enemy-hp-text">50</span>/<span id="enemy-max-hp-text">50</span></p>
-          </div>
-          
-          <div class="flex-1 flex flex-col justify-center items-center my-4 space-y-4">
-              <p id="battle-log" class="text-sm text-yellow-400 h-12 text-center px-4">A wild glitch appeared!</p>
-              <button id="attack-btn" onclick="attackRound()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 border-2 border-blue-400 rounded animate-pulse">
-                  ATTACK PROTOCOL
-              </button>
-          </div>
-
-          <div class="bg-slate-800 p-3 rounded border border-blue-500">
-              <div class="flex justify-between items-end">
-                  <div>
-                      <h3 class="text-blue-400">PLAYER.SYS</h3>
-                      <p class="text-xs text-gray-400">LVL <span id="player-lvl">1</span></p>
-                  </div>
-                  <div class="text-right w-40">
-                      <div class="health-bar"><div id="player-hp-bar" class="health-fill" style="width: 100%;"></div></div>
-                      <p class="text-xs mt-1">HP: <span id="player-hp-text">100</span>/<span id="player-max-hp-text">100</span></p>
-                  </div>
-              </div>
-              <div class="mt-2 text-xs text-yellow-500">
-                  XP: <span id="player-xp">0</span> / <span id="xp-to-next">100</span>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  <p class="mt-4 text-xs text-gray-500 text-center">Use Arrow Keys to explore.<br>Find the exit node (blue tile).</p>
-
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const battleUi = document.getElementById('battle-ui');
-    
-    // --- GAME CONSTANTS ---
-    const TILE_SIZE = 32;
-    const COLS = canvas.width / TILE_SIZE;
-    const ROWS = canvas.height / TILE_SIZE;
-    const ENCOUNTER_CHANCE = 0.15; // 15% chance per step
-
-    // --- GAME STATE ---
-    let gameState = 'EXPLORING'; // 'EXPLORING' or 'BATTLING'
-
-    // --- TILEMAP (0=Floor, 1=Wall, 2=Exit) ---
-    // A simple 15x15 maze
-    const map = [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
-        [1,0,1,0,1,0,1,1,1,0,1,1,1,0,1],
-        [1,0,1,0,0,0,0,0,1,0,0,0,1,0,1],
-        [1,0,1,1,1,1,1,0,1,1,1,0,1,0,1],
-        [1,0,0,0,0,0,1,0,0,0,0,0,1,0,1],
-        [1,1,1,1,1,0,1,1,1,0,1,1,1,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],
-        [1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
-        [1,0,1,0,1,1,1,0,1,1,1,1,1,0,1],
-        [1,0,1,0,0,0,1,0,0,0,0,0,1,0,1],
-        [1,0,1,1,1,0,1,0,1,1,1,0,1,0,1],
-        [1,0,0,0,0,0,1,0,0,0,0,0,0,2,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    ];
-
-    // --- OBJECTS ---
-    const player = {
-        x: 1, y: 1, // Grid coordinates
-        color: '#3b82f6', // Blue player
-        // Stats
-        lvl: 1, xp: 0, xpToNext: 100,
-        hp: 100, maxHp: 100, attack: 15, defense: 5
-    };
-
-    let currentEnemy = null;
-    const enemyTypes = [
-        { name: "GLITCH BUG", hp: 40, attack: 10, defense: 2, xp: 30, color: '#ef4444' },
-        { name: "CYBER RAT", hp: 55, attack: 14, defense: 4, xp: 50, color: '#a855f7' },
-        { name: "ROGUE AI", hp: 80, attack: 18, defense: 8, xp: 80, color: '#f97316' }
-    ];
-
-    // --- MAIN LOOP ---
-    function gameLoop() {
-        if (gameState === 'EXPLORING') {
-            drawMap();
-        }
-        requestAnimationFrame(gameLoop);
-    }
-
-    // --- EXPLORATION LOGIC ---
-    function drawMap() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                let tile = map[r][c];
-                // Floor (dark gray), Wall (lighter gray), Exit (blue)
-                ctx.fillStyle = tile === 1 ? '#1e293b' : (tile === 2 ? '#2563eb' : '#0f172a');
-                ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                // Add a subtle grid line
-                ctx.strokeStyle = '#1e293b';
-                ctx.lineWidth = 0.5;
-                ctx.strokeRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-            }
-        }
-        // Draw Player
-        ctx.fillStyle = player.color;
-        // Add a glow effect
-        ctx.shadowColor = player.color;
-        ctx.shadowBlur = 15;
-        ctx.fillRect(player.x * TILE_SIZE + 4, player.y * TILE_SIZE + 4, TILE_SIZE - 8, TILE_SIZE - 8);
-        ctx.shadowBlur = 0;
-    }
-
-    function movePlayer(dx, dy) {
-        if (gameState !== 'EXPLORING') return;
-
-        const newX = player.x + dx;
-        const newY = player.y + dy;
-
-        // Collision Detection: Check boundaries and walls
-        if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS && map[newY][newX] !== 1) {
-            player.x = newX;
-            player.y = newY;
+    <nav>
+        <div class="logo">Unfiltered</div>
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
             
-            // Check for Exit
-            if (map[newY][newX] === 2) {
-                alert("SYSTEM CORE REACHED! Mission Accomplished.");
-                resetGame();
-                return;
-            }
+            <div class="dropdown">
+                <button class="dropbtn">Projects ▾</button>
+                <div class="dropdown-content">
+                    <a href="calc-splainer.html">Calc Splainer</a>
+                    <a href="determinants.html">Determinant Calc</a>
+                    <a href="matrix-ops.html">Matrix Ops</a>
+                    <a href="anime-quiz.html">Anime Quiz</a>
+                    <a href="mlbb-quiz.html">MLBB Quiz</a>
+                    <a href="snake-game.html">Snake Game</a>
+                    <a href="flappy-bird.html">Neon Flap</a>
+                    <a href="tic-tac-toe.html">Minimax AI</a>
+                    <a href="2048.html">2048 Puzzle</a>
+                    <a href="rpg-game.html">RPG Engine</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-            // Roll for random encounter
-            if (Math.random() < ENCOUNTER_CHANCE) {
-                startBattle();
-            }
-        }
+    <div class="container" style="display: block; max-width: 1200px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Neon Rogue</h1>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A turn-based RPG with Cyberpunk aesthetics. Features a custom particle system, screen shake effects, and resource management combat.</p>
+        </div>
+
+        <div class="split-container">
+            <div class="code-view">
+<pre>
+<span class="c">// --- Visual FX: Particle System ---</span>
+<span class="c">// Adds "juice" to the combat and exploration</span>
+
+let particles = [];
+
+<span class="k">function</span> <span class="f">spawnParticles</span>(x, y, color, count) {
+    <span class="k">for</span>(let i=<span class="n">0</span>; i<count; i++) {
+        particles.<span class="f">push</span>({
+            x: x, 
+            y: y,
+            <span class="c">// Random explosive velocity</span>
+            vx: (Math.<span class="f">random</span>() - <span class="n">0.5</span>) * <span class="n">8</span>,
+            vy: (Math.<span class="f">random</span>() - <span class="n">0.5</span>) * <span class="n">8</span>,
+            life: <span class="n">20</span> + Math.<span class="f">random</span>() * <span class="n">10</span>,
+            color: color,
+            size: <span class="n">2</span> + Math.<span class="f">random</span>() * <span class="n">3</span>
+        });
     }
+}
 
-    // --- BATTLE LOGIC ---
-    function startBattle() {
-        gameState = 'BATTLING';
-        // Pick a random enemy based on player level (simplified)
-        let enemyIndex = Math.min(player.lvl - 1, enemyTypes.length - 1);
-        // Add some randomness
-        if (Math.random() > 0.7 && enemyIndex < enemyTypes.length - 1) enemyIndex++;
-        
-        const baseEnemy = enemyTypes[enemyIndex];
-        currentEnemy = { ...baseEnemy, maxHp: baseEnemy.hp }; // Create a copy
-
-        // Update UI
-        battleUi.classList.remove('hidden');
-        document.getElementById('attack-btn').disabled = false;
-        document.getElementById('battle-log').innerText = `A hostile ${currentEnemy.name} interrupts your connection!`;
-        updateBattleStats();
+<span class="k">function</span> <span class="f">update</span>() {
+    <span class="c">// Screen Shake Logic</span>
+    <span class="k">if</span>(shakeDuration > <span class="n">0</span>) {
+        let offset = Math.<span class="f">random</span>()*<span class="n">4</span> - <span class="n">2</span>;
+        gameContainer.style.transform = 
+            `translate(${offset}px, ${offset}px)`;
+        shakeDuration--;
     }
+    <span class="c">// ... particle updates ...</span>
+}
+</pre>
+            </div>
 
-    function attackRound() {
-        const attackBtn = document.getElementById('attack-btn');
-        attackBtn.disabled = true;
-        const log = document.getElementById('battle-log');
-
-        // --- Player Turn ---
-        // Damage = Attacker Attack - Defender Defense (min 1)
-        let playerDmg = Math.max(1, player.attack - currentEnemy.defense + Math.floor(Math.random() * 5));
-        currentEnemy.hp = Math.max(0, currentEnemy.hp - playerDmg);
-        log.innerText = `You hit ${currentEnemy.name} for ${playerDmg} damage.`;
-        updateBattleStats();
-
-        if (currentEnemy.hp === 0) {
-            // Victory
-            setTimeout(() => {
-                log.innerText = `Target Eliminated! Gained ${currentEnemy.xp} XP.`;
-                log.className = "text-sm text-green-400 h-12 text-center px-4";
-                gainXp(currentEnemy.xp);
-                setTimeout(endBattle, 1500);
-            }, 1000);
-            return;
-        }
-
-        // --- Enemy Turn (after a short delay) ---
-        setTimeout(() => {
-            let enemyDmg = Math.max(1, currentEnemy.attack - player.defense + Math.floor(Math.random() * 5));
-            player.hp = Math.max(0, player.hp - enemyDmg);
-            log.innerText = `${currentEnemy.name} hits you for ${enemyDmg} damage!`;
-            log.className = "text-sm text-red-400 h-12 text-center px-4";
-            updateBattleStats();
-
-            if (player.hp === 0) {
-                // Defeat
-                setTimeout(() => {
-                     alert("CRITICAL SYSTEM FAILURE. Game Over.");
-                     resetGame();
-                     endBattle();
-                }, 1000);
-            } else {
-                // Next round ready
-                attackBtn.disabled = false;
-            }
-        }, 1200);
-    }
-
-    function endBattle() {
-        battleUi.classList.add('hidden');
-        gameState = 'EXPLORING';
-        document.getElementById('battle-log').className = "text-sm text-yellow-400 h-12 text-center px-4";
-        currentEnemy = null;
-    }
-
-    function updateBattleStats() {
-        // Player
-        document.getElementById('player-hp-text').innerText = player.hp;
-        document.getElementById('player-max-hp-text').innerText = player.maxHp;
-        document.getElementById('player-hp-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
-        
-        // Enemy
-        if (currentEnemy) {
-            document.getElementById('enemy-name').innerText = currentEnemy.name;
-            document.getElementById('enemy-hp-text').innerText = currentEnemy.hp;
-            document.getElementById('enemy-max-hp-text').innerText = currentEnemy.maxHp;
-            document.getElementById('enemy-hp-bar').style.width = `${(currentEnemy.hp / currentEnemy.maxHp) * 100}%`;
-        }
-    }
-
-    function gainXp(amount) {
-        player.xp += amount;
-        // Level Up Logic
-        if (player.xp >= player.xpToNext) {
-            player.lvl++;
-            player.xp -= player.xpToNext;
-            player.xpToNext = Math.floor(player.xpToNext * 1.5); // Harder to level up next time
-            
-            // Stat increases
-            player.maxHp += 20;
-            player.hp = player.maxHp; // Full heal on level up
-            player.attack += 5;
-            player.defense += 3;
-            
-            alert(`LEVEL UP! You are now Level ${player.lvl}. Stats increased!`);
-        }
-        
-        // Update exploration UI stats
-        document.getElementById('player-lvl').innerText = player.lvl;
-        document.getElementById('player-xp').innerText = player.xp;
-        document.getElementById('xp-to-next').innerText = player.xpToNext;
-    }
-
-    function resetGame() {
-        player.x = 1; player.y = 1;
-        player.hp = player.maxHp;
-        // We'll keep level and stats for now for fun, but reset position/hp
-        updateBattleStats();
-    }
-
-    // --- INPUT HANDLING ---
-    window.addEventListener('keydown', (e) => {
-        if (gameState === 'BATTLING' && e.code === 'Space') {
-            // Allow spacebar to attack for convenience
-            const btn = document.getElementById('attack-btn');
-            if (!btn.disabled) btn.click();
-            return;
-        }
-        
-        switch(e.key) {
-            case 'ArrowUp': case 'w': movePlayer(0, -1); break;
-            case 'ArrowDown': case 's': movePlayer(0, 1); break;
-            case 'ArrowLeft': case 'a': movePlayer(-1, 0); break;
-            case 'ArrowRight': case 'd': movePlayer(1, 0); break;
-        }
-    });
-
-    // Init
-    updateBattleStats();
-    gainXp(0); // Initial UI update
-    gameLoop();
-  </script>
+            <div class="output-view">
+                <iframe src="rpg-game-app.html?v=2"></iframe>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
