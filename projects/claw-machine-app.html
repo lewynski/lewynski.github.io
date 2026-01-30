@@ -3,67 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cyber Catch</title>
+  <title>Toy Kingdom Claw</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap" rel="stylesheet">
   <style>
     body { 
-        background-color: #050505; 
-        font-family: 'Orbitron', sans-serif; 
+        background-color: #fef3c7; /* Light Yellow */
+        font-family: 'Nunito', sans-serif; 
         touch-action: none; 
         overflow: hidden;
     }
     
+    h1, h2, .btn-font { font-family: 'Fredoka One', cursive; }
+
+    /* Toy Kingdom Style Container */
     #game-container {
         position: relative;
-        box-shadow: 0 0 50px rgba(236, 72, 153, 0.2); /* Pink Glow */
-        border: 2px solid #333;
-        background: radial-gradient(circle at center bottom, #1f1f1f 0%, #000 70%);
+        box-shadow: 0 10px 0 rgba(0,0,0,0.1);
+        border: 8px solid #ef4444; /* Bright Red Border */
+        border-radius: 20px;
+        background: radial-gradient(circle at center, #bfdbfe 0%, #60a5fa 100%); /* Sky Blue BG */
+        overflow: hidden;
     }
 
     canvas { display: block; }
 
+    /* Buttons */
     .btn-control {
-        background: #1f2937;
-        border: 1px solid #374151;
-        color: #e5e7eb;
-        border-radius: 8px;
+        background: #fbbf24; /* Amber */
+        border: 4px solid #d97706;
+        color: #78350f;
+        border-radius: 50%;
+        width: 60px; height: 60px;
+        font-size: 1.5rem;
         transition: all 0.1s;
+        box-shadow: 0 6px 0 #d97706;
+        display: flex; align-items: center; justify-content: center;
     }
-    .btn-control:active { background: #ec4899; color: black; transform: translateY(2px); }
+    .btn-control:active { transform: translateY(6px); box-shadow: 0 0 0; }
     
     .drop-btn {
-        background: #be185d;
+        background: #ef4444; /* Red */
+        border-color: #b91c1c;
         color: white;
-        border-color: #ec4899;
-        box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 6px 0 #b91c1c;
     }
-    .drop-btn:active { background: #db2777; }
+
+    .diff-btn {
+        opacity: 0.5; transform: scale(0.9); transition: all 0.2s;
+    }
+    .diff-active {
+        opacity: 1; transform: scale(1.1); border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
-<body class="flex flex-col items-center justify-center h-screen text-white p-2">
+<body class="flex flex-col items-center justify-center h-screen text-gray-800 p-2">
 
-  <div class="flex justify-between w-full max-w-[400px] mb-2 px-2 text-xs tracking-widest">
-      <div class="text-pink-500">CREDITS: <span id="credits">3</span></div>
-      <div class="text-cyan-400">SCORE: <span id="score">0</span></div>
-  </div>
-
-  <div id="game-container" class="rounded-lg overflow-hidden relative">
-      <canvas id="gameCanvas" width="400" height="500"></canvas>
-      
-      <div id="game-over-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-20">
-          <h2 class="text-pink-500 text-2xl mb-2">OUT OF CREDITS</h2>
-          <p class="text-xs text-gray-300 mb-6">Total Haul: <span id="final-score" class="text-white">0</span></p>
-          <button onclick="startGame()" class="px-6 py-3 border-2 border-pink-500 text-pink-400 hover:bg-pink-900/50 text-xs rounded transition-all">
-              INSERT COIN
-          </button>
+  <div class="flex justify-between items-center w-full max-w-[400px] mb-2 px-1">
+      <div class="flex gap-2">
+          <button onclick="setDifficulty('EASY')" id="btn-easy" class="diff-btn bg-green-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">EASY</button>
+          <button onclick="setDifficulty('HARD')" id="btn-hard" class="diff-btn bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">HARD</button>
+      </div>
+      <div class="bg-white px-4 py-1 rounded-full border-2 border-gray-200 text-xs font-bold text-orange-500 shadow-sm">
+          COINS: <span id="credits">3</span>
       </div>
   </div>
 
-  <div class="grid grid-cols-3 gap-2 mt-4 w-[300px]">
-      <button class="btn-control h-14 text-2xl" onmousedown="moveLeft(true)" onmouseup="moveLeft(false)" ontouchstart="moveLeft(true)" ontouchend="moveLeft(false)">◀</button>
-      <button class="btn-control drop-btn h-14 text-sm font-bold" onclick="dropClaw()">DROP</button>
-      <button class="btn-control h-14 text-2xl" onmousedown="moveRight(true)" onmouseup="moveRight(false)" ontouchstart="moveRight(true)" ontouchend="moveRight(false)">▶</button>
+  <div id="game-container">
+      <canvas id="gameCanvas" width="400" height="500"></canvas>
+      
+      <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-20">
+          <h1 class="text-4xl text-red-500 mb-2 drop-shadow-sm text-center tracking-wide" style="-webkit-text-stroke: 1px white;">TOY<br>KINGDOM</h1>
+          <p class="text-sm text-gray-500 mb-6 font-bold">Catch the Plushies!</p>
+          <button onclick="startGame()" class="px-8 py-4 bg-yellow-400 border-b-4 border-yellow-600 text-yellow-900 rounded-2xl font-black text-xl hover:bg-yellow-300 transition-all btn-font shadow-xl">
+              PLAY NOW
+          </button>
+      </div>
+
+      <div id="game-over-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20 text-white">
+          <h2 class="text-3xl mb-2 btn-font text-yellow-400">GAME OVER</h2>
+          <p class="text-sm mb-6 font-bold">You collected <span id="final-score" class="text-yellow-400 text-xl">0</span> points!</p>
+          <button onclick="startGame()" class="px-6 py-3 bg-blue-500 border-b-4 border-blue-700 text-white rounded-xl font-bold transition-all shadow-lg hover:bg-blue-400">
+              INSERT COIN
+          </button>
+      </div>
+      
+      <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-lg border-2 border-yellow-600 font-bold text-sm shadow-md">
+          ★ <span id="score">0</span>
+      </div>
+  </div>
+
+  <div class="flex items-end justify-center gap-4 mt-6 w-[350px]">
+      <button class="btn-control" onmousedown="moveLeft(true)" onmouseup="moveLeft(false)" ontouchstart="moveLeft(true)" ontouchend="moveLeft(false)">◀</button>
+      
+      <div class="flex-1">
+          <button class="btn-control drop-btn h-16 text-xl btn-font" onclick="dropClaw()">GRAB!</button>
+      </div>
+      
+      <button class="btn-control" onmousedown="moveRight(true)" onmouseup="moveRight(false)" ontouchstart="moveRight(true)" ontouchend="moveRight(false)">▶</button>
   </div>
 
   <script>
@@ -73,9 +112,14 @@
     // --- CONFIG ---
     const WIDTH = 400;
     const HEIGHT = 500;
-    const CLAW_SPEED_X = 4;
-    const CLAW_SPEED_Y = 5;
-    const FLOOR_Y = 450;
+    const FLOOR_Y = 440;
+    const CLAW_SPEED_X = 5;
+    const CLAW_SPEED_Y = 6;
+    
+    // --- DIFFICULTY SETTINGS ---
+    let difficulty = 'EASY'; // EASY or HARD
+    // Hard mode: 30% chance to drop item every 10 frames while retracting
+    const SLIP_CHANCE = 0.02; 
     
     // --- STATE ---
     let score = 0;
@@ -87,28 +131,32 @@
     // --- OBJECTS ---
     const claw = {
         x: WIDTH / 2,
-        y: 60,
-        state: 'IDLE', // IDLE, DROPPING, GRABBING, RETRACTING
-        width: 40,
+        y: 80,
+        state: 'IDLE', 
+        width: 50,
         grabbedItem: null
     };
 
     let prizes = [];
-    const prizeTypes = [
-        { color: '#22d3ee', score: 100, radius: 15 }, // Cyan (Small)
-        { color: '#a855f7', score: 50, radius: 20 },  // Purple (Med)
-        { color: '#facc15', score: 20, radius: 25 }   // Gold (Large/Easy)
-    ];
+    const prizeColors = ['#ef4444', '#3b82f6', '#22c55e', '#a855f7', '#f97316']; // Red, Blue, Green, Purple, Orange
 
     // --- GAME LOGIC ---
+    function setDifficulty(level) {
+        difficulty = level;
+        document.getElementById('btn-easy').className = `diff-btn bg-green-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm ${level==='EASY'?'diff-active':''}`;
+        document.getElementById('btn-hard').className = `diff-btn bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm ${level==='HARD'?'diff-active':''}`;
+    }
+
     function initPrizes() {
         prizes = [];
-        for(let i=0; i<12; i++) {
+        for(let i=0; i<15; i++) {
             prizes.push({
-                x: 40 + Math.random() * (WIDTH - 80),
-                y: FLOOR_Y - 10 - Math.random() * 30, // Pile them at bottom
-                type: prizeTypes[Math.floor(Math.random() * prizeTypes.length)],
-                rotation: Math.random() * Math.PI
+                x: 50 + Math.random() * (WIDTH - 100),
+                y: FLOOR_Y - 15 - Math.random() * 50, 
+                color: prizeColors[Math.floor(Math.random() * prizeColors.length)],
+                radius: 15 + Math.random() * 10,
+                rotation: Math.random() * Math.PI,
+                face: Math.random() > 0.5 ? '🐻' : '🐼' // Plushie Faces
             });
         }
     }
@@ -118,10 +166,12 @@
         credits = 3;
         isRunning = true;
         claw.state = 'IDLE';
-        claw.y = 60;
+        claw.y = 80;
         claw.grabbedItem = null;
         
+        setDifficulty(difficulty); // Refresh UI
         initPrizes();
+        document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('game-over-screen').classList.add('hidden');
         updateHUD();
         loop();
@@ -135,39 +185,43 @@
     }
 
     function update() {
-        // 1. Horizontal Movement (Only when IDLE)
+        // 1. Move Left/Right
         if (claw.state === 'IDLE') {
-            if (leftPressed && claw.x > 30) claw.x -= CLAW_SPEED_X;
-            if (rightPressed && claw.x < WIDTH - 30) claw.x += CLAW_SPEED_X;
+            if (leftPressed && claw.x > 40) claw.x -= CLAW_SPEED_X;
+            if (rightPressed && claw.x < WIDTH - 40) claw.x += CLAW_SPEED_X;
         }
 
-        // 2. Vertical Logic
+        // 2. Drop
         if (claw.state === 'DROPPING') {
             claw.y += CLAW_SPEED_Y;
-            // Hit floor?
-            if (claw.y >= FLOOR_Y - 20) {
+            if (claw.y >= FLOOR_Y - 30) {
                 claw.state = 'GRABBING';
-                setTimeout(attemptGrab, 500); // Pause briefly at bottom
+                setTimeout(attemptGrab, 500);
             }
         } 
+        // 3. Retract & Slippage Logic
         else if (claw.state === 'RETRACTING') {
             claw.y -= CLAW_SPEED_Y;
             
-            // Carry Prize
             if (claw.grabbedItem) {
                 claw.grabbedItem.x = claw.x;
-                claw.grabbedItem.y = claw.y + 20;
+                claw.grabbedItem.y = claw.y + 30;
+
+                // DIFFICULTY LOGIC: Random Slip
+                if (difficulty === 'HARD' && Math.random() < SLIP_CHANCE) {
+                    // Drop the item!
+                    claw.grabbedItem.y = FLOOR_Y - 20; // Teleport to floor for simplicity
+                    prizes.push(claw.grabbedItem); // Add back to pile
+                    claw.grabbedItem = null; // Lose grip
+                }
             }
 
-            // Back at top?
-            if (claw.y <= 60) {
+            // Top reached
+            if (claw.y <= 80) {
                 if (claw.grabbedItem) {
-                    // Success!
-                    score += claw.grabbedItem.type.score;
-                    claw.grabbedItem = null; // Consume item
-                    updateHUD();
+                    score += 100;
+                    claw.grabbedItem = null; // Collected
                 }
-                
                 credits--;
                 updateHUD();
                 
@@ -181,22 +235,23 @@
         let bestDist = 1000;
         let chosenIndex = -1;
 
-        // Find closest prize
         prizes.forEach((p, index) => {
             let dx = claw.x - p.x;
-            let dy = (claw.y + 20) - p.y;
+            let dy = (claw.y + 30) - p.y;
             let dist = Math.sqrt(dx*dx + dy*dy);
 
-            if (dist < p.type.radius + 15 && dist < bestDist) {
+            // Easier grab radius in Easy mode
+            let grabRadius = difficulty === 'EASY' ? 40 : 25;
+
+            if (dist < grabRadius && dist < bestDist) {
                 bestDist = dist;
                 chosenIndex = index;
             }
         });
 
         if (chosenIndex !== -1) {
-            // GRAB SUCCESS (Maybe add RNG for slip later)
             claw.grabbedItem = prizes[chosenIndex];
-            prizes.splice(chosenIndex, 1); // Remove from floor
+            prizes.splice(chosenIndex, 1);
         }
 
         claw.state = 'RETRACTING';
@@ -206,61 +261,70 @@
         // Clear
         ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
+        // Draw Background Decoration (Clouds)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath(); ctx.arc(50, 50, 40, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(350, 100, 60, 0, Math.PI*2); ctx.fill();
+
         // Draw Rail
-        ctx.fillStyle = '#333';
-        ctx.fillRect(0, 20, WIDTH, 10);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillRect(20, 30, WIDTH-40, 10);
 
         // Draw Rope
-        ctx.strokeStyle = '#555';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(claw.x, 30);
+        ctx.moveTo(claw.x, 40);
         ctx.lineTo(claw.x, claw.y);
         ctx.stroke();
 
-        // Draw Claw Machine Arm
-        ctx.fillStyle = '#ec4899'; // Neon Pink
-        ctx.shadowBlur = 15; ctx.shadowColor = '#ec4899';
+        // Draw Claw (Silver Industrial Style)
+        ctx.fillStyle = '#94a3b8'; // Silver
+        ctx.fillRect(claw.x - 20, claw.y, 40, 15); // Base
         
-        ctx.fillRect(claw.x - 20, claw.y, 40, 10); // Base
-        
-        // Pincers (Animate based on state)
-        let openAmount = (claw.state === 'IDLE' || claw.state === 'DROPPING') ? 25 : 10;
+        // Pincers
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 6;
+        let openAmount = (claw.state === 'IDLE' || claw.state === 'DROPPING') ? 30 : 10;
         
         ctx.beginPath();
         ctx.moveTo(claw.x - 15, claw.y + 10);
-        ctx.lineTo(claw.x - openAmount, claw.y + 35); // Left finger
+        ctx.quadraticCurveTo(claw.x - 35, claw.y + 30, claw.x - openAmount, claw.y + 50);
         ctx.stroke();
-        
+
         ctx.beginPath();
         ctx.moveTo(claw.x + 15, claw.y + 10);
-        ctx.lineTo(claw.x + openAmount, claw.y + 35); // Right finger
+        ctx.quadraticCurveTo(claw.x + 35, claw.y + 30, claw.x + openAmount, claw.y + 50);
         ctx.stroke();
-        
-        ctx.shadowBlur = 0;
 
-        // Draw Prizes
+        // Draw Prizes (Plushies)
         prizes.forEach(p => drawPrize(p));
-
-        // Draw Grabbed Prize (on top)
         if (claw.grabbedItem) drawPrize(claw.grabbedItem);
+        
+        // Draw Bin (Bottom Left)
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(0, 350, 10, 150);
+        ctx.fillRect(0, 490, 80, 10);
     }
 
     function drawPrize(p) {
-        ctx.fillStyle = p.type.color;
-        ctx.shadowBlur = 10; ctx.shadowColor = p.type.color;
-        
+        ctx.fillStyle = p.color;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.type.radius, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
         
-        // Shine
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.beginPath();
-        ctx.arc(p.x - 5, p.y - 5, p.type.radius / 3, 0, Math.PI * 2);
-        ctx.fill();
+        // Face
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.font = `${p.radius}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.face, p.x, p.y);
         
-        ctx.shadowBlur = 0;
+        // Highlight (Plastic wrap look)
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.beginPath();
+        ctx.arc(p.x - 5, p.y - 5, p.radius/3, 0, Math.PI * 2);
+        ctx.fill();
     }
 
     function dropClaw() {
@@ -270,7 +334,7 @@
     function moveLeft(pressed) { leftPressed = pressed; }
     function moveRight(pressed) { rightPressed = pressed; }
     
-    // Keyboard Support
+    // Keyboard
     window.addEventListener('keydown', e => {
         if(e.code === 'ArrowLeft') leftPressed = true;
         if(e.code === 'ArrowRight') rightPressed = true;
@@ -292,8 +356,7 @@
         document.getElementById('credits').innerText = credits;
     }
     
-    // Start immediately
-    startGame();
+    setDifficulty('EASY'); // Init
   </script>
 </body>
 </html>
