@@ -14,7 +14,7 @@ Welcome to **Unfiltered**. I am an **Electronics Engineering (ECE)** student and
 
 * 🔭 **Currently working on:** Advanced matrix solvers & AI-integrated tools.
 * 🌱 **Learning:** Embedded Systems & Modern Web Frameworks.
-* 💬 **Ask me about:** Python, Crout's Method, and Computational Logic.
+* 💬 **Ask me about:** Basic programming questions and also other technologies related.
 
 ---
 
