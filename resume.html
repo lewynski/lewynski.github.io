@@ -28,7 +28,7 @@
         }
 
         .resume-container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -44,39 +44,54 @@
             border-bottom: 1px solid var(--border-color);
             position: relative;
             background: radial-gradient(circle at top left, #1e3a8a 0%, var(--bg-card) 60%);
+            display: flex;
+            align-items: center;
+            gap: 30px;
         }
 
+        .header-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-blue);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .header-content { flex: 1; }
+
         h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 800;
-            margin: 0 0 10px 0;
+            margin: 0 0 5px 0;
             background: linear-gradient(to right, #60a5fa, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
         }
 
         .title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--text-muted);
             font-weight: 500;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-family: 'Fira Code', monospace;
         }
 
         .contact-info {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
             font-size: 0.9rem;
             color: var(--text-muted);
         }
 
-        .contact-info a {
+        .contact-info a, .contact-info span {
             color: var(--text-muted);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: color 0.2s;
         }
 
@@ -85,7 +100,7 @@
         /* PDF Download Button */
         .download-btn {
             position: absolute;
-            top: 50px;
+            top: 40px;
             right: 40px;
             background: var(--accent-blue);
             color: white;
@@ -100,10 +115,7 @@
             box-shadow: 0 4px 15px var(--accent-glow);
         }
 
-        .download-btn:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-        }
+        .download-btn:hover { background: #2563eb; transform: translateY(-2px); }
 
         /* Layout Grid */
         .content {
@@ -115,7 +127,7 @@
 
         /* Sections */
         .section-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 20px;
             display: flex;
@@ -123,6 +135,8 @@
             gap: 10px;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .section-title i { color: var(--accent-blue); }
@@ -131,51 +145,75 @@
         .item { margin-bottom: 30px; }
         .item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
         .item-title { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
-        .item-subtitle { color: var(--accent-blue); font-weight: 500; font-size: 0.95rem; }
+        .item-subtitle { color: var(--accent-blue); font-weight: 600; font-size: 0.95rem; }
         .item-date { color: var(--text-muted); font-size: 0.85rem; font-family: 'Fira Code', monospace; }
         .item-desc { color: var(--text-muted); font-size: 0.95rem; margin-top: 10px; }
         .item-desc ul { padding-left: 20px; margin-top: 5px; }
-        .item-desc li { margin-bottom: 5px; }
+        .item-desc li { margin-bottom: 6px; }
 
-        /* Skills Tags */
-        .skills-category { margin-bottom: 20px; }
-        .skills-category h4 { margin: 0 0 10px 0; font-size: 0.95rem; color: #f1f5f9; }
-        .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        /* Sidebar Elements */
+        .sidebar-section { margin-bottom: 40px; }
+        
+        .skills-list { list-style: none; padding: 0; margin: 0; }
+        .skills-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .skills-list li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .tag {
             background: #0f172a;
             border: 1px solid var(--border-color);
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: #e2e8f0;
             font-family: 'Fira Code', monospace;
+            transition: border-color 0.2s;
         }
+        .tag:hover { border-color: var(--accent-blue); }
 
         @media (max-width: 768px) {
             .content { grid-template-columns: 1fr; }
+            .header { flex-direction: column; text-align: center; padding: 30px 20px; }
+            .contact-info { justify-content: center; }
             .download-btn { position: relative; top: 0; right: 0; display: inline-flex; margin-top: 20px; }
-            .header { padding: 30px 20px; }
-            .content { padding: 20px; }
+            .item-header { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-    <a href="index.html" style="display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-weight: 500;">
+    <a href="index.html" style="display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-weight: 500; font-family: 'Inter', sans-serif;">
         <i class="fas fa-arrow-left"></i> Back to Portfolio
     </a>
 
     <div class="resume-container">
         
         <header class="header">
-            <h1>Jon Lewyn Tanggaro</h1>
-            <div class="title">&gt; Electronics Engineering Student & Software Developer</div>
+            <img src="me.jpg" alt="Jon Lewyn Tanggaro" class="header-pic">
             
-            <div class="contact-info">
-                <a href="mailto:your.email@example.com"><i class="fas fa-envelope"></i> your.email@example.com</a>
-                <a href="#"><i class="fas fa-phone"></i> +63 9XX XXX XXXX</a>
-                <a href="https://github.com/lewynski" target="_blank"><i class="fab fa-github"></i> github.com/lewynski</a>
-                <a href="#"><i class="fas fa-map-marker-alt"></i> Tanauan City, Philippines</a>
+            <div class="header-content">
+                <h1>JON LEWYN VILLARAM TANGGARO</h1>
+                <div class="title">&gt; Electronics Engineering Student & Developer</div>
+                
+                <div class="contact-info">
+                    <span><i class="fas fa-map-marker-alt"></i> Talaga, Tanauan City, Batangas City</span>
+                    <a href="mailto:lewynvllram@gmail.com"><i class="fas fa-envelope"></i> lewynvllram@gmail.com</a>
+                    <a href="tel:+639707210609"><i class="fas fa-phone"></i> +63 970 721 0609</a>
+                    <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank"><i class="fab fa-linkedin"></i> linkedin.com/in/jon-lewyn-tanggaro</a>
+                    <a href="https://lewynski.github.io" target="_blank"><i class="fas fa-globe"></i> lewynski.github.io</a>
+                </div>
             </div>
 
             <a href="Tanggaro_Resume.pdf" target="_blank" class="download-btn">
@@ -188,62 +226,31 @@
             <div class="main-column">
                 
                 <section>
-                    <h2 class="section-title"><i class="fas fa-briefcase"></i> Selected Projects</h2>
+                    <h2 class="section-title"><i class="fas fa-briefcase"></i> Professional Experience</h2>
                     
                     <div class="item">
                         <div class="item-header">
-                            <span class="item-title">Eiji AI Assistant</span>
-                            <span class="item-date">2026</span>
+                            <span class="item-title">Electronics Engineering Intern (OJT)</span>
+                            <span class="item-date">July 14, 2025 – August 29, 2025</span>
                         </div>
-                        <div class="item-subtitle">Full-Stack AI Integration</div>
+                        <div class="item-subtitle">Bandai Wireharness Philippines INC.</div>
                         <div class="item-desc">
                             <ul>
-                                <li>Developed an interactive, conversational web interface powered by the Google Gemini API.</li>
-                                <li>Implemented the Web Speech API to provide real-time Text-to-Speech responses.</li>
-                                <li>Designed a dynamic UI featuring async data fetching and markdown parsing.</li>
+                                <li>Developed and implemented an automated company system using macro programming, successfully reducing production time and manual workload.</li>
+                                <li>Monitored the production line to understand manufacturing workflows and assisted supervisors in documenting daily production metrics.</li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="item">
                         <div class="item-header">
-                            <span class="item-title">Crout Calculator</span>
-                            <span class="item-date">Jan 2026</span>
+                            <span class="item-title">Secondary Education Work Immersion</span>
+                            <span class="item-date">April 26 – May 11, 2023</span>
                         </div>
-                        <div class="item-subtitle">Android Application (Kivy/Buildozer)</div>
+                        <div class="item-subtitle">Negros Occidental Electric Cooperative (NOCECO)</div>
                         <div class="item-desc">
                             <ul>
-                                <li>Engineered an Android mobile application dedicated to solving Crout's method for matrices.</li>
-                                <li>Utilized Python and the Kivy framework for the frontend interface and mathematical logic.</li>
-                                <li>Compiled and packaged the application into a deployable APK using Buildozer via Google Colab.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">Automatic Sorting Machine</span>
-                            <span class="item-date">Nov 2025</span>
-                        </div>
-                        <div class="item-subtitle">Hardware & Embedded Systems</div>
-                        <div class="item-desc">
-                            <ul>
-                                <li>Co-developed a sorting mechanism integrating an optical feedback system for real-time detection.</li>
-                                <li>Designed system architecture and programmed microcontrollers to manage sensor inputs and actuator responses.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">Interactive Web Applications Engine</span>
-                            <span class="item-date">2025 - Present</span>
-                        </div>
-                        <div class="item-subtitle">JavaScript / HTML5 Canvas</div>
-                        <div class="item-desc">
-                            <ul>
-                                <li>Built a suite of 10+ browser-based applications including matrix calculators and physics-based logic games (Flappy Bird clone, 2048, RPG engine).</li>
-                                <li>Implemented complex state machines, 2D array matrix manipulations, and custom Minimax algorithms for unbeatable AI opponents.</li>
+                                <li>Assisted company supervisors in their daily tasks and gained hands-on experience in industry related operations.</li>
                             </ul>
                         </div>
                     </div>
@@ -255,14 +262,54 @@
                     <div class="item">
                         <div class="item-header">
                             <span class="item-title">Bachelor of Science in Electronics Engineering</span>
-                            <span class="item-date">Present</span>
+                            <span class="item-date">2023 – Present</span>
                         </div>
-                        <div class="item-subtitle">Polytechnic University of the Philippines, Sto. Tomas Branch</div>
+                        <div class="item-subtitle">Polytechnic University of the Philippines</div>
+                        <div class="item-desc">
+                            <p style="margin-top: 5px; color: #e2e8f0; font-weight: 500;">AFFILIATIONS:</p>
+                            <ul>
+                                <li>Organization of Electronics Engineering Students (OECES) of PUP - Sto. Tomas Campus.</li>
+                                <li>Special Project Officer for OECES at PUP Sto. Tomas Campus.</li>
+                                <li>Institute of Electronics Engineers of the Philippines - Batangas Student Chapter.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Science, Technology, Engineering, and Mathematics (STEM)</span>
+                            <span class="item-date">2021 – 2023</span>
+                        </div>
+                        <div class="item-subtitle">Fellowship Baptist College</div>
                         <div class="item-desc">
                             <ul>
-                                <li><strong>Coursework Highlights:</strong> Digital Signal Processing (DSP), Feedback and Control Systems, Electromagnetics, Antenna Design, Data Communications.</li>
-                                <li><strong>Research:</strong> Authored papers focusing on Feedback and Control Systems stability analysis.</li>
-                                <li><strong>Field Tools:</strong> Proficient in utilizing Google Earth and UISP Design Center for Line-of-Sight (LOS) antenna system computations.</li>
+                                <li>Graduated With High Honor</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Junior High School</span>
+                            <span class="item-date">2017 – 2021</span>
+                        </div>
+                        <div class="item-subtitle">Fellowship Baptist College</div>
+                        <div class="item-desc">
+                            <ul>
+                                <li>Graduated With Honor</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Primary Education</span>
+                            <span class="item-date">2011 – 2017</span>
+                        </div>
+                        <div class="item-subtitle">Jose G. Peralta Memorial School</div>
+                        <div class="item-desc">
+                            <ul>
+                                <li>Graduated Valedictorian</li>
                             </ul>
                         </div>
                     </div>
@@ -272,50 +319,50 @@
 
             <div class="side-column">
                 
-                <section>
-                    <h2 class="section-title"><i class="fas fa-code"></i> Technical Skills</h2>
-                    
-                    <div class="skills-category">
-                        <h4>Programming</h4>
-                        <div class="tags">
-                            <span class="tag">Python</span>
-                            <span class="tag">JavaScript</span>
-                            <span class="tag">HTML/CSS</span>
-                            <span class="tag">C/C++</span>
-                        </div>
+                <div class="sidebar-section">
+                    <h2 class="section-title"><i class="fas fa-microchip"></i> Technical Expertise</h2>
+                    <div class="tags">
+                        <span class="tag">Arduino Uno</span>
+                        <span class="tag">AutoCAD</span>
+                        <span class="tag">Python</span>
+                        <span class="tag">JavaScript</span>
+                        <span class="tag">CSS / HTML</span>
+                        <span class="tag">NI Multisim</span>
+                        <span class="tag">Quartus (FPGA)</span>
+                        <span class="tag">Canva</span>
+                        <span class="tag">Livewire</span>
+                        <span class="tag">Everycircuit</span>
+                        <span class="tag">Falstad</span>
+                        <span class="tag">MS Office Suite</span>
+                        <span class="tag">Replit</span>
+                        <span class="tag">Render</span>
+                        <span class="tag">Railway</span>
+                        <span class="tag">MongoDB</span>
                     </div>
+                </div>
 
-                    <div class="skills-category">
-                        <h4>Frameworks & Tools</h4>
-                        <div class="tags">
-                            <span class="tag">Kivy</span>
-                            <span class="tag">Buildozer</span>
-                            <span class="tag">Git / GitHub</span>
-                            <span class="tag">Tailwind CSS</span>
-                        </div>
-                    </div>
+                <div class="sidebar-section">
+                    <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Skills</h2>
+                    <ul class="skills-list">
+                        <li>Ability to adapt and be flexible in dynamic circumstances.</li>
+                        <li>Diligent and capable of working independently with minimal supervision.</li>
+                        <li>Motivated by enthusiasm and a strong sense of curiosity.</li>
+                        <li>Proficient in <strong>Python</strong> and <strong>JavaScript</strong>, with practical experience in <strong>HTML</strong> and <strong>CSS</strong> for web development.</li>
+                        <li>Familiar with utilizing <strong>Gmail, Google Docs, Google Sheets</strong>, and <strong>Google Forms</strong>.</li>
+                        <li>Proficient in Microsoft Office Suite, including <strong>Word, Excel, PowerPoint, Outlook</strong>, and other related software.</li>
+                        <li>Skilled in graphic design and capable of creating visual content using <strong>Canva</strong> and other design software.</li>
+                    </ul>
+                </div>
 
-                    <div class="skills-category">
-                        <h4>Hardware & ECE</h4>
-                        <div class="tags">
-                            <span class="tag">Arduino</span>
-                            <span class="tag">Microcontrollers</span>
-                            <span class="tag">MATLAB</span>
-                            <span class="tag">Digital Signal Processing</span>
-                            <span class="tag">Antenna Theory</span>
-                            <span class="tag">Control Systems</span>
-                        </div>
-                    </div>
-                    
-                    <div class="skills-category">
-                        <h4>Data Comms & Protocols</h4>
-                        <div class="tags">
-                            <span class="tag">VRC/LRC</span>
-                            <span class="tag">Hamming Codes</span>
-                            <span class="tag">CRC Error Detection</span>
-                        </div>
-                    </div>
-                </section>
+                <div class="sidebar-section">
+                    <h2 class="section-title"><i class="fas fa-certificate"></i> Professional Development</h2>
+                    <ul class="skills-list" style="font-size: 0.85rem;">
+                        <li><strong>ELECTRONEXT:</strong> Empowering the Next Generation with a Comprehensive Guide to Radio Transceiver Regulations, Permitting, and Professional Practice in Electronics Engineering.</li>
+                        <li><strong>First Batangas ECE Student Summit:</strong> Role of Electronics in Building a Sustainable Future Seminar.</li>
+                        <li><strong>First Batangas ECE Student Summit:</strong> Innovation Topic Seminar.</li>
+                        <li><strong>Second Batangas ECE Student Summit:</strong> The Crucial Role of Electronics Engineers in Shaping a Sustainable Future Seminar.</li>
+                    </ul>
+                </div>
 
             </div>
             
