@@ -75,44 +75,41 @@
     <div class="container" style="display: block; max-width: 1200px;">
         <div style="text-align: center; margin-bottom: 40px;">
             <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #3b82f6, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Eiji Assistant</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A sleek, conversational interface powered directly by Google's Gemini API, parsing markdown data in real-time.</p>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A sleek, conversational interface powered by <strong>Groq LPUs</strong> and Meta's <strong>Llama 3</strong>, parsing markdown data in real-time.</p>
         </div>
 
         <div class="split-container">
             <div class="code-view">
 <pre>
-<span class="c">// --- Gemini API Integration ---</span>
-<span class="c">// Sends user prompt to Google's AI model</span>
+<span class="c">// --- Groq API Integration ---</span>
+<span class="c">// Utilizes Meta's Llama 3 via Groq LPU</span>
 
 <span class="k">async function</span> <span class="f">sendMessage</span>(text) {
     
-    <span class="c">// 1. Prepare Payload</span>
-    <span class="k">const</span> url = <span class="s">`https://generativelanguage.googleapis.com
-        /v1beta/models/gemini-1.5-flash:generateContent
-        ?key=${API_KEY}`</span>;
-        
-    <span class="c">// 2. Send Request</span>
-    <span class="k">const</span> response = <span class="k">await</span> <span class="f">fetch</span>(url, {
+    <span class="k">const</span> response = <span class="k">await</span> <span class="f">fetch</span>(<span class="s">"https://api.groq.com/openai/v1/chat/completions"</span>, {
         method: <span class="s">"POST"</span>,
-        headers: { <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span> },
+        headers: { 
+            <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span>,
+            <span class="s">"Authorization"</span>: <span class="s">"Bearer "</span> + API_KEY
+        },
         body: JSON.<span class="f">stringify</span>({
-            contents: [{
-                parts: [{ text: text }]
-            }]
+            model: <span class="s">"llama3-8b-8192"</span>,
+            messages: [
+                { role: <span class="s">"system"</span>, content: SYSTEM_PROMPT },
+                { role: <span class="s">"user"</span>, content: text }
+            ]
         })
     });
 
-    <span class="c">// 3. Parse Result</span>
+    <span class="c">// Parse OpenAI-compatible response</span>
     <span class="k">const</span> data = <span class="k">await</span> response.<span class="f">json</span>();
-    
-    <span class="c">// 4. Extract AI Text</span>
-    <span class="k">return</span> data.candidates[<span class="n">0</span>].content.parts[<span class="n">0</span>].text;
+    <span class="k">return</span> data.choices[<span class="n">0</span>].message.content;
 }
 </pre>
             </div>
 
             <div class="output-view">
-                <iframe src="eiji-ai-app.html?v=3"></iframe>
+                <iframe src="eiji-ai-app.html?v=4"></iframe>
             </div>
         </div>
     </div>
