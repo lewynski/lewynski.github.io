@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eiji - Real AI</title>
+  <title>Eiji - Groq Powered</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -23,7 +23,6 @@
     .msg-user { background: #1e293b; color: #e2e8f0; align-self: flex-end; border-bottom-right-radius: 2px; }
     .msg-ai { background: #2563eb; color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
     
-    /* Markdown Styles inside chat */
     .msg-ai p { margin-bottom: 0.5rem; }
     .msg-ai code { background: rgba(0,0,0,0.2); padding: 2px 4px; rounded; font-family: monospace; }
     .msg-ai strong { font-weight: 700; color: #bfdbfe; }
@@ -34,31 +33,33 @@
   <div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[650px]">
       
     <div class="bg-slate-800 p-4 border-b border-slate-700 flex items-center gap-4">
-        <div class="relative w-12 h-12 flex items-center justify-center bg-blue-900 rounded-full">
+        <div class="relative w-12 h-12 flex items-center justify-center bg-blue-900 rounded-full shadow-lg border-2 border-blue-500">
             <span class="text-2xl">⚡</span>
         </div>
         <div>
-            <h1 class="font-bold text-lg text-blue-400">Eiji (Gemini Powered)</h1>
-            <p id="status-text" class="text-xs text-gray-400">Connected to Neural Net</p>
+            <h1 class="font-bold text-lg text-blue-400 tracking-wide">Eiji <span class="text-xs text-gray-500">(Llama 3)</span></h1>
+            <p id="status-text" class="text-xs text-emerald-400 font-bold">● Online & Connected</p>
         </div>
     </div>
 
     <div id="chat-box" class="flex-1 p-4 flex flex-col gap-3">
         <div class="p-3 rounded-xl max-w-[85%] msg-ai shadow-md text-sm">
-            Systems online. I am Eiji. Ask me anything!
+            Groq LPU engines online. I am Eiji. How can I assist you today?
         </div>
     </div>
 
     <div class="p-4 bg-slate-800 border-t border-slate-700">
         <form onsubmit="sendMessage(event)" class="flex gap-2">
-            <input id="user-input" type="text" placeholder="Ask Eiji anything..." autocomplete="off"
+            <input id="user-input" type="text" placeholder="Message Eiji..." autocomplete="off"
                 class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 text-white transition-colors">
-            <button id="send-btn" type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-4 rounded-lg transition-colors font-bold">
+            <button id="send-btn" type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-5 rounded-lg transition-all font-bold shadow-md hover:shadow-blue-500/50">
                 ➤
             </button>
         </form>
-        <div class="flex justify-end items-center mt-2 px-1">
-            <button onclick="clearChat()" class="text-xs text-red-400 hover:text-red-300">Clear Memory</button>
+        <div class="flex justify-end items-center mt-3 px-1">
+            <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-red-400 transition-colors tracking-wide">
+                <i class="fas fa-trash"></i> Clear Memory
+            </button>
         </div>
     </div>
 
@@ -66,9 +67,9 @@
 
   <script>
     /* ====================================================
-       PASTE YOUR API KEY BETWEEN THE QUOTES BELOW 
+       PASTE YOUR GROQ API KEY BETWEEN THE QUOTES BELOW 
        ==================================================== */
-    const API_KEY = "AIzaSyDe9s0_R4BVOaIOEddkbACh_MRE01OO5Tg"; 
+    const API_KEY = "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"; 
     /* ==================================================== */
 
     const chatBox = document.getElementById('chat-box');
@@ -84,8 +85,8 @@
         const text = userInput.value.trim();
         if (!text) return;
         
-        if (API_KEY === "PASTE_YOUR_API_KEY_HERE" || API_KEY.length < 10) {
-            addMessage("⚠️ Error: Please insert your API Key in the code.", 'ai');
+        if (API_KEY === "PASTE_YOUR_GROQ_API_KEY_HERE" || API_KEY.length < 10) {
+            addMessage("⚠️ **Error:** Missing API Key. Please insert your Groq API Key on line 66.", 'ai');
             return;
         }
 
@@ -94,44 +95,48 @@
         userInput.value = '';
         userInput.disabled = true;
         sendBtn.disabled = true;
-        statusText.innerText = "Accessing Google Cloud...";
-        statusText.className = "text-xs text-blue-400 animate-pulse";
+        statusText.innerText = "● Processing (Groq LPU)...";
+        statusText.className = "text-xs text-blue-400 animate-pulse font-bold";
 
         try {
-            // THE FIX: The URL is forced onto one strict line to prevent hidden spaces from breaking the connection.
-            const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY.trim();
-
-            const response = await fetch(url, {
+            // Groq API Endpoint
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + API_KEY.trim()
+                },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: SYSTEM_PROMPT + "\nUser: " + text }]
-                    }]
+                    model: "llama3-8b-8192", // Fast & Free Meta Llama 3 model
+                    messages: [
+                        { role: "system", content: SYSTEM_PROMPT },
+                        { role: "user", content: text }
+                    ],
+                    temperature: 0.7
                 })
             });
 
             const data = await response.json();
             
-            // Process Response
-            if(data.error) throw new Error(data.error.message);
+            if (data.error) throw new Error(data.error.message);
             
-            if (!data.candidates || data.candidates.length === 0) {
-                 throw new Error("No response from AI. Try again.");
+            // Extract text from Groq's response format
+            if (data.choices && data.choices.length > 0) {
+                const aiReply = data.choices[0].message.content;
+                addMessage(aiReply, 'ai');
+            } else {
+                throw new Error("No response generated.");
             }
 
-            const aiReply = data.candidates[0].content.parts[0].text;
-            addMessage(aiReply, 'ai');
-
         } catch (error) {
-            addMessage("Connection Error: " + error.message, 'ai');
+            addMessage("⚠️ **Connection Error:** " + error.message, 'ai');
             console.error(error);
         } finally {
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.focus();
-            statusText.innerText = "Online & Ready";
-            statusText.className = "text-xs text-gray-400";
+            statusText.innerText = "● Online & Connected";
+            statusText.className = "text-xs text-emerald-400 font-bold";
         }
     }
 
@@ -139,8 +144,7 @@
         const div = document.createElement('div');
         div.className = `p-3 rounded-xl max-w-[85%] shadow-md text-sm ${sender === 'user' ? 'msg-user' : 'msg-ai'}`;
         
-        // Render Markdown for AI, Plain text for User
-        if(sender === 'ai') {
+        if (sender === 'ai') {
             try {
                 div.innerHTML = marked.parse(text);
             } catch(err) {
