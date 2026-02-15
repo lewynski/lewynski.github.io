@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume | Jon Lewyn Tanggaro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modern Dark Theme */
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --border-color: #334155;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .resume-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Top Header */
+        .header {
+            padding: 50px 40px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            background: radial-gradient(circle at top left, #1e3a8a 0%, var(--bg-card) 60%);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 20px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .contact-info a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .contact-info a:hover { color: var(--accent-blue); }
+
+        /* PDF Download Button */
+        .download-btn {
+            position: absolute;
+            top: 50px;
+            right: 40px;
+            background: var(--accent-blue);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .download-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        /* Layout Grid */
+        .content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        /* Sections */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .section-title i { color: var(--accent-blue); }
+
+        /* Items */
+        .item { margin-bottom: 30px; }
+        .item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+        .item-title { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+        .item-subtitle { color: var(--accent-blue); font-weight: 500; font-size: 0.95rem; }
+        .item-date { color: var(--text-muted); font-size: 0.85rem; font-family: 'Fira Code', monospace; }
+        .item-desc { color: var(--text-muted); font-size: 0.95rem; margin-top: 10px; }
+        .item-desc ul { padding-left: 20px; margin-top: 5px; }
+        .item-desc li { margin-bottom: 5px; }
+
+        /* Skills Tags */
+        .skills-category { margin-bottom: 20px; }
+        .skills-category h4 { margin: 0 0 10px 0; font-size: 0.95rem; color: #f1f5f9; }
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .content { grid-template-columns: 1fr; }
+            .download-btn { position: relative; top: 0; right: 0; display: inline-flex; margin-top: 20px; }
+            .header { padding: 30px 20px; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" style="display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-weight: 500;">
+        <i class="fas fa-arrow-left"></i> Back to Portfolio
+    </a>
+
+    <div class="resume-container">
+        
+        <header class="header">
+            <h1>Jon Lewyn Tanggaro</h1>
+            <div class="title">&gt; Electronics Engineering Student & Software Developer</div>
+            
+            <div class="contact-info">
+                <a href="mailto:your.email@example.com"><i class="fas fa-envelope"></i> your.email@example.com</a>
+                <a href="#"><i class="fas fa-phone"></i> +63 9XX XXX XXXX</a>
+                <a href="https://github.com/lewynski" target="_blank"><i class="fab fa-github"></i> github.com/lewynski</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Tanauan City, Philippines</a>
+            </div>
+
+            <a href="Tanggaro_Resume.pdf" target="_blank" class="download-btn">
+                <i class="fas fa-download"></i> Download PDF
+            </a>
+        </header>
+
+        <div class="content">
+            
+            <div class="main-column">
+                
+                <section>
+                    <h2 class="section-title"><i class="fas fa-briefcase"></i> Selected Projects</h2>
+                    
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Eiji AI Assistant</span>
+                            <span class="item-date">2026</span>
+                        </div>
+                        <div class="item-subtitle">Full-Stack AI Integration</div>
+                        <div class="item-desc">
+                            <ul>
+                                <li>Developed an interactive, conversational web interface powered by the Google Gemini API.</li>
+                                <li>Implemented the Web Speech API to provide real-time Text-to-Speech responses.</li>
+                                <li>Designed a dynamic UI featuring async data fetching and markdown parsing.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Crout Calculator</span>
+                            <span class="item-date">Jan 2026</span>
+                        </div>
+                        <div class="item-subtitle">Android Application (Kivy/Buildozer)</div>
+                        <div class="item-desc">
+                            <ul>
+                                <li>Engineered an Android mobile application dedicated to solving Crout's method for matrices.</li>
+                                <li>Utilized Python and the Kivy framework for the frontend interface and mathematical logic.</li>
+                                <li>Compiled and packaged the application into a deployable APK using Buildozer via Google Colab.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Automatic Sorting Machine</span>
+                            <span class="item-date">Nov 2025</span>
+                        </div>
+                        <div class="item-subtitle">Hardware & Embedded Systems</div>
+                        <div class="item-desc">
+                            <ul>
+                                <li>Co-developed a sorting mechanism integrating an optical feedback system for real-time detection.</li>
+                                <li>Designed system architecture and programmed microcontrollers to manage sensor inputs and actuator responses.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Interactive Web Applications Engine</span>
+                            <span class="item-date">2025 - Present</span>
+                        </div>
+                        <div class="item-subtitle">JavaScript / HTML5 Canvas</div>
+                        <div class="item-desc">
+                            <ul>
+                                <li>Built a suite of 10+ browser-based applications including matrix calculators and physics-based logic games (Flappy Bird clone, 2048, RPG engine).</li>
+                                <li>Implemented complex state machines, 2D array matrix manipulations, and custom Minimax algorithms for unbeatable AI opponents.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Education</h2>
+                    
+                    <div class="item">
+                        <div class="item-header">
+                            <span class="item-title">Bachelor of Science in Electronics Engineering</span>
+                            <span class="item-date">Present</span>
+                        </div>
+                        <div class="item-subtitle">Polytechnic University of the Philippines, Sto. Tomas Branch</div>
+                        <div class="item-desc">
+                            <ul>
+                                <li><strong>Coursework Highlights:</strong> Digital Signal Processing (DSP), Feedback and Control Systems, Electromagnetics, Antenna Design, Data Communications.</li>
+                                <li><strong>Research:</strong> Authored papers focusing on Feedback and Control Systems stability analysis.</li>
+                                <li><strong>Field Tools:</strong> Proficient in utilizing Google Earth and UISP Design Center for Line-of-Sight (LOS) antenna system computations.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="side-column">
+                
+                <section>
+                    <h2 class="section-title"><i class="fas fa-code"></i> Technical Skills</h2>
+                    
+                    <div class="skills-category">
+                        <h4>Programming</h4>
+                        <div class="tags">
+                            <span class="tag">Python</span>
+                            <span class="tag">JavaScript</span>
+                            <span class="tag">HTML/CSS</span>
+                            <span class="tag">C/C++</span>
+                        </div>
+                    </div>
+
+                    <div class="skills-category">
+                        <h4>Frameworks & Tools</h4>
+                        <div class="tags">
+                            <span class="tag">Kivy</span>
+                            <span class="tag">Buildozer</span>
+                            <span class="tag">Git / GitHub</span>
+                            <span class="tag">Tailwind CSS</span>
+                        </div>
+                    </div>
+
+                    <div class="skills-category">
+                        <h4>Hardware & ECE</h4>
+                        <div class="tags">
+                            <span class="tag">Arduino</span>
+                            <span class="tag">Microcontrollers</span>
+                            <span class="tag">MATLAB</span>
+                            <span class="tag">Digital Signal Processing</span>
+                            <span class="tag">Antenna Theory</span>
+                            <span class="tag">Control Systems</span>
+                        </div>
+                    </div>
+                    
+                    <div class="skills-category">
+                        <h4>Data Comms & Protocols</h4>
+                        <div class="tags">
+                            <span class="tag">VRC/LRC</span>
+                            <span class="tag">Hamming Codes</span>
+                            <span class="tag">CRC Error Detection</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+            
+        </div>
+    </div>
+
+</body>
+</html>
