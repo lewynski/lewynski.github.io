@@ -75,14 +75,14 @@
     <div class="container" style="display: block; max-width: 1200px;">
         <div style="text-align: center; margin-bottom: 40px;">
             <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #3b82f6, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Eiji Assistant</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A sleek, conversational interface powered by <strong>Groq LPUs</strong> and Meta's <strong>Llama 3</strong>, parsing markdown data in real-time.</p>
+            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A sleek, conversational interface powered by <strong>Groq LPUs</strong> and Meta's <strong>Llama 3.3</strong>, parsing markdown data in real-time.</p>
         </div>
 
         <div class="split-container">
             <div class="code-view">
 <pre>
 <span class="c">// --- Groq API Integration ---</span>
-<span class="c">// Utilizes Meta's Llama 3 via Groq LPU</span>
+<span class="c">// Utilizes Meta's Llama 3.3 via Groq LPU</span>
 
 <span class="k">async function</span> <span class="f">sendMessage</span>(text) {
     
@@ -93,7 +93,7 @@
             <span class="s">"Authorization"</span>: <span class="s">"Bearer "</span> + API_KEY
         },
         body: JSON.<span class="f">stringify</span>({
-            model: <span class="s">"llama3-8b-8192"</span>,
+            model: <span class="s">"llama-3.3-70b-versatile"</span>,
             messages: [
                 { role: <span class="s">"system"</span>, content: SYSTEM_PROMPT },
                 { role: <span class="s">"user"</span>, content: text }
@@ -109,7 +109,7 @@
             </div>
 
             <div class="output-view">
-                <iframe src="eiji-ai-app.html?v=4"></iframe>
+                <iframe src="eiji-ai-app.html?v=5"></iframe>
             </div>
         </div>
     </div>
