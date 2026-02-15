@@ -6,6 +6,7 @@
   <title>D Dwarf Mini - Groq Powered</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body { background-color: #0f172a; font-family: 'Roboto Mono', monospace; }
@@ -19,6 +20,17 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
     ::-webkit-scrollbar-track { background: #1e293b; }
+
+    /* Speaking Animation */
+    @keyframes pulse-ring {
+        0% { transform: scale(0.8); opacity: 0.5; }
+        100% { transform: scale(1.3); opacity: 0; }
+    }
+    .speaking-ring {
+        position: absolute; width: 100%; height: 100%;
+        border-radius: 50%; border: 2px solid #3b82f6;
+        animation: pulse-ring 1.5s infinite;
+    }
 
     .msg-user { background: #1e293b; color: #e2e8f0; align-self: flex-end; border-bottom-right-radius: 2px; }
     .msg-ai { background: #2563eb; color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
@@ -34,7 +46,8 @@
       
     <div class="bg-slate-800 p-4 border-b border-slate-700 flex items-center gap-4">
         <div class="relative w-12 h-12 flex items-center justify-center bg-blue-900 rounded-full shadow-lg border-2 border-blue-500">
-            <span class="text-2xl">⚡</span>
+            <div id="ai-ring" class="hidden speaking-ring"></div>
+            <span class="text-2xl z-10">⚡</span>
         </div>
         <div>
             <h1 class="font-bold text-lg text-blue-400 tracking-wide">D Dwarf Mini <span class="text-xs text-gray-500">(Llama 3.3)</span></h1>
@@ -56,7 +69,12 @@
                 ➤
             </button>
         </form>
-        <div class="flex justify-end items-center mt-3 px-1">
+        
+        <div class="flex justify-between items-center mt-3 px-1">
+            <label class="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" id="voice-toggle" class="w-4 h-4 accent-blue-500" checked>
+                <span class="text-xs text-slate-400 group-hover:text-white transition-colors">Voice Output</span>
+            </label>
             <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-red-400 transition-colors tracking-wide">
                 <i class="fas fa-trash"></i> Clear Memory
             </button>
@@ -76,8 +94,9 @@
     const userInput = document.getElementById('user-input');
     const statusText = document.getElementById('status-text');
     const sendBtn = document.getElementById('send-btn');
+    const aiRing = document.getElementById('ai-ring');
+    const voiceToggle = document.getElementById('voice-toggle');
 
-    // AI Brain updated here!
     const SYSTEM_PROMPT = "You are D Dwarf Mini, a witty and helpful AI assistant created by Jon Lewyn. Keep your answers concise (under 3 sentences) unless asked for details.";
 
     async function sendMessage(e) {
@@ -86,7 +105,7 @@
         if (!text) return;
         
         if (API_KEY === "PASTE_YOUR_GROQ_API_KEY_HERE" || API_KEY.length < 10) {
-            addMessage("⚠️ **Error:** Missing API Key. Please insert your Groq API Key on line 66.", 'ai');
+            addMessage("⚠️ **Error:** Missing API Key. Please insert your Groq API Key on line 78.", 'ai');
             return;
         }
 
@@ -121,6 +140,11 @@
             if (data.choices && data.choices.length > 0) {
                 const aiReply = data.choices[0].message.content;
                 addMessage(aiReply, 'ai');
+                
+                // TRIGGER VOICE IF CHECKED
+                if (voiceToggle.checked) {
+                    speak(aiReply);
+                }
             } else {
                 throw new Error("No response generated.");
             }
@@ -132,8 +156,12 @@
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.focus();
-            statusText.innerText = "● Online & Connected";
-            statusText.className = "text-xs text-emerald-400 font-bold";
+            
+            // Only reset status text if AI isn't currently speaking
+            if (!window.speechSynthesis.speaking) {
+                statusText.innerText = "● Online & Connected";
+                statusText.className = "text-xs text-emerald-400 font-bold";
+            }
         }
     }
 
@@ -155,9 +183,41 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    // --- TEXT TO SPEECH ENGINE ---
+    function speak(text) {
+        if (!window.speechSynthesis) return;
+        
+        // Cancel any currently playing speech
+        window.speechSynthesis.cancel();
+
+        // Strip markdown formatting (*, #, _, `) so the voice doesn't read punctuation out loud
+        const cleanText = text.replace(/[*#`_]/g, '');
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.pitch = 1;
+        utterance.rate = 1.05; // Slightly faster pacing
+        
+        // When speech starts
+        utterance.onstart = () => {
+            aiRing.classList.remove('hidden');
+            statusText.innerText = "● D Dwarf Mini is speaking...";
+            statusText.className = "text-xs text-blue-400 animate-pulse font-bold";
+        };
+
+        // When speech finishes
+        utterance.onend = () => {
+            aiRing.classList.add('hidden');
+            statusText.innerText = "● Online & Connected";
+            statusText.className = "text-xs text-emerald-400 font-bold";
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
     function clearChat() {
         chatBox.innerHTML = '';
         addMessage("Memory purged. Systems optimized.", 'ai');
+        window.speechSynthesis.cancel(); // Stop speaking if cleared
     }
   </script>
 </body>
