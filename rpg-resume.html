@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jon's Interactive House Resume</title>
+<title>Jon's Resume Village</title>
 
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -17,24 +16,25 @@ body{
     background:linear-gradient(to top,#dbeafe,#f0f9ff);
 }
 
-/* Aesthetic info card */
+/* Floating aesthetic info card */
 #infoCard{
     position:absolute;
-    top:50%;
+    bottom:30px;
     left:50%;
-    transform:translate(-50%,-50%);
-    width:400px;
-    background:rgba(255,255,255,.8);
+    transform:translateX(-50%);
+    width:420px;
+    background:rgba(255,255,255,.85);
     backdrop-filter:blur(20px);
     border-radius:20px;
-    padding:30px;
-    box-shadow:0 30px 60px rgba(0,0,0,.2);
+    padding:25px;
+    box-shadow:0 20px 60px rgba(0,0,0,.15);
     display:none;
     text-align:center;
+    transition:.3s;
 }
 
 #infoCard h2{
-    margin:0 0 10px 0;
+    margin:0 0 8px 0;
     font-weight:700;
     color:#1e293b;
 }
@@ -44,71 +44,60 @@ body{
     color:#475569;
     line-height:1.6;
 }
-
-#infoCard button{
-    margin-top:15px;
-    padding:8px 15px;
-    border:none;
-    background:#3b82f6;
-    color:white;
-    border-radius:10px;
-    cursor:pointer;
-}
 </style>
 </head>
 <body>
 
 <div id="infoCard">
-    <h2>About Me</h2>
-    <p>
-    B.S. Electronics Engineering Student<br>
-    Passionate about automation systems, embedded systems, and creative tech projects.<br><br>
-    Polytechnic University of the Philippines
-    </p>
-    <button onclick="closeCard()">Close</button>
+    <h2 id="infoTitle"></h2>
+    <p id="infoText"></p>
 </div>
 
 <script>
 
+const resumeData = [
+    {x:200,y:400,title:"Primary Education",text:"Jose G. Peralta Memorial School<br>Valedictorian (2011-2017)"},
+    {x:400,y:250,title:"Junior High",text:"Fellowship Baptist College<br>With Honor (2017-2021)"},
+    {x:650,y:350,title:"Senior High",text:"STEM Strand<br>With High Honor (2021-2023)"},
+    {x:850,y:450,title:"College",text:"B.S. Electronics Engineering<br>PUP - Present"},
+    {x:600,y:150,title:"Work Experience",text:"Bandai Wireharness (2025)<br>NOCECO (2023)"}
+];
+
 const config={
     type:Phaser.AUTO,
-    width:1000,
+    width:1100,
     height:600,
     physics:{default:'arcade',arcade:{gravity:{y:0},debug:false}},
-    scene:[OutsideScene,InsideScene]
+    scene:{create,update}
 };
 
 const game=new Phaser.Game(config);
 
 let player;
-let cursors,keyW,keyA,keyS,keyD,keyE,keyESC;
-let nearDoor=false;
+let cursors,keyW,keyA,keyS,keyD;
+let houses=[];
+let currentHouse=null;
 
-/* ================= OUTSIDE SCENE ================= */
+function create(){
 
-function OutsideScene(){
-    Phaser.Scene.call(this,{key:'Outside'});
-}
-OutsideScene.prototype=Object.create(Phaser.Scene.prototype);
+    // Sky
+    this.add.rectangle(550,300,1100,600,0xbfdbfe);
 
-OutsideScene.prototype.create=function(){
+    // Grass
+    this.add.rectangle(550,520,1100,200,0x86efac);
 
-    this.add.rectangle(500,300,1000,600,0xbfdbfe); // sky
-    this.add.rectangle(500,500,1000,200,0x86efac); // grass
+    // Create trees
+    for(let i=0;i<8;i++){
+        createTree(this,Phaser.Math.Between(100,1000),Phaser.Math.Between(350,500));
+    }
 
-    // House body
-    this.add.rectangle(500,350,300,200,0xfef3c7)
-        .setStrokeStyle(4,0xf59e0b);
-
-    // Roof
-    this.add.triangle(500,220,350,300,650,300,500,150,0xf87171);
-
-    // Door
-    this.door=this.add.rectangle(500,400,70,120,0x92400e);
-    this.physics.add.existing(this.door,true);
+    // Create houses
+    resumeData.forEach(data=>{
+        createHouse(this,data);
+    });
 
     // Player
-    player=this.add.circle(500,500,15,0x2563eb);
+    player=this.add.circle(550,500,14,0x2563eb);
     this.physics.add.existing(player);
     player.body.setCollideWorldBounds(true);
 
@@ -117,16 +106,9 @@ OutsideScene.prototype.create=function(){
     keyA=this.input.keyboard.addKey('A');
     keyS=this.input.keyboard.addKey('S');
     keyD=this.input.keyboard.addKey('D');
-    keyE=this.input.keyboard.addKey('E');
+}
 
-    this.physics.add.overlap(player,this.door,()=>{
-        nearDoor=true;
-        this.door.setFillStyle(0xb45309);
-    });
-
-};
-
-OutsideScene.prototype.update=function(){
+function update(){
 
     let vx=0,vy=0;
 
@@ -136,55 +118,65 @@ OutsideScene.prototype.update=function(){
     if(cursors.down.isDown||keyS.isDown)vy=1;
 
     const vec=new Phaser.Math.Vector2(vx,vy);
-    if(vec.length()>0)vec.normalize().scale(220);
+    if(vec.length()>0)vec.normalize().scale(230);
 
     player.body.setVelocity(vec.x,vec.y);
 
-    if(!Phaser.Geom.Intersects.RectangleToRectangle(player.getBounds(),this.door.getBounds())){
-        nearDoor=false;
-        this.door.setFillStyle(0x92400e);
-    }
-
-    if(nearDoor && Phaser.Input.Keyboard.JustDown(keyE)){
-        this.cameras.main.fadeOut(500);
-        this.time.delayedCall(500,()=>{
-            this.scene.start('Inside');
-        });
-    }
-};
-
-/* ================= INSIDE SCENE ================= */
-
-function InsideScene(){
-    Phaser.Scene.call(this,{key:'Inside'});
+    checkHouseProximity();
 }
-InsideScene.prototype=Object.create(Phaser.Scene.prototype);
 
-InsideScene.prototype.create=function(){
+function createHouse(scene,data){
 
-    this.add.rectangle(500,300,1000,600,0xf1f5f9); // interior wall
-    this.add.rectangle(500,550,1000,100,0xe2e8f0); // floor
+    // Shadow
+    scene.add.ellipse(data.x,data.y+40,100,30,0x000000,0.2);
 
-    this.add.text(500,150,"Welcome Inside 🏡",
-        {font:'28px Inter',fill:'#1e293b'}).setOrigin(0.5);
+    // Body
+    const body=scene.add.rectangle(data.x,data.y,100,70,0xfef3c7)
+        .setStrokeStyle(3,0xf59e0b);
 
-    this.add.text(500,200,"Press ESC to exit",
-        {font:'14px Inter',fill:'#64748b'}).setOrigin(0.5);
+    // Roof
+    scene.add.triangle(data.x,data.y-45,
+        data.x-60,data.y-10,
+        data.x+60,data.y-10,
+        data.x,data.y-90,
+        0xf87171);
 
-    keyESC=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    body.info=data;
+    houses.push(body);
+}
 
-    document.getElementById("infoCard").style.display="block";
+function createTree(scene,x,y){
 
-};
+    scene.add.ellipse(x,y+20,40,20,0x000000,0.2);
+    scene.add.rectangle(x,y,15,40,0x92400e);
+    scene.add.circle(x,y-30,35,0x16a34a);
+}
 
-InsideScene.prototype.update=function(){
-    if(Phaser.Input.Keyboard.JustDown(keyESC)){
-        document.getElementById("infoCard").style.display="none";
-        this.scene.start('Outside');
+function checkHouseProximity(){
+
+    let found=false;
+
+    houses.forEach(house=>{
+        const dist=Phaser.Math.Distance.Between(player.x,player.y,house.x,house.y);
+
+        if(dist<90){
+            showInfo(house.info.title,house.info.text);
+            found=true;
+        }
+    });
+
+    if(!found){
+        hideInfo();
     }
-};
+}
 
-function closeCard(){
+function showInfo(title,text){
+    document.getElementById("infoTitle").innerHTML=title;
+    document.getElementById("infoText").innerHTML=text;
+    document.getElementById("infoCard").style.display="block";
+}
+
+function hideInfo(){
     document.getElementById("infoCard").style.display="none";
 }
 
