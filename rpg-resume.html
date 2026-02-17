@@ -5,54 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Jon's RPG Journey</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             margin: 0;
-            background: #0f172a;
+            background: #020617; /* Deep modern dark background */
             font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Prevent scrolling while playing */
-            touch-action: none; /* Prevent browser default touch actions */
+            overflow: hidden;
+            touch-action: none;
         }
         #game-container {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100%; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* --- UI Overlay (Dialogue Box) --- */
+        /* --- Modern Glassmorphism Dialogue Box --- */
         #dialogue-overlay {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 600px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 2px solid #3b82f6; border-radius: 12px;
-            padding: 20px; color: #f8fafc; display: none; /* Hidden by default */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 650px;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px; color: #f8fafc; display: none;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 20px rgba(59, 130, 246, 0.2);
             z-index: 100;
         }
-        #dialogue-title { font-size: 1.2rem; font-weight: 700; color: #60a5fa; margin-bottom: 10px; }
-        #dialogue-text { font-size: 1rem; line-height: 1.6; font-family: 'Fira Code', monospace; }
-        #close-dialogue {
-            margin-top: 15px; background: #3b82f6; border: none; color: white;
-            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;
+        
+        #dialogue-title { 
+            font-size: 1.4rem; font-weight: 700; 
+            color: #60a5fa; margin-bottom: 12px; 
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
         }
+        
+        #dialogue-text { 
+            font-size: 1.05rem; line-height: 1.7; 
+            color: #cbd5e1;
+        }
+        
+        #dialogue-text strong { color: #f8fafc; }
 
-        /* --- Mobile Controls --- */
+        #close-dialogue {
+            margin-top: 25px; background: #3b82f6; border: none; color: white;
+            padding: 10px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;
+            transition: all 0.2s; width: 100%; font-size: 1rem;
+        }
+        #close-dialogue:hover { background: #2563eb; transform: translateY(-2px); }
+
+        /* --- Sleek Mobile Controls --- */
         #mobile-controls {
-            position: absolute; bottom: 20px; left: 20px;
-            display: none; /* Hidden on PC, shown via JS on mobile */
-            z-index: 50;
+            position: absolute; bottom: 30px; left: 30px;
+            display: none; z-index: 50;
         }
-        .d-pad { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 5px; }
+        .d-pad { display: grid; grid-template-columns: repeat(3, 65px); grid-template-rows: repeat(3, 65px); gap: 8px; }
         .ctrl-btn {
-            background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4);
-            border-radius: 12px; color: white; font-size: 24px; display: flex;
+            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; color: #94a3b8; font-size: 24px; display: flex;
             justify-content: center; align-items: center; user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        .ctrl-btn:active { background: rgba(59, 130, 246, 0.6); }
+        .ctrl-btn:active { background: rgba(59, 130, 246, 0.4); color: white; border-color: #3b82f6; }
         #btn-up { grid-column: 2; grid-row: 1; }
         #btn-left { grid-column: 1; grid-row: 2; }
         #btn-right { grid-column: 3; grid-row: 2; }
@@ -61,22 +78,24 @@
         /* Back Button */
         .back-btn {
             position: absolute; top: 20px; left: 20px; z-index: 100;
-            background: rgba(15, 23, 42, 0.8); color: white; text-decoration: none;
-            padding: 10px 15px; border-radius: 8px; font-weight: 600;
-            border: 1px solid #334155;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px);
+            color: #cbd5e1; text-decoration: none;
+            padding: 10px 20px; border-radius: 10px; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;
         }
+        .back-btn:hover { background: rgba(15, 23, 42, 0.9); color: white; }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Exit Game</a>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Return to Portfolio</a>
 
     <div id="game-container"></div>
 
     <div id="dialogue-overlay">
-        <div id="dialogue-title">Building Name</div>
+        <div id="dialogue-title"><i class="fas fa-map-marker-alt"></i> <span id="title-text">Building Name</span></div>
         <div id="dialogue-text">Details go here...</div>
-        <button id="close-dialogue">Close (Continue)</button>
+        <button id="close-dialogue">Continue Journey</button>
     </div>
 
     <div id="mobile-controls">
