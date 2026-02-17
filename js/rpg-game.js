@@ -1,9 +1,9 @@
 const config = {
-    type: Phaser.AUTO,
+    type: Phaser.AUTO, // Automatically falls back to safe Canvas mode if WebGL fails
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
-    backgroundColor: '#020617', // Very dark blue/black
+    backgroundColor: '#020617', 
     physics: {
         default: 'arcade',
         arcade: { gravity: { y: 0 }, debug: false }
@@ -14,7 +14,8 @@ const config = {
 const game = new Phaser.Game(config);
 
 let player, cursors, wasd;
-let moveSpeed = 250; // Slightly faster, smoother
+let playerGlow; // Safe glow variable
+let moveSpeed = 250; 
 let isDialogueOpen = false;
 let touchUp = false, touchDown = false, touchLeft = false, touchRight = false;
 
@@ -32,26 +33,21 @@ const resumeData = {
 function create() {
     this.physics.world.setBounds(0, 0, 2000, 2000);
 
-    // 1. AESTHETIC BACKGROUND: Draw a blueprint grid
+    // 1. AESTHETIC BACKGROUND
     this.add.grid(1000, 1000, 2000, 2000, 64, 64, 0x020617, 1, 0x1e293b, 0.5).setDepth(-2);
-    
-    // Draw the main path
     let path = this.add.rectangle(1000, 1000, 240, 2000, 0x0f172a).setDepth(-1);
     path.setStrokeStyle(2, 0x334155);
 
     const buildings = this.physics.add.staticGroup();
 
-    // 2. AESTHETIC BUILDINGS: Glowing zones with Emojis instead of solid blocks
+    // 2. AESTHETIC BUILDINGS
     function createZone(scene, x, y, width, height, color, emoji, title) {
-        // Glowing border effect
         let glow = scene.add.rectangle(x, y, width, height, color, 0.1);
         glow.setStrokeStyle(3, color, 0.8);
         buildings.add(glow);
 
-        // Text label
         scene.add.text(x, y - 15, emoji, { font: '40px Arial' }).setOrigin(0.5);
         scene.add.text(x, y + 30, title, { font: '16px Inter', fill: '#cbd5e1', fontStyle: 'bold' }).setOrigin(0.5);
-        
         return glow;
     }
 
@@ -70,7 +66,7 @@ function create() {
     createZone(this, 1000, 100, 400, 180, 0x3b82f6, '💼', 'Experience');
     createTrigger(this, 1000, 210, resumeData.work, 'work', 0x3b82f6);
 
-    // 3. AESTHETIC GATES: Red glowing barriers
+    // 3. AESTHETIC GATES
     const gates = this.physics.add.staticGroup();
     function createGate(scene, y) {
         let g = scene.add.rectangle(1000, y, 240, 10, 0xef4444, 0.6);
@@ -82,16 +78,18 @@ function create() {
     gateSHS = createGate(this, 1050);
     gateCollege = createGate(this, 650);
 
-    // 4. AESTHETIC PLAYER: A glowing orb instead of a white box
-    player = this.add.circle(1000, 1900, 16, 0x3b82f6);
+    // 4. CRASH-PROOF PLAYER AESTHETICS
+    // We create a separate, slightly larger transparent circle to act as a glow
+    playerGlow = this.add.circle(1000, 1900, 22, 0x3b82f6, 0.3);
+    
+    player = this.add.circle(1000, 1900, 14, 0x3b82f6);
     player.setStrokeStyle(3, 0x60a5fa);
+    
     this.physics.add.existing(player);
     player.body.setCollideWorldBounds(true);
-    // Give the player a soft glow shadow
-    player.preFX.addGlow(0x3b82f6, 4, 0, false);
 
     // Camera
-    this.cameras.main.startFollow(player, true, 0.08, 0.08); // Smoother lerp
+    this.cameras.main.startFollow(player, true, 0.08, 0.08); 
     this.cameras.main.setZoom(1.2);
 
     // Collisions
@@ -107,6 +105,10 @@ function create() {
 }
 
 function update() {
+    // Make the safe glow follow the player exactly
+    playerGlow.x = player.x;
+    playerGlow.y = player.y;
+
     if (isDialogueOpen) {
         player.body.setVelocity(0);
         return;
@@ -135,7 +137,6 @@ function createTrigger(scene, x, y, data, stageKey, color) {
     scene.add.text(x, y, "STEP HERE", { font: '10px Inter', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
     scene.physics.add.existing(pad, true); 
 
-    // Make the pad pulse
     scene.tweens.add({ targets: pad, alpha: 0.5, yoyo: true, repeat: -1, duration: 800 });
 
     scene.physics.add.overlap(player, pad, () => {
