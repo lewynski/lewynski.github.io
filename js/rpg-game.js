@@ -17,7 +17,8 @@ const config = {
 const game = new Phaser.Game(config);
 
 let player, playerLabel;
-let cursors, wasd;
+let cursors;
+let keyW, keyA, keyS, keyD; // Explicitly defined keys for safety
 let moveSpeed = 200; 
 let isDialogueOpen = false;
 
@@ -35,11 +36,12 @@ const resumeData = {
 function create() {
     this.physics.world.setBounds(0, 0, 800, 600);
 
-    // --- GAME FOCUS FIX ---
-    // If user clicks the canvas, ensure keyboard is captured
-    this.input.on('pointerdown', () => {
-        window.focus();
-    });
+    // --- FORCED BROWSER FOCUS ---
+    // This stops the browser window from scrolling when you press arrows or WASD
+    this.input.keyboard.addCapture('W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE');
+    
+    // Auto-focus the game when your mouse hovers over it
+    this.input.on('pointerover', () => { window.focus(); });
 
     const stations = this.physics.add.staticGroup();
 
@@ -86,17 +88,20 @@ function create() {
     }).setOrigin(0.5);
     playerLabel.setShadow(0, 1, 'rgba(0,0,0,0.1)', 2);
 
+    // --- BULLETPROOF KEYBOARD MAPPING ---
     cursors = this.input.keyboard.createCursorKeys();
-    wasd = this.input.keyboard.addKeys({ 
-        'up': Phaser.Input.Keyboard.KeyCodes.W, 
-        'down': Phaser.Input.Keyboard.KeyCodes.S, 
-        'left': Phaser.Input.Keyboard.KeyCodes.A, 
-        'right': Phaser.Input.Keyboard.KeyCodes.D 
-    });
+    keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
     setupMobileControls();
 
-    document.getElementById('close-dialogue').addEventListener('click', closeDialogue);
+    // Prevent crashing if the dialogue close button hasn't loaded yet
+    let closeBtn = document.getElementById('close-dialogue');
+    if(closeBtn) {
+        closeBtn.addEventListener('click', closeDialogue);
+    }
 }
 
 function update() {
@@ -111,12 +116,11 @@ function update() {
     let velX = 0;
     let velY = 0;
 
-    // Supports WASD, Arrow Keys, OR Mobile Touch buttons!
-    if (cursors.left.isDown || wasd.left.isDown || touchLeft) velX = -moveSpeed;
-    else if (cursors.right.isDown || wasd.right.isDown || touchRight) velX = moveSpeed;
+    if (cursors.left.isDown || keyA.isDown || touchLeft) velX = -moveSpeed;
+    else if (cursors.right.isDown || keyD.isDown || touchRight) velX = moveSpeed;
 
-    if (cursors.up.isDown || wasd.up.isDown || touchUp) velY = -moveSpeed;
-    else if (cursors.down.isDown || wasd.down.isDown || touchDown) velY = moveSpeed;
+    if (cursors.up.isDown || keyW.isDown || touchUp) velY = -moveSpeed;
+    else if (cursors.down.isDown || keyS.isDown || touchDown) velY = moveSpeed;
 
     player.body.setVelocity(velX, velY);
 
@@ -139,29 +143,36 @@ function createTrigger(scene, x, y, data) {
 function showDialogue(title, text) {
     isDialogueOpen = true;
     const overlay = document.getElementById('dialogue-overlay');
-    document.getElementById('dialogue-title').innerHTML = title;
-    document.getElementById('dialogue-text').innerHTML = text;
-    overlay.style.display = 'block';
+    if(overlay) {
+        document.getElementById('dialogue-title').innerHTML = title;
+        document.getElementById('dialogue-text').innerHTML = text;
+        overlay.style.display = 'block';
+    }
 }
 
 function closeDialogue() {
-    document.getElementById('dialogue-overlay').style.display = 'none';
-    player.y += 15; // Bounce player off pad so they can move away
+    const overlay = document.getElementById('dialogue-overlay');
+    if(overlay) overlay.style.display = 'none';
+    
+    player.y += 15; 
     setTimeout(() => { isDialogueOpen = false; }, 200);
 }
 
-// --- MOBILE TOUCHSCREEN HANDLERS ---
+// --- CRASH-PROOF MOBILE CONTROLS ---
 function setupMobileControls() {
-    // Check if the user is on a touch device
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-        document.getElementById('mobile-controls').style.display = 'block';
-        // Hide the PC instruction panel to save space on phones
+        let mobileContainer = document.getElementById('mobile-controls');
+        if(mobileContainer) mobileContainer.style.display = 'block';
+        
         const pcInstructions = document.getElementById('pc-instructions');
         if (pcInstructions) pcInstructions.style.display = 'none';
     }
 
     const setupBtn = (id, startFn, endFn) => {
         const btn = document.getElementById(id);
+        // SAFETY CHECK: If button doesn't exist, stop immediately instead of crashing the game
+        if (!btn) return; 
+        
         btn.addEventListener('touchstart', (e) => { e.preventDefault(); startFn(); });
         btn.addEventListener('mousedown', (e) => { e.preventDefault(); startFn(); });
         btn.addEventListener('touchend', (e) => { e.preventDefault(); endFn(); });
