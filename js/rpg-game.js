@@ -1,13 +1,12 @@
 const config = {
     type: Phaser.AUTO,
-    // Embed the game directly inside our new HTML wrapper container
     scale: {
         mode: Phaser.Scale.FIT,
         parent: 'game-wrapper',
         width: 800,
         height: 600
     },
-    backgroundColor: '#f8fafc', // Very light gray/white background
+    backgroundColor: '#f8fafc',
     physics: {
         default: 'arcade',
         arcade: { gravity: { y: 0 }, debug: false }
@@ -22,6 +21,9 @@ let cursors, wasd;
 let moveSpeed = 200; 
 let isDialogueOpen = false;
 
+// Touch variables
+let touchUp = false, touchDown = false, touchLeft = false, touchRight = false;
+
 const resumeData = {
     elem: { title: "Primary Education", text: "<strong>Jose G. Peralta Memorial School</strong><br>Graduated Valedictorian (2011-2017)" },
     jhs: { title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>Graduated With Honor (2017-2021)" },
@@ -33,81 +35,57 @@ const resumeData = {
 function create() {
     this.physics.world.setBounds(0, 0, 800, 600);
 
+    // --- GAME FOCUS FIX ---
+    // If user clicks the canvas, ensure keyboard is captured
+    this.input.on('pointerdown', () => {
+        window.focus();
+    });
+
     const stations = this.physics.add.staticGroup();
 
-    // Helper: Creates minimalist minimalist desks/objects with labels
     function createStation(scene, x, y, width, height, title) {
-        // Shadow
         scene.add.rectangle(x, y + 4, width, height, 0xe2e8f0);
-        // Main block (looks like a minimalist desk/machine)
         let block = scene.add.rectangle(x, y, width, height, 0x94a3b8);
         block.setStrokeStyle(2, 0x64748b);
-        
-        // Label underneath
         scene.add.text(x, y + (height/2) + 10, title, { 
             font: '12px Inter', fill: '#4b5563', fontStyle: 'bold' 
         }).setOrigin(0.5);
-
         return block;
     }
 
-    // Helper: Creates a dotted outline zone (like the CodeCred.dev box in the reference)
     function createDottedZone(scene, x, y, width, height, title) {
-        let graphics = scene.add.graphics();
-        graphics.lineStyle(2, 0x94a3b8, 1);
-        
-        // Draw dashed rectangle manually
-        graphics.beginPath();
-        let dashLen = 8, gapLen = 6;
-        let perimeter = (width * 2) + (height * 2);
-        
-        // Very basic dashed box representation
         let box = scene.add.rectangle(x, y, width, height, 0xffffff, 0);
-        box.setStrokeStyle(2, 0x9ca3af); // Fallback solid line if we don't code complex dashed paths
-        
+        box.setStrokeStyle(2, 0x9ca3af); 
         scene.add.text(x, y, title, { font: '14px Inter', fill: '#111827', fontStyle: 'bold' }).setOrigin(0.5);
         scene.add.text(x, y + 20, "Step inside to view", { font: '10px Inter', fill: '#6b7280' }).setOrigin(0.5);
-        
         return box;
     }
 
-    // --- Place Stations around the open room ---
-    
-    // Bottom Left: Elementary
     let elemSt = createStation(this, 150, 450, 60, 40, "Primary Edu");
     createTrigger(this, 150, 480, resumeData.elem);
 
-    // Mid Left: JHS
     let jhsSt = createStation(this, 150, 250, 60, 40, "Junior High");
     createTrigger(this, 150, 280, resumeData.jhs);
 
-    // Top Center: SHS
     let shsSt = createStation(this, 400, 150, 60, 40, "Senior High");
     createTrigger(this, 400, 180, resumeData.shs);
 
-    // Mid Right: College
     let colSt = createStation(this, 650, 250, 80, 50, "PUP College");
     createTrigger(this, 650, 290, resumeData.college);
 
-    // Bottom Center: Work Experience (Dotted Box)
     let workZone = createDottedZone(this, 400, 450, 200, 100, "Work Experience");
     createTrigger(this, 400, 450, resumeData.work);
 
-
-    // --- Create Minimalist Player ---
-    // Instead of glowing, it's a simple clean dark blue square matching the reference
     player = this.add.rectangle(400, 350, 24, 24, 0x3b82f6);
     this.physics.add.existing(player);
     player.body.setCollideWorldBounds(true);
     
-    // Add the Name Tag text floating below the player!
     playerLabel = this.add.text(400, 380, "Jon Lewyn", { 
         font: '12px Inter', fill: '#111827', fontStyle: 'bold', 
         backgroundColor: '#ffffff', padding: {x:4, y:2} 
     }).setOrigin(0.5);
     playerLabel.setShadow(0, 1, 'rgba(0,0,0,0.1)', 2);
 
-    // Controls
     cursors = this.input.keyboard.createCursorKeys();
     wasd = this.input.keyboard.addKeys({ 
         'up': Phaser.Input.Keyboard.KeyCodes.W, 
@@ -116,11 +94,12 @@ function create() {
         'right': Phaser.Input.Keyboard.KeyCodes.D 
     });
 
+    setupMobileControls();
+
     document.getElementById('close-dialogue').addEventListener('click', closeDialogue);
 }
 
 function update() {
-    // Make the name tag perfectly follow the player character
     playerLabel.x = player.x;
     playerLabel.y = player.y + 25;
 
@@ -132,11 +111,12 @@ function update() {
     let velX = 0;
     let velY = 0;
 
-    if (cursors.left.isDown || wasd.left.isDown) velX = -moveSpeed;
-    else if (cursors.right.isDown || wasd.right.isDown) velX = moveSpeed;
+    // Supports WASD, Arrow Keys, OR Mobile Touch buttons!
+    if (cursors.left.isDown || wasd.left.isDown || touchLeft) velX = -moveSpeed;
+    else if (cursors.right.isDown || wasd.right.isDown || touchRight) velX = moveSpeed;
 
-    if (cursors.up.isDown || wasd.up.isDown) velY = -moveSpeed;
-    else if (cursors.down.isDown || wasd.down.isDown) velY = moveSpeed;
+    if (cursors.up.isDown || wasd.up.isDown || touchUp) velY = -moveSpeed;
+    else if (cursors.down.isDown || wasd.down.isDown || touchDown) velY = moveSpeed;
 
     player.body.setVelocity(velX, velY);
 
@@ -145,9 +125,8 @@ function update() {
     }
 }
 
-// Invisible trigger pad that detects the player
 function createTrigger(scene, x, y, data) {
-    let pad = scene.add.rectangle(x, y, 60, 40, 0x000000, 0); // Invisible
+    let pad = scene.add.rectangle(x, y, 60, 40, 0x000000, 0); 
     scene.physics.add.existing(pad, true); 
 
     scene.physics.add.overlap(player, pad, () => {
@@ -167,7 +146,31 @@ function showDialogue(title, text) {
 
 function closeDialogue() {
     document.getElementById('dialogue-overlay').style.display = 'none';
-    // Move player down slightly so they don't immediately re-trigger the box
-    player.y += 10;
+    player.y += 15; // Bounce player off pad so they can move away
     setTimeout(() => { isDialogueOpen = false; }, 200);
+}
+
+// --- MOBILE TOUCHSCREEN HANDLERS ---
+function setupMobileControls() {
+    // Check if the user is on a touch device
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        document.getElementById('mobile-controls').style.display = 'block';
+        // Hide the PC instruction panel to save space on phones
+        const pcInstructions = document.getElementById('pc-instructions');
+        if (pcInstructions) pcInstructions.style.display = 'none';
+    }
+
+    const setupBtn = (id, startFn, endFn) => {
+        const btn = document.getElementById(id);
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); startFn(); });
+        btn.addEventListener('mousedown', (e) => { e.preventDefault(); startFn(); });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); endFn(); });
+        btn.addEventListener('mouseup', (e) => { e.preventDefault(); endFn(); });
+        btn.addEventListener('mouseleave', (e) => { e.preventDefault(); endFn(); });
+    };
+
+    setupBtn('btn-up', () => touchUp = true, () => touchUp = false);
+    setupBtn('btn-down', () => touchDown = true, () => touchDown = false);
+    setupBtn('btn-left', () => touchLeft = true, () => touchLeft = false);
+    setupBtn('btn-right', () => touchRight = true, () => touchRight = false);
 }
