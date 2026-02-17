@@ -2,109 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jon's RPG Journey</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jon's Journey - Interactive Resume</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            margin: 0;
-            background: #020617; /* Deep modern dark background */
+            background-color: #ffffff;
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            touch-action: none;
-        }
-        #game-container {
-            width: 100%; height: 100vh;
-            display: flex; justify-content: center; align-items: center;
+            color: #111827;
+            padding: 40px;
+            min-height: 100vh;
         }
 
-        /* --- Modern Glassmorphism Dialogue Box --- */
+        /* Header */
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+        .page-header p { color: #6b7280; font-size: 0.95rem; }
+        
+        .back-btn {
+            display: inline-block; margin-bottom: 20px;
+            color: #4b5563; text-decoration: none; font-weight: 500;
+            background: #f3f4f6; padding: 8px 16px; border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: #e5e7eb; }
+
+        /* Main Layout */
+        .layout-container {
+            display: flex; gap: 24px; max-width: 1200px;
+        }
+
+        /* Left Side (Panels) */
+        .left-column {
+            width: 300px; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .panel h3 { font-size: 0.75rem; color: #9ca3af; letter-spacing: 1px; margin-bottom: 16px; text-transform: uppercase; }
+
+        /* Keyboard Graphic */
+        .keyboard-layout { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 16px; }
+        .key-row { display: flex; gap: 6px; }
+        .key {
+            width: 40px; height: 40px;
+            background: #ffffff; border: 1px solid #e5e7eb;
+            border-radius: 8px; display: flex; justify-content: center; align-items: center;
+            font-weight: 600; color: #374151;
+            box-shadow: 0 2px 0 #e5e7eb;
+        }
+        .instruction-text { text-align: center; color: #9ca3af; font-size: 0.8rem; }
+
+        /* Right Side (Game Canvas) */
+        .right-column {
+            flex: 1; position: relative;
+        }
+
+        #game-wrapper {
+            width: 100%; height: 600px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* Clean Dialogue Box Overlay */
         #dialogue-overlay {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 650px;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px; color: #f8fafc; display: none;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 20px rgba(59, 130, 246, 0.2);
-            z-index: 100;
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid #e5e7eb; border-radius: 12px;
+            padding: 24px; display: none;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            z-index: 10;
         }
         
-        #dialogue-title { 
-            font-size: 1.4rem; font-weight: 700; 
-            color: #60a5fa; margin-bottom: 12px; 
-            display: flex; align-items: center; gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-        }
-        
-        #dialogue-text { 
-            font-size: 1.05rem; line-height: 1.7; 
-            color: #cbd5e1;
-        }
-        
-        #dialogue-text strong { color: #f8fafc; }
+        #dialogue-title { font-size: 1.1rem; font-weight: 700; color: #111827; margin-bottom: 8px; }
+        #dialogue-text { font-size: 0.95rem; line-height: 1.6; color: #4b5563; }
+        #dialogue-text strong { color: #111827; }
 
         #close-dialogue {
-            margin-top: 25px; background: #3b82f6; border: none; color: white;
-            padding: 10px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;
-            transition: all 0.2s; width: 100%; font-size: 1rem;
+            margin-top: 16px; background: #f3f4f6; border: 1px solid #e5e7eb; color: #374151;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;
+            width: 100%; transition: all 0.2s;
         }
-        #close-dialogue:hover { background: #2563eb; transform: translateY(-2px); }
+        #close-dialogue:hover { background: #e5e7eb; }
 
-        /* --- Sleek Mobile Controls --- */
-        #mobile-controls {
-            position: absolute; bottom: 30px; left: 30px;
-            display: none; z-index: 50;
+        /* Responsive */
+        @media (max-width: 900px) {
+            .layout-container { flex-direction: column; }
+            .left-column { width: 100%; }
         }
-        .d-pad { display: grid; grid-template-columns: repeat(3, 65px); grid-template-rows: repeat(3, 65px); gap: 8px; }
-        .ctrl-btn {
-            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px; color: #94a3b8; font-size: 24px; display: flex;
-            justify-content: center; align-items: center; user-select: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .ctrl-btn:active { background: rgba(59, 130, 246, 0.4); color: white; border-color: #3b82f6; }
-        #btn-up { grid-column: 2; grid-row: 1; }
-        #btn-left { grid-column: 1; grid-row: 2; }
-        #btn-right { grid-column: 3; grid-row: 2; }
-        #btn-down { grid-column: 2; grid-row: 3; }
-
-        /* Back Button */
-        .back-btn {
-            position: absolute; top: 20px; left: 20px; z-index: 100;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px);
-            color: #cbd5e1; text-decoration: none;
-            padding: 10px 20px; border-radius: 10px; font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;
-        }
-        .back-btn:hover { background: rgba(15, 23, 42, 0.9); color: white; }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Return to Portfolio</a>
+    <a href="index.html" class="back-btn">← Back to Portfolio</a>
 
-    <div id="game-container"></div>
-
-    <div id="dialogue-overlay">
-        <div id="dialogue-title"><i class="fas fa-map-marker-alt"></i> <span id="title-text">Building Name</span></div>
-        <div id="dialogue-text">Details go here...</div>
-        <button id="close-dialogue">Continue Journey</button>
+    <div class="page-header">
+        <h1>Welcome to Jon's Journey</h1>
+        <p>Roam around, step on stations, and discover my background.</p>
     </div>
 
-    <div id="mobile-controls">
-        <div class="d-pad">
-            <div class="ctrl-btn" id="btn-up"><i class="fas fa-chevron-up"></i></div>
-            <div class="ctrl-btn" id="btn-left"><i class="fas fa-chevron-left"></i></div>
-            <div class="ctrl-btn" id="btn-right"><i class="fas fa-chevron-right"></i></div>
-            <div class="ctrl-btn" id="btn-down"><i class="fas fa-chevron-down"></i></div>
+    <div class="layout-container">
+        
+        <div class="left-column">
+            
+            <div class="panel">
+                <h3>System Log</h3>
+                <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; font-size: 0.85rem; color: #4b5563; margin-bottom: 8px;">
+                    <strong>Server:</strong> Welcome to the interactive resume.
+                </div>
+                <div style="background: #3b82f6; color: white; padding: 12px; border-radius: 8px; font-size: 0.85rem; align-self: flex-end;">
+                    Explore the map to see my stats!
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Instructions</h3>
+                <div class="keyboard-layout">
+                    <div class="key-row">
+                        <div class="key">W</div>
+                    </div>
+                    <div class="key-row">
+                        <div class="key">A</div>
+                        <div class="key">S</div>
+                        <div class="key">D</div>
+                    </div>
+                </div>
+                <p class="instruction-text">Hold WASD or Arrow keys to walk.<br>Step on stations to interact.</p>
+            </div>
+
         </div>
+
+        <div class="right-column">
+            <div id="game-wrapper">
+                <div id="dialogue-overlay">
+                    <div id="dialogue-title">Building Name</div>
+                    <div id="dialogue-text">Details go here...</div>
+                    <button id="close-dialogue">Close</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="js/rpg-game.js"></script>
