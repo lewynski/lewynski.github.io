@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jon's 3D Resume World</title>
+<title>Jon's Interactive House Resume</title>
 
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
 
@@ -12,140 +12,121 @@
 <style>
 body{
     margin:0;
-    background: radial-gradient(circle at top,#0f172a,#020617);
+    overflow:hidden;
     font-family:'Inter',sans-serif;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    overflow:hidden;
+    background:linear-gradient(to top,#dbeafe,#f0f9ff);
 }
 
-#game-wrapper{
-    width:1100px;
-    height:650px;
-    border-radius:20px;
-    overflow:hidden;
-    box-shadow:0 40px 80px rgba(0,0,0,.6);
-    position:relative;
-}
-
-#dialogue{
+/* Aesthetic info card */
+#infoCard{
     position:absolute;
-    bottom:30px;
+    top:50%;
     left:50%;
-    transform:translateX(-50%);
-    width:500px;
-    background:rgba(15,23,42,.85);
-    backdrop-filter:blur(15px);
-    border:1px solid rgba(255,255,255,.1);
-    padding:25px;
+    transform:translate(-50%,-50%);
+    width:400px;
+    background:rgba(255,255,255,.8);
+    backdrop-filter:blur(20px);
     border-radius:20px;
+    padding:30px;
+    box-shadow:0 30px 60px rgba(0,0,0,.2);
     display:none;
-    box-shadow:0 20px 50px rgba(0,0,0,.6);
+    text-align:center;
 }
 
-#dialogue h2{
+#infoCard h2{
     margin:0 0 10px 0;
     font-weight:700;
+    color:#1e293b;
 }
 
-#dialogue p{
+#infoCard p{
     font-size:14px;
+    color:#475569;
     line-height:1.6;
-    color:#cbd5e1;
 }
 
-#dialogue button{
+#infoCard button{
     margin-top:15px;
     padding:8px 15px;
-    background:#3b82f6;
     border:none;
-    border-radius:8px;
+    background:#3b82f6;
     color:white;
+    border-radius:10px;
     cursor:pointer;
 }
 </style>
 </head>
 <body>
 
-<div id="game-wrapper"></div>
-
-<div id="dialogue">
-    <h2 id="d-title"></h2>
-    <p id="d-text"></p>
-    <button onclick="closeDialogue()">Close</button>
+<div id="infoCard">
+    <h2>About Me</h2>
+    <p>
+    B.S. Electronics Engineering Student<br>
+    Passionate about automation systems, embedded systems, and creative tech projects.<br><br>
+    Polytechnic University of the Philippines
+    </p>
+    <button onclick="closeCard()">Close</button>
 </div>
 
 <script>
 
-const resumeData = {
-    elem:{title:"Primary Education",text:"Jose G. Peralta Memorial School<br>Valedictorian (2011-2017)"},
-    jhs:{title:"Junior High",text:"Fellowship Baptist College<br>With Honor (2017-2021)"},
-    shs:{title:"Senior High - STEM",text:"Fellowship Baptist College<br>With High Honor (2021-2023)"},
-    college:{title:"B.S. Electronics Engineering",text:"Polytechnic University of the Philippines<br>Present"},
-    work:{title:"Work Experience",text:"Bandai Wireharness (2025)<br>NOCECO (2023)"}
-};
-
 const config={
     type:Phaser.AUTO,
-    parent:"game-wrapper",
-    width:1100,
-    height:650,
-    backgroundColor:"#0f172a",
-    physics:{
-        default:"arcade",
-        arcade:{gravity:{y:0},debug:false}
-    },
-    scene:{create,update}
+    width:1000,
+    height:600,
+    physics:{default:'arcade',arcade:{gravity:{y:0},debug:false}},
+    scene:[OutsideScene,InsideScene]
 };
 
 const game=new Phaser.Game(config);
 
 let player;
-let cursors,keyW,keyA,keyS,keyD,keyE;
-let currentZone=null;
-let speed=250;
-let zones;
+let cursors,keyW,keyA,keyS,keyD,keyE,keyESC;
+let nearDoor=false;
 
-function create(){
+/* ================= OUTSIDE SCENE ================= */
 
-    this.cameras.main.setBackgroundColor("#0f172a");
+function OutsideScene(){
+    Phaser.Scene.call(this,{key:'Outside'});
+}
+OutsideScene.prototype=Object.create(Phaser.Scene.prototype);
 
-    // Floating ground illusion
-    const ground=this.add.rectangle(550,330,900,450,0x1e293b)
-        .setStrokeStyle(4,0x334155)
-        .setDepth(0);
+OutsideScene.prototype.create=function(){
 
-    ground.setAngle(5);
+    this.add.rectangle(500,300,1000,600,0xbfdbfe); // sky
+    this.add.rectangle(500,500,1000,200,0x86efac); // grass
 
-    zones=this.physics.add.staticGroup();
+    // House body
+    this.add.rectangle(500,350,300,200,0xfef3c7)
+        .setStrokeStyle(4,0xf59e0b);
 
-    createBuilding(this,250,500,"Primary",resumeData.elem);
-    createBuilding(this,250,200,"Junior",resumeData.jhs);
-    createBuilding(this,550,120,"Senior",resumeData.shs);
-    createBuilding(this,850,250,"College",resumeData.college);
-    createBuilding(this,550,520,"Work",resumeData.work);
+    // Roof
+    this.add.triangle(500,220,350,300,650,300,500,150,0xf87171);
 
-    player=this.add.circle(550,330,15,0x3b82f6);
+    // Door
+    this.door=this.add.rectangle(500,400,70,120,0x92400e);
+    this.physics.add.existing(this.door,true);
+
+    // Player
+    player=this.add.circle(500,500,15,0x2563eb);
     this.physics.add.existing(player);
     player.body.setCollideWorldBounds(true);
 
     cursors=this.input.keyboard.createCursorKeys();
-    keyW=this.input.keyboard.addKey("W");
-    keyA=this.input.keyboard.addKey("A");
-    keyS=this.input.keyboard.addKey("S");
-    keyD=this.input.keyboard.addKey("D");
-    keyE=this.input.keyboard.addKey("E");
+    keyW=this.input.keyboard.addKey('W');
+    keyA=this.input.keyboard.addKey('A');
+    keyS=this.input.keyboard.addKey('S');
+    keyD=this.input.keyboard.addKey('D');
+    keyE=this.input.keyboard.addKey('E');
 
-    this.physics.add.overlap(player,zones,(p,z)=>{
-        currentZone=z.data;
+    this.physics.add.overlap(player,this.door,()=>{
+        nearDoor=true;
+        this.door.setFillStyle(0xb45309);
     });
 
-}
+};
 
-function update(){
+OutsideScene.prototype.update=function(){
 
     let vx=0,vy=0;
 
@@ -155,46 +136,56 @@ function update(){
     if(cursors.down.isDown||keyS.isDown)vy=1;
 
     const vec=new Phaser.Math.Vector2(vx,vy);
-
-    if(vec.length()>0){
-        vec.normalize().scale(speed);
-    }
+    if(vec.length()>0)vec.normalize().scale(220);
 
     player.body.setVelocity(vec.x,vec.y);
 
-    if(Phaser.Input.Keyboard.JustDown(keyE) && currentZone){
-        showDialogue(currentZone.title,currentZone.text);
+    if(!Phaser.Geom.Intersects.RectangleToRectangle(player.getBounds(),this.door.getBounds())){
+        nearDoor=false;
+        this.door.setFillStyle(0x92400e);
     }
 
-    if(vec.length()==0){
-        currentZone=null;
+    if(nearDoor && Phaser.Input.Keyboard.JustDown(keyE)){
+        this.cameras.main.fadeOut(500);
+        this.time.delayedCall(500,()=>{
+            this.scene.start('Inside');
+        });
     }
+};
+
+/* ================= INSIDE SCENE ================= */
+
+function InsideScene(){
+    Phaser.Scene.call(this,{key:'Inside'});
 }
+InsideScene.prototype=Object.create(Phaser.Scene.prototype);
 
-function createBuilding(scene,x,y,label,data){
+InsideScene.prototype.create=function(){
 
-    const shadow=scene.add.rectangle(x,y+15,120,60,0x000000,0.4);
-    const building=scene.add.rectangle(x,y,120,60,0x475569)
-        .setStrokeStyle(3,0x94a3b8);
+    this.add.rectangle(500,300,1000,600,0xf1f5f9); // interior wall
+    this.add.rectangle(500,550,1000,100,0xe2e8f0); // floor
 
-    const text=scene.add.text(x,y,label,{
-        font:"14px Inter",
-        fill:"#fff"
-    }).setOrigin(0.5);
+    this.add.text(500,150,"Welcome Inside 🏡",
+        {font:'28px Inter',fill:'#1e293b'}).setOrigin(0.5);
 
-    scene.physics.add.existing(building,true);
-    building.data=data;
-    zones.add(building);
-}
+    this.add.text(500,200,"Press ESC to exit",
+        {font:'14px Inter',fill:'#64748b'}).setOrigin(0.5);
 
-function showDialogue(title,text){
-    document.getElementById("d-title").innerHTML=title;
-    document.getElementById("d-text").innerHTML=text;
-    document.getElementById("dialogue").style.display="block";
-}
+    keyESC=this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
-function closeDialogue(){
-    document.getElementById("dialogue").style.display="none";
+    document.getElementById("infoCard").style.display="block";
+
+};
+
+InsideScene.prototype.update=function(){
+    if(Phaser.Input.Keyboard.JustDown(keyESC)){
+        document.getElementById("infoCard").style.display="none";
+        this.scene.start('Outside');
+    }
+};
+
+function closeCard(){
+    document.getElementById("infoCard").style.display="none";
 }
 
 </script>
