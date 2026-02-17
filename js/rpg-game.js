@@ -1,190 +1,144 @@
-// Game Configuration
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
     parent: 'game-container',
-    backgroundColor: '#1e293b', // Dark background
+    backgroundColor: '#020617', // Very dark blue/black
     physics: {
         default: 'arcade',
-        arcade: {
-            gravity: { y: 0 }, // Top-down game, no gravity
-            debug: false // Set to true to see collision boxes
-        }
+        arcade: { gravity: { y: 0 }, debug: false }
     },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
+    scene: { create: create, update: update }
 };
 
 const game = new Phaser.Game(config);
 
-// --- Game Variables ---
-let player;
-let cursors;
-let wasd;
-let moveSpeed = 200;
+let player, cursors, wasd;
+let moveSpeed = 250; // Slightly faster, smoother
 let isDialogueOpen = false;
-// Mobile touch variables
 let touchUp = false, touchDown = false, touchLeft = false, touchRight = false;
 
-// Progression Flags
-let progress = {
-    elem: false,
-    jhs: false,
-    shs: false,
-    college: false
-};
+let progress = { elem: false, jhs: false, shs: false, college: false };
+let gateJHS, gateSHS, gateCollege;
 
-// Barriers (Gates)
-let gateJHS, gateSHS, gateCollege, gateWork;
-
-// --- RESUME DATA STORE ---
 const resumeData = {
-    elem: {
-        title: "Primary Education (2011-2017)",
-        text: "Jose G. Peralta Memorial School.<br><br>Achievement: Graduated Valedictorian."
-    },
-    jhs: {
-        title: "Junior High School (2017-2021)",
-        text: "Fellowship Baptist College.<br><br>Achievement: Graduated With Honor."
-    },
-    shs: {
-        title: "Senior High School - STEM (2021-2023)",
-        text: "Fellowship Baptist College.<br><br>Achievement: Graduated With High Honor. Focus on Science, Technology, Engineering, and Mathematics."
-    },
-    college: {
-        title: "B.S. Electronics Engineering (2023-Present)",
-        text: "Polytechnic University of the Philippines (PUP).<br><br>Affiliations: OECES Special Project Officer, IECEP Batangas Student Chapter."
-    },
-    work: {
-        title: "Professional Experience",
-        text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems to reduce production time.<br><br><strong>NOCECO (2023):</strong> Assisted supervisors in daily technical operations."
-    }
+    elem: { title: "Primary Education (2011-2017)", text: "<strong>Jose G. Peralta Memorial School.</strong><br><br>Achievement: Graduated Valedictorian." },
+    jhs: { title: "Junior High School (2017-2021)", text: "<strong>Fellowship Baptist College.</strong><br><br>Achievement: Graduated With Honor." },
+    shs: { title: "Senior High School - STEM (2021-2023)", text: "<strong>Fellowship Baptist College.</strong><br><br>Achievement: Graduated With High Honor.<br>Focus on Science, Technology, Engineering, and Mathematics." },
+    college: { title: "B.S. Electronics Engineering (2023-Present)", text: "<strong>Polytechnic University of the Philippines (PUP).</strong><br><br>Affiliations: OECES Special Project Officer, IECEP Batangas Student Chapter." },
+    work: { title: "Professional Experience", text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems to reduce production time.<br><br><strong>NOCECO (2023):</strong> Assisted supervisors in daily technical operations." }
 };
-
-function preload() {
-    // In a real game, load spritesheets and tilesets here.
-    // For prototype, we use placeholder shapes generated in 'create'.
-}
 
 function create() {
-    // 1. Setup World Boundaries
     this.physics.world.setBounds(0, 0, 2000, 2000);
 
-    // 2. Create Ground (Placeholder Green)
-    this.add.rectangle(1000, 1000, 2000, 2000, 0x0f172a).setDepth(-1);
-    // Add a path (lighter color)
-    let path = this.add.rectangle(1000, 1000, 200, 2000, 0x334155).setDepth(0);
+    // 1. AESTHETIC BACKGROUND: Draw a blueprint grid
+    this.add.grid(1000, 1000, 2000, 2000, 64, 64, 0x020617, 1, 0x1e293b, 0.5).setDepth(-2);
+    
+    // Draw the main path
+    let path = this.add.rectangle(1000, 1000, 240, 2000, 0x0f172a).setDepth(-1);
+    path.setStrokeStyle(2, 0x334155);
 
-    // 3. Create Buildings (Static Physics Objects)
-    // Instead of images, we use colored rectangles for now.
     const buildings = this.physics.add.staticGroup();
 
-    // Building 1: Elementary (Bottom) - Red
-    let bElem = this.add.rectangle(1000, 1600, 300, 200, 0xef4444);
-    buildings.add(bElem);
-    createTrigger(this, 1000, 1720, resumeData.elem, 'elem');
+    // 2. AESTHETIC BUILDINGS: Glowing zones with Emojis instead of solid blocks
+    function createZone(scene, x, y, width, height, color, emoji, title) {
+        // Glowing border effect
+        let glow = scene.add.rectangle(x, y, width, height, color, 0.1);
+        glow.setStrokeStyle(3, color, 0.8);
+        buildings.add(glow);
 
-    // Building 2: Junior High (Mid-Bottom) - Orange
-    let bJHS = this.add.rectangle(1000, 1200, 300, 200, 0xf97316);
-    buildings.add(bJHS);
-    createTrigger(this, 1000, 1320, resumeData.jhs, 'jhs');
+        // Text label
+        scene.add.text(x, y - 15, emoji, { font: '40px Arial' }).setOrigin(0.5);
+        scene.add.text(x, y + 30, title, { font: '16px Inter', fill: '#cbd5e1', fontStyle: 'bold' }).setOrigin(0.5);
+        
+        return glow;
+    }
 
-    // Building 3: Senior High (Center) - Yellow
-    let bSHS = this.add.rectangle(1000, 800, 300, 200, 0xeab308);
-    buildings.add(bSHS);
-    createTrigger(this, 1000, 920, resumeData.shs, 'shs');
+    createZone(this, 1000, 1650, 300, 150, 0xef4444, '🎒', 'Elementary');
+    createTrigger(this, 1000, 1750, resumeData.elem, 'elem', 0xef4444);
 
-    // Building 4: College (Mid-Top) - Green
-    let bCollege = this.add.rectangle(1000, 400, 350, 250, 0x22c55e);
-    buildings.add(bCollege);
-    createTrigger(this, 1000, 550, resumeData.college, 'college');
+    createZone(this, 1000, 1250, 300, 150, 0xf97316, '🏫', 'Junior High');
+    createTrigger(this, 1000, 1350, resumeData.jhs, 'jhs', 0xf97316);
 
-    // Building 5: Work (Top) - Blue
-    let bWork = this.add.rectangle(1000, 100, 400, 200, 0x3b82f6);
-    buildings.add(bWork);
-    createTrigger(this, 1000, 220, resumeData.work, 'work');
+    createZone(this, 1000, 850, 300, 150, 0xeab308, '🎓', 'Senior High');
+    createTrigger(this, 1000, 950, resumeData.shs, 'shs', 0xeab308);
 
+    createZone(this, 1000, 450, 350, 180, 0x22c55e, '🏛️', 'PUP College');
+    createTrigger(this, 1000, 560, resumeData.college, 'college', 0x22c55e);
 
-    // 4. Create Progression Gates (Barriers)
+    createZone(this, 1000, 100, 400, 180, 0x3b82f6, '💼', 'Experience');
+    createTrigger(this, 1000, 210, resumeData.work, 'work', 0x3b82f6);
+
+    // 3. AESTHETIC GATES: Red glowing barriers
     const gates = this.physics.add.staticGroup();
-    // Gate blocking JHS
-    gateJHS = this.add.rectangle(1000, 1400, 220, 20, 0xffffff).setAlpha(0.5);
-    gates.add(gateJHS);
-    // Gate blocking SHS
-    gateSHS = this.add.rectangle(1000, 1000, 220, 20, 0xffffff).setAlpha(0.5);
-    gates.add(gateSHS);
-    // Gate blocking College
-    gateCollege = this.add.rectangle(1000, 600, 220, 20, 0xffffff).setAlpha(0.5);
-    gates.add(gateCollege);
+    function createGate(scene, y) {
+        let g = scene.add.rectangle(1000, y, 240, 10, 0xef4444, 0.6);
+        g.setStrokeStyle(2, 0xff0000, 1);
+        gates.add(g);
+        return g;
+    }
+    gateJHS = createGate(this, 1450);
+    gateSHS = createGate(this, 1050);
+    gateCollege = createGate(this, 650);
 
-
-    // 5. Create Player (Placeholder White Square)
-    // Starting position at the bottom of the map
-    player = this.add.rectangle(1000, 1900, 32, 32, 0xffffff);
+    // 4. AESTHETIC PLAYER: A glowing orb instead of a white box
+    player = this.add.circle(1000, 1900, 16, 0x3b82f6);
+    player.setStrokeStyle(3, 0x60a5fa);
     this.physics.add.existing(player);
     player.body.setCollideWorldBounds(true);
+    // Give the player a soft glow shadow
+    player.preFX.addGlow(0x3b82f6, 4, 0, false);
 
-    // Camera Follow
-    this.cameras.main.startFollow(player, true, 0.1, 0.1);
-    this.cameras.main.setZoom(1.5);
+    // Camera
+    this.cameras.main.startFollow(player, true, 0.08, 0.08); // Smoother lerp
+    this.cameras.main.setZoom(1.2);
 
     // Collisions
     this.physics.add.collider(player, buildings);
     this.physics.add.collider(player, gates);
 
-    // 6. Controls Setup
+    // Controls
     cursors = this.input.keyboard.createCursorKeys();
     wasd = this.input.keyboard.addKeys({ 'up': Phaser.Input.Keyboard.KeyCodes.W, 'down': Phaser.Input.Keyboard.KeyCodes.S, 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D });
-
     setupMobileControls();
 
-    // UI Listeners
     document.getElementById('close-dialogue').addEventListener('click', closeDialogue);
 }
 
 function update() {
-    // Stop movement if dialogue is open based on the boolean flag
     if (isDialogueOpen) {
         player.body.setVelocity(0);
         return;
     }
 
-    // Reset velocity
-    player.body.setVelocity(0);
+    let velX = 0;
+    let velY = 0;
 
-    // Horizontal Movement (PC & Mobile combined)
-    if (cursors.left.isDown || wasd.left.isDown || touchLeft) {
-        player.body.setVelocityX(-moveSpeed);
-    } else if (cursors.right.isDown || wasd.right.isDown || touchRight) {
-        player.body.setVelocityX(moveSpeed);
-    }
+    if (cursors.left.isDown || wasd.left.isDown || touchLeft) velX = -moveSpeed;
+    else if (cursors.right.isDown || wasd.right.isDown || touchRight) velX = moveSpeed;
 
-    // Vertical Movement (PC & Mobile combined)
-    if (cursors.up.isDown || wasd.up.isDown || touchUp) {
-        player.body.setVelocityY(-moveSpeed);
-    } else if (cursors.down.isDown || wasd.down.isDown || touchDown) {
-        player.body.setVelocityY(moveSpeed);
-    }
+    if (cursors.up.isDown || wasd.up.isDown || touchUp) velY = -moveSpeed;
+    else if (cursors.down.isDown || wasd.down.isDown || touchDown) velY = moveSpeed;
 
-    // Normalize speed for diagonals
-    if (player.body.velocity.x !== 0 && player.body.velocity.y !== 0) {
+    player.body.setVelocity(velX, velY);
+
+    if (velX !== 0 && velY !== 0) {
         player.body.velocity.normalize().scale(moveSpeed);
     }
 }
 
+// Helper: Creates a pulsing "step here" trigger pad
+function createTrigger(scene, x, y, data, stageKey, color) {
+    let pad = scene.add.rectangle(x, y, 120, 30, color, 0.2);
+    pad.setStrokeStyle(2, color, 0.8);
+    scene.add.text(x, y, "STEP HERE", { font: '10px Inter', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+    scene.physics.add.existing(pad, true); 
 
-// --- Helper Functions ---
+    // Make the pad pulse
+    scene.tweens.add({ targets: pad, alpha: 0.5, yoyo: true, repeat: -1, duration: 800 });
 
-// Creates an invisible trigger zone in front of a building
-function createTrigger(scene, x, y, data, stageKey) {
-    let trigger = scene.add.rectangle(x, y, 100, 50, 0xffff00, 0.3); // semi-transparent yellow for debug
-    scene.physics.add.existing(trigger, true); // true = static body
-
-    scene.physics.add.overlap(player, trigger, () => {
+    scene.physics.add.overlap(player, pad, () => {
         if (!isDialogueOpen) {
             showDialogue(data.title, data.text);
             unlockNextStage(stageKey);
@@ -192,48 +146,38 @@ function createTrigger(scene, x, y, data, stageKey) {
     });
 }
 
-// Handles unlocking gates based on progress
 function unlockNextStage(currentStage) {
     if (currentStage === 'elem' && !progress.elem) {
         progress.elem = true;
-        gateJHS.destroy(); // Remove the gate
-        alert("Achievement Unlocked: Valedictorian! Path to High School opened.");
+        gateJHS.destroy(); 
     }
     else if (currentStage === 'jhs' && !progress.jhs) {
         progress.jhs = true;
         gateSHS.destroy();
-        alert("Junior High Completed! STEM path opened.");
     }
     else if (currentStage === 'shs' && !progress.shs) {
         progress.shs = true;
         gateCollege.destroy();
-        alert("Senior High Graduated! The road to PUP is open.");
     }
 }
 
-// Shows the HTML overlay
 function showDialogue(title, text) {
     isDialogueOpen = true;
     const overlay = document.getElementById('dialogue-overlay');
-    document.getElementById('dialogue-title').innerHTML = title;
+    document.getElementById('title-text').innerHTML = title;
     document.getElementById('dialogue-text').innerHTML = text;
     overlay.style.display = 'block';
 }
 
-// Closes the HTML overlay
 function closeDialogue() {
     document.getElementById('dialogue-overlay').style.display = 'none';
-    // Small delay before allowing movement again so they don't instantly re-trigger
     setTimeout(() => { isDialogueOpen = false; }, 200);
 }
 
-// Wire up HTML buttons to JS variables
 function setupMobileControls() {
-    // Only show on touch devices
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
         document.getElementById('mobile-controls').style.display = 'block';
     }
-
     const setupBtn = (id, startFn, endFn) => {
         const btn = document.getElementById(id);
         btn.addEventListener('touchstart', (e) => { e.preventDefault(); startFn(); });
@@ -241,14 +185,10 @@ function setupMobileControls() {
         btn.addEventListener('touchend', (e) => { e.preventDefault(); endFn(); });
         btn.addEventListener('mouseup', (e) => { e.preventDefault(); endFn(); });
     };
-
     setupBtn('btn-up', () => touchUp = true, () => touchUp = false);
     setupBtn('btn-down', () => touchDown = true, () => touchDown = false);
     setupBtn('btn-left', () => touchLeft = true, () => touchLeft = false);
     setupBtn('btn-right', () => touchRight = true, () => touchRight = false);
 }
 
-// Handle window resizing
-window.addEventListener('resize', () => {
-    game.scale.resize(window.innerWidth, window.innerHeight);
-});
+window.addEventListener('resize', () => { game.scale.resize(window.innerWidth, window.innerHeight); });
