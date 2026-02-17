@@ -6,16 +6,23 @@
     <title>Jon's Pixel Resume Journey</title>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* --- CUSTOM RETRO CURSOR --- */
         body {
             margin: 0; padding: 0; overflow: hidden;
             background-color: #0f172a; font-family: 'Inter', sans-serif;
+            /* Default retro hand cursor */
+            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
         }
 
-        /* --- MODERN HD UI PANEL --- */
+        /* Changes to a pointing finger on interactive elements */
+        a, button, .ctrl-btn {
+            cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important;
+        }
+
         #infoCard {
             position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 550px;
@@ -49,7 +56,6 @@
         }
         .back-btn:hover { background: rgba(59, 130, 246, 0.8); color: white; }
 
-        /* --- MOBILE TOUCH CONTROLS --- */
         #mobile-controls {
             position: absolute; bottom: 30px; left: 30px; display: none; z-index: 50;
         }
@@ -85,27 +91,36 @@
     </div>
 
     <script>
-        const WORLD_WIDTH = 2400;
-        const WORLD_HEIGHT = 1600;
+        // MASSIVE MAP SIZE
+        const WORLD_WIDTH = 3200;
+        const WORLD_HEIGHT = 3200;
 
-        // Resume Data
+        // Expanded Resume Data! Education, Skills, and Projects!
         const resumeData = [
-            { id: 'elem', x: 400, y: 1300, icon: '🎒', title: "Primary Education", text: "<strong>Jose G. Peralta Memorial School</strong><br>Graduated Valedictorian (2011-2017)" },
-            { id: 'jhs', x: 900, y: 1000, icon: '🏫', title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>Graduated With Honor (2017-2021)" },
-            { id: 'shs', x: 1400, y: 700, icon: '🎓', title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>Graduated With High Honor (2021-2023)" },
-            { id: 'college', x: 1900, y: 400, icon: '🏛️', title: "College", text: "<strong>B.S. Electronics Engineering</strong><br>Polytechnic University of the Philippines (Present)<br>Affiliations: OECES, IECEP Batangas." },
-            { id: 'work', x: 1200, y: 200, icon: '💼', title: "Work Experience", text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." }
+            // Chapter 1: Education & Experience (Bottom to Middle)
+            { id: 'elem', x: 600, y: 2800, icon: '🎒', title: "Primary Education", text: "<strong>Jose G. Peralta Memorial School</strong><br>Graduated Valedictorian (2011-2017)" },
+            { id: 'jhs', x: 1200, y: 2500, icon: '🏫', title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>Graduated With Honor (2017-2021)" },
+            { id: 'shs', x: 1800, y: 2200, icon: '🎓', title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>Graduated With High Honor (2021-2023)" },
+            { id: 'college', x: 2400, y: 1900, icon: '🏛️', title: "College", text: "<strong>B.S. Electronics Engineering</strong><br>Polytechnic University of the Philippines<br>Affiliations: OECES, IECEP Batangas." },
+            { id: 'work', x: 1600, y: 1600, icon: '💼', title: "Work Experience", text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." },
+
+            // Chapter 2: The Skill Forge (Middle to Top Left)
+            { id: 'skill_prog', x: 800, y: 1200, icon: '💻', title: "Programming Arsenal", text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack applications.</em>" },
+            { id: 'skill_hw', x: 1400, y: 1000, icon: '⚙️', title: "Embedded Systems", text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and physical circuitry.</em>" },
+            { id: 'skill_sim', x: 800, y: 800, icon: '📐', title: "Simulation & Design", text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex systems and architectural blueprints.</em>" },
+
+            // Chapter 3: The Project Arcade (Top Right)
+            { id: 'proj_calc', x: 2200, y: 1200, icon: '🧮', title: "Engineering Tools", text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built to solve complex math problems.</em>" },
+            { id: 'proj_game', x: 2800, y: 900, icon: '🕹️', title: "Interactive Games", text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048, Toy Kingdom.<br><em>Game development testing complex logic and physics.</em>" },
+            { id: 'proj_ai', x: 2200, y: 600, icon: '🤖', title: "AI Integration", text: "<strong>Project:</strong> D Dwarf Mini AI.<br><em>A sleek conversational assistant powered by Groq LPUs and Meta's Llama 3.3.</em>" }
         ];
 
         const config = {
             type: Phaser.AUTO,
             width: window.innerWidth,
             height: window.innerHeight,
-            pixelArt: true, // CRITICAL: Makes graphics sharp, chunky, and retro!
-            physics: {
-                default: 'arcade',
-                arcade: { gravity: { y: 0 }, debug: false }
-            },
+            pixelArt: true, 
+            physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
             scene: { preload: preload, create: create, update: update }
         };
 
@@ -113,59 +128,46 @@
 
         let player;
         let cursors, keyW, keyA, keyS, keyD;
-        let depthGroup; // Handles putting player behind/in front of buildings
+        let depthGroup; 
         let currentActiveHouse = null;
         let touchUp = false, touchDown = false, touchLeft = false, touchRight = false;
 
         function preload() {
-            // Sourcing permanent, reliable pixel assets from Phaser Labs
             this.load.image('grass', 'https://labs.phaser.io/assets/textures/grass.png');
             this.load.image('tree', 'https://labs.phaser.io/assets/sprites/tree.png');
-            
-            // Using a crate scaled up to look like a pixelated wooden building
             this.load.image('building', 'https://labs.phaser.io/assets/sprites/crate.png');
-            
-            // Cool Spaceman to represent your Engineering/Tech background!
             this.load.image('player', 'https://labs.phaser.io/assets/sprites/spaceman.png');
         }
 
         function create() {
             this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
             
-            // Force keyboard focus
             this.input.keyboard.addCapture('W,A,S,D,UP,DOWN,LEFT,RIGHT');
             this.input.on('pointerdown', () => { window.focus(); });
 
-            // 1. Pixel Art Grass Background (Tiled)
             this.add.tileSprite(WORLD_WIDTH/2, WORLD_HEIGHT/2, WORLD_WIDTH, WORLD_HEIGHT, 'grass').setDepth(-10);
 
-            // Group for depth sorting
             depthGroup = this.add.group();
 
-            // 2. Decorate with Pixel Trees
-            for (let i = 0; i < 70; i++) {
-                let x = Phaser.Math.Between(50, WORLD_WIDTH - 50);
-                let y = Phaser.Math.Between(50, WORLD_HEIGHT - 50);
+            // Spawn 150 trees for the massive map!
+            for (let i = 0; i < 150; i++) {
+                let x = Phaser.Math.Between(100, WORLD_WIDTH - 100);
+                let y = Phaser.Math.Between(100, WORLD_HEIGHT - 100);
                 
-                // Don't spawn trees on top of buildings
                 let tooClose = resumeData.some(d => Phaser.Math.Distance.Between(x, y, d.x, d.y) < 250);
                 if(!tooClose) {
-                    let tree = this.add.image(x, y, 'tree').setScale(1.5); // Scale up for chunkiness
-                    tree.setOrigin(0.5, 0.9); // Origin at trunk
+                    let tree = this.add.image(x, y, 'tree').setScale(1.5); 
+                    tree.setOrigin(0.5, 0.9); 
                     depthGroup.add(tree);
                 }
             }
 
-            // 3. Create Buildings
             resumeData.forEach(data => {
-                // Drop shadow
                 this.add.ellipse(data.x, data.y + 10, 160, 40, 0x000000, 0.4).setDepth(-1);
                 
-                // Scaled up crate acts as a retro building structure
                 let building = this.add.image(data.x, data.y, 'building').setScale(4);
                 building.setOrigin(0.5, 0.8);
                 
-                // Add a cute sign board above the building
                 this.add.text(data.x, data.y - 100, data.icon + " " + data.id.toUpperCase(), {
                     fontFamily: 'Inter', fontSize: '18px', fontStyle: 'bold',
                     backgroundColor: 'rgba(15, 23, 42, 0.8)', color: '#fff', padding: {x: 8, y: 4}
@@ -174,23 +176,20 @@
                 building.info = data;
                 depthGroup.add(building);
 
-                // Pulsing interact ring
                 let ring = this.add.circle(data.x, data.y + 20, 100, 0x60a5fa, 0);
                 ring.setStrokeStyle(3, 0x60a5fa, 0.5);
                 this.tweens.add({ targets: ring, scale: 1.2, alpha: 0.1, yoyo: true, repeat: -1, duration: 1500 });
             });
 
-            // 4. Create Player
-            player = this.physics.add.sprite(200, 1400, 'player').setScale(1.5); // Chunky spaceman!
-            player.setOrigin(0.5, 0.9); // Origin at feet
+            // Start player at the very bottom near Elementary!
+            player = this.physics.add.sprite(600, 3000, 'player').setScale(1.5); 
+            player.setOrigin(0.5, 0.9); 
             player.setCollideWorldBounds(true);
             
-            // 5. Camera Follow
             this.cameras.main.startFollow(player, true, 0.08, 0.08);
             this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-            this.cameras.main.setZoom(1.2); 
+            this.cameras.main.setZoom(1.1); // Slightly zoomed out to see the huge world
 
-            // Controls
             cursors = this.input.keyboard.createCursorKeys();
             keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
             keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
@@ -202,7 +201,7 @@
 
         function update() {
             let vx = 0, vy = 0;
-            const speed = 250;
+            const speed = 350; // Increased speed for the massive map!
 
             if (cursors.left.isDown || keyA.isDown || touchLeft) vx = -1;
             if (cursors.right.isDown || keyD.isDown || touchRight) vx = 1;
@@ -214,8 +213,6 @@
 
             player.setVelocity(vec.x, vec.y);
 
-            // REALISTIC DEPTH SORTING
-            // Elements lower on the screen render on top of elements higher up
             depthGroup.children.iterate(function (child) {
                 child.setDepth(child.y);
             });
@@ -226,7 +223,7 @@
 
         function checkProximity() {
             let closestBuilding = null;
-            let minDistance = 140; // Trigger radius
+            let minDistance = 140; 
 
             depthGroup.children.iterate(function (child) {
                 if (child.info) { 
@@ -251,7 +248,6 @@
             }
         }
 
-        // --- UI HANDLING ---
         const infoCard = document.getElementById("infoCard");
 
         function showInfo(title, text) {
@@ -270,7 +266,6 @@
             }, 300);
         }
 
-        // --- MOBILE CONTROLS ---
         function setupMobileControls() {
             if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
                 let mobileContainer = document.getElementById('mobile-controls');
