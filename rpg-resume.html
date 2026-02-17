@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jon's RPG Journey</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Prevent scrolling while playing */
+            touch-action: none; /* Prevent browser default touch actions */
+        }
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- UI Overlay (Dialogue Box) --- */
+        #dialogue-overlay {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 600px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #3b82f6; border-radius: 12px;
+            padding: 20px; color: #f8fafc; display: none; /* Hidden by default */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+        #dialogue-title { font-size: 1.2rem; font-weight: 700; color: #60a5fa; margin-bottom: 10px; }
+        #dialogue-text { font-size: 1rem; line-height: 1.6; font-family: 'Fira Code', monospace; }
+        #close-dialogue {
+            margin-top: 15px; background: #3b82f6; border: none; color: white;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;
+        }
+
+        /* --- Mobile Controls --- */
+        #mobile-controls {
+            position: absolute; bottom: 20px; left: 20px;
+            display: none; /* Hidden on PC, shown via JS on mobile */
+            z-index: 50;
+        }
+        .d-pad { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 5px; }
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 12px; color: white; font-size: 24px; display: flex;
+            justify-content: center; align-items: center; user-select: none;
+        }
+        .ctrl-btn:active { background: rgba(59, 130, 246, 0.6); }
+        #btn-up { grid-column: 2; grid-row: 1; }
+        #btn-left { grid-column: 1; grid-row: 2; }
+        #btn-right { grid-column: 3; grid-row: 2; }
+        #btn-down { grid-column: 2; grid-row: 3; }
+
+        /* Back Button */
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+            background: rgba(15, 23, 42, 0.8); color: white; text-decoration: none;
+            padding: 10px 15px; border-radius: 8px; font-weight: 600;
+            border: 1px solid #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Exit Game</a>
+
+    <div id="game-container"></div>
+
+    <div id="dialogue-overlay">
+        <div id="dialogue-title">Building Name</div>
+        <div id="dialogue-text">Details go here...</div>
+        <button id="close-dialogue">Close (Continue)</button>
+    </div>
+
+    <div id="mobile-controls">
+        <div class="d-pad">
+            <div class="ctrl-btn" id="btn-up"><i class="fas fa-chevron-up"></i></div>
+            <div class="ctrl-btn" id="btn-left"><i class="fas fa-chevron-left"></i></div>
+            <div class="ctrl-btn" id="btn-right"><i class="fas fa-chevron-right"></i></div>
+            <div class="ctrl-btn" id="btn-down"><i class="fas fa-chevron-down"></i></div>
+        </div>
+    </div>
+
+    <script src="js/rpg-game.js"></script>
+</body>
+</html>
