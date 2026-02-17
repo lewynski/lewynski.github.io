@@ -1,239 +1,301 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jon's Ghibli Resume Village</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jon's Pixel Resume Journey</title>
 
-<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<style>
-body{
-    margin:0;
-    overflow:hidden;
-    font-family:'Inter',sans-serif;
-    background:linear-gradient(to top,#fef6e4,#fde2e4);
-}
+    <style>
+        body {
+            margin: 0; padding: 0; overflow: hidden;
+            background-color: #0f172a; font-family: 'Inter', sans-serif;
+        }
 
-/* Floating soft info panel */
-#infoCard{
-    position:absolute;
-    bottom:40px;
-    left:50%;
-    transform:translateX(-50%);
-    width:450px;
-    background:rgba(255,255,255,.85);
-    backdrop-filter:blur(15px);
-    border-radius:25px;
-    padding:28px;
-    box-shadow:0 25px 70px rgba(0,0,0,.15);
-    display:none;
-    text-align:center;
-    transition:.4s ease;
-}
+        /* --- MODERN HD UI PANEL --- */
+        #infoCard {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 550px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px; padding: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+            display: none; color: #f8fafc; text-align: left; z-index: 100;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0; transform: translate(-50%, 20px);
+        }
 
-#infoCard h2{
-    margin:0 0 8px 0;
-    font-weight:700;
-    color:#5f6f52;
-}
+        #infoCard.active { display: block; opacity: 1; transform: translate(-50%, 0); }
 
-#infoCard p{
-    font-size:15px;
-    color:#6c757d;
-    line-height:1.7;
-}
-</style>
+        #infoCard h2 {
+            margin: 0 0 12px 0; font-weight: 700; font-size: 1.4rem;
+            color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px; display: flex; align-items: center; gap: 10px;
+        }
+
+        #infoCard p { font-size: 1.05rem; color: #cbd5e1; line-height: 1.6; margin: 0; }
+        #infoCard p strong { color: #ffffff; font-weight: 600; }
+
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px);
+            color: #cbd5e1; text-decoration: none; padding: 10px 20px;
+            border-radius: 10px; font-weight: 600; font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;
+        }
+        .back-btn:hover { background: rgba(59, 130, 246, 0.8); color: white; }
+
+        /* --- MOBILE TOUCH CONTROLS --- */
+        #mobile-controls {
+            position: absolute; bottom: 30px; left: 30px; display: none; z-index: 50;
+        }
+        .d-pad { display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 6px; }
+        .ctrl-btn {
+            background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px; color: #94a3b8; font-size: 24px; display: flex;
+            justify-content: center; align-items: center; user-select: none;
+        }
+        .ctrl-btn:active { background: rgba(59, 130, 246, 0.6); color: white; }
+        #btn-up { grid-column: 2; grid-row: 1; }
+        #btn-left { grid-column: 1; grid-row: 2; }
+        #btn-right { grid-column: 3; grid-row: 2; }
+        #btn-down { grid-column: 2; grid-row: 3; }
+    </style>
 </head>
 <body>
 
-<div id="infoCard">
-    <h2 id="infoTitle"></h2>
-    <p id="infoText"></p>
-</div>
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Exit to Portfolio</a>
 
-<script>
+    <div id="infoCard">
+        <h2 id="infoTitle"><i class="fas fa-map-marker-alt"></i> Location</h2>
+        <p id="infoText">Details...</p>
+    </div>
 
-const WORLD_WIDTH = 2000;
-const WORLD_HEIGHT = 1000;
+    <div id="mobile-controls">
+        <div class="d-pad">
+            <div class="ctrl-btn" id="btn-up"><i class="fas fa-chevron-up"></i></div>
+            <div class="ctrl-btn" id="btn-left"><i class="fas fa-chevron-left"></i></div>
+            <div class="ctrl-btn" id="btn-right"><i class="fas fa-chevron-right"></i></div>
+            <div class="ctrl-btn" id="btn-down"><i class="fas fa-chevron-down"></i></div>
+        </div>
+    </div>
 
-const resumeData = [
-    {x:400,y:700,title:"Primary Education",text:"Jose G. Peralta Memorial School<br>Valedictorian (2011-2017)"},
-    {x:800,y:500,title:"Junior High",text:"Fellowship Baptist College<br>With Honor (2017-2021)"},
-    {x:1200,y:650,title:"Senior High (STEM)",text:"With High Honor (2021-2023)"},
-    {x:1500,y:450,title:"College",text:"B.S. Electronics Engineering<br>PUP - Present"},
-    {x:1000,y:300,title:"Work Experience",text:"Bandai Wireharness (2025)<br>NOCECO (2023)"}
-];
+    <script>
+        const WORLD_WIDTH = 2400;
+        const WORLD_HEIGHT = 1600;
 
-const config={
-    type:Phaser.AUTO,
-    width:window.innerWidth,
-    height:window.innerHeight,
-    physics:{default:'arcade',arcade:{gravity:{y:0},debug:false}},
-    scene:{create,update}
-};
+        // Resume Data
+        const resumeData = [
+            { id: 'elem', x: 400, y: 1300, icon: '🎒', title: "Primary Education", text: "<strong>Jose G. Peralta Memorial School</strong><br>Graduated Valedictorian (2011-2017)" },
+            { id: 'jhs', x: 900, y: 1000, icon: '🏫', title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>Graduated With Honor (2017-2021)" },
+            { id: 'shs', x: 1400, y: 700, icon: '🎓', title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>Graduated With High Honor (2021-2023)" },
+            { id: 'college', x: 1900, y: 400, icon: '🏛️', title: "College", text: "<strong>B.S. Electronics Engineering</strong><br>Polytechnic University of the Philippines (Present)<br>Affiliations: OECES, IECEP Batangas." },
+            { id: 'work', x: 1200, y: 200, icon: '💼', title: "Work Experience", text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." }
+        ];
 
-const game=new Phaser.Game(config);
+        const config = {
+            type: Phaser.AUTO,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            pixelArt: true, // CRITICAL: Makes graphics sharp, chunky, and retro!
+            physics: {
+                default: 'arcade',
+                arcade: { gravity: { y: 0 }, debug: false }
+            },
+            scene: { preload: preload, create: create, update: update }
+        };
 
-let player;
-let cursors,keyW,keyA,keyS,keyD;
-let houses=[];
-let clouds=[];
-let camera;
-let currentHouse=null;
+        const game = new Phaser.Game(config);
 
-function create(){
+        let player;
+        let cursors, keyW, keyA, keyS, keyD;
+        let depthGroup; // Handles putting player behind/in front of buildings
+        let currentActiveHouse = null;
+        let touchUp = false, touchDown = false, touchLeft = false, touchRight = false;
 
-    // Soft sky gradient
-    const sky = this.add.rectangle(WORLD_WIDTH/2,WORLD_HEIGHT/2,WORLD_WIDTH,WORLD_HEIGHT,0xfde2e4);
-
-    this.physics.world.setBounds(0,0,WORLD_WIDTH,WORLD_HEIGHT);
-
-    // Grass
-    this.add.rectangle(WORLD_WIDTH/2,850,WORLD_WIDTH,300,0xd8f3dc);
-
-    // Random trees
-    for(let i=0;i<25;i++){
-        createTree(this,
-            Phaser.Math.Between(100,WORLD_WIDTH-100),
-            Phaser.Math.Between(400,850)
-        );
-    }
-
-    // Clouds
-    for(let i=0;i<8;i++){
-        createCloud(this,
-            Phaser.Math.Between(0,WORLD_WIDTH),
-            Phaser.Math.Between(50,250)
-        );
-    }
-
-    // Houses
-    resumeData.forEach(data=>{
-        createHouse(this,data);
-    });
-
-    // Player (soft circle like Ghibli spirit)
-    player=this.add.circle(600,800,16,0x588157);
-    this.physics.add.existing(player);
-    player.body.setCollideWorldBounds(true);
-
-    // Camera follow
-    camera=this.cameras.main;
-    camera.startFollow(player,true,0.08,0.08);
-    camera.setBounds(0,0,WORLD_WIDTH,WORLD_HEIGHT);
-
-    cursors=this.input.keyboard.createCursorKeys();
-    keyW=this.input.keyboard.addKey('W');
-    keyA=this.input.keyboard.addKey('A');
-    keyS=this.input.keyboard.addKey('S');
-    keyD=this.input.keyboard.addKey('D');
-}
-
-function update(){
-
-    let vx=0,vy=0;
-
-    if(cursors.left.isDown||keyA.isDown)vx=-1;
-    if(cursors.right.isDown||keyD.isDown)vx=1;
-    if(cursors.up.isDown||keyW.isDown)vy=-1;
-    if(cursors.down.isDown||keyS.isDown)vy=1;
-
-    const vec=new Phaser.Math.Vector2(vx,vy);
-    if(vec.length()>0)vec.normalize().scale(260);
-
-    player.body.setVelocity(vec.x,vec.y);
-
-    moveClouds();
-
-    checkProximity();
-}
-
-/* ================= GHIBLI OBJECTS ================= */
-
-function createHouse(scene,data){
-
-    // Shadow
-    scene.add.ellipse(data.x,data.y+45,120,30,0x000000,0.15);
-
-    // Body
-    const body=scene.add.rectangle(data.x,data.y,120,80,0xffe8d6)
-        .setStrokeStyle(4,0xddbea9);
-
-    // Roof
-    scene.add.triangle(
-        data.x,data.y-60,
-        data.x-80,data.y-10,
-        data.x+80,data.y-10,
-        data.x,data.y-130,
-        0xcb997e
-    );
-
-    // Window
-    scene.add.rectangle(data.x-25,data.y,25,25,0xbde0fe);
-    scene.add.rectangle(data.x+25,data.y,25,25,0xbde0fe);
-
-    body.info=data;
-    houses.push(body);
-}
-
-function createTree(scene,x,y){
-
-    scene.add.ellipse(x,y+25,40,20,0x000000,0.1);
-    scene.add.rectangle(x,y,18,50,0x8d5524);
-    scene.add.circle(x,y-40,45,0x95d5b2);
-    scene.add.circle(x-25,y-30,35,0xb7e4c7);
-    scene.add.circle(x+25,y-30,35,0xb7e4c7);
-}
-
-function createCloud(scene,x,y){
-    let cloud=scene.add.container(x,y);
-
-    let c1=scene.add.circle(0,0,35,0xffffff,0.9);
-    let c2=scene.add.circle(40,10,30,0xffffff,0.9);
-    let c3=scene.add.circle(-40,10,30,0xffffff,0.9);
-
-    cloud.add([c1,c2,c3]);
-    clouds.push(cloud);
-}
-
-function moveClouds(){
-    clouds.forEach(cloud=>{
-        cloud.x+=0.2;
-        if(cloud.x>WORLD_WIDTH+100)cloud.x=-100;
-    });
-}
-
-/* ================= INTERACTION ================= */
-
-function checkProximity(){
-
-    let found=false;
-
-    houses.forEach(house=>{
-        const dist=Phaser.Math.Distance.Between(player.x,player.y,house.x,house.y);
-        if(dist<110){
-            showInfo(house.info.title,house.info.text);
-            found=true;
+        function preload() {
+            // Sourcing permanent, reliable pixel assets from Phaser Labs
+            this.load.image('grass', 'https://labs.phaser.io/assets/textures/grass.png');
+            this.load.image('tree', 'https://labs.phaser.io/assets/sprites/tree.png');
+            
+            // Using a crate scaled up to look like a pixelated wooden building
+            this.load.image('building', 'https://labs.phaser.io/assets/sprites/crate.png');
+            
+            // Cool Spaceman to represent your Engineering/Tech background!
+            this.load.image('player', 'https://labs.phaser.io/assets/sprites/spaceman.png');
         }
-    });
 
-    if(!found){
-        hideInfo();
-    }
-}
+        function create() {
+            this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+            
+            // Force keyboard focus
+            this.input.keyboard.addCapture('W,A,S,D,UP,DOWN,LEFT,RIGHT');
+            this.input.on('pointerdown', () => { window.focus(); });
 
-function showInfo(title,text){
-    document.getElementById("infoTitle").innerHTML=title;
-    document.getElementById("infoText").innerHTML=text;
-    document.getElementById("infoCard").style.display="block";
-}
+            // 1. Pixel Art Grass Background (Tiled)
+            this.add.tileSprite(WORLD_WIDTH/2, WORLD_HEIGHT/2, WORLD_WIDTH, WORLD_HEIGHT, 'grass').setDepth(-10);
 
-function hideInfo(){
-    document.getElementById("infoCard").style.display="none";
-}
+            // Group for depth sorting
+            depthGroup = this.add.group();
 
-</script>
+            // 2. Decorate with Pixel Trees
+            for (let i = 0; i < 70; i++) {
+                let x = Phaser.Math.Between(50, WORLD_WIDTH - 50);
+                let y = Phaser.Math.Between(50, WORLD_HEIGHT - 50);
+                
+                // Don't spawn trees on top of buildings
+                let tooClose = resumeData.some(d => Phaser.Math.Distance.Between(x, y, d.x, d.y) < 250);
+                if(!tooClose) {
+                    let tree = this.add.image(x, y, 'tree').setScale(1.5); // Scale up for chunkiness
+                    tree.setOrigin(0.5, 0.9); // Origin at trunk
+                    depthGroup.add(tree);
+                }
+            }
+
+            // 3. Create Buildings
+            resumeData.forEach(data => {
+                // Drop shadow
+                this.add.ellipse(data.x, data.y + 10, 160, 40, 0x000000, 0.4).setDepth(-1);
+                
+                // Scaled up crate acts as a retro building structure
+                let building = this.add.image(data.x, data.y, 'building').setScale(4);
+                building.setOrigin(0.5, 0.8);
+                
+                // Add a cute sign board above the building
+                this.add.text(data.x, data.y - 100, data.icon + " " + data.id.toUpperCase(), {
+                    fontFamily: 'Inter', fontSize: '18px', fontStyle: 'bold',
+                    backgroundColor: 'rgba(15, 23, 42, 0.8)', color: '#fff', padding: {x: 8, y: 4}
+                }).setOrigin(0.5).setDepth(9999);
+
+                building.info = data;
+                depthGroup.add(building);
+
+                // Pulsing interact ring
+                let ring = this.add.circle(data.x, data.y + 20, 100, 0x60a5fa, 0);
+                ring.setStrokeStyle(3, 0x60a5fa, 0.5);
+                this.tweens.add({ targets: ring, scale: 1.2, alpha: 0.1, yoyo: true, repeat: -1, duration: 1500 });
+            });
+
+            // 4. Create Player
+            player = this.physics.add.sprite(200, 1400, 'player').setScale(1.5); // Chunky spaceman!
+            player.setOrigin(0.5, 0.9); // Origin at feet
+            player.setCollideWorldBounds(true);
+            
+            // 5. Camera Follow
+            this.cameras.main.startFollow(player, true, 0.08, 0.08);
+            this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+            this.cameras.main.setZoom(1.2); 
+
+            // Controls
+            cursors = this.input.keyboard.createCursorKeys();
+            keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+            keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+            keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+            keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+            setupMobileControls();
+        }
+
+        function update() {
+            let vx = 0, vy = 0;
+            const speed = 250;
+
+            if (cursors.left.isDown || keyA.isDown || touchLeft) vx = -1;
+            if (cursors.right.isDown || keyD.isDown || touchRight) vx = 1;
+            if (cursors.up.isDown || keyW.isDown || touchUp) vy = -1;
+            if (cursors.down.isDown || keyS.isDown || touchDown) vy = 1;
+
+            const vec = new Phaser.Math.Vector2(vx, vy);
+            if (vec.length() > 0) vec.normalize().scale(speed);
+
+            player.setVelocity(vec.x, vec.y);
+
+            // REALISTIC DEPTH SORTING
+            // Elements lower on the screen render on top of elements higher up
+            depthGroup.children.iterate(function (child) {
+                child.setDepth(child.y);
+            });
+            player.setDepth(player.y);
+
+            checkProximity();
+        }
+
+        function checkProximity() {
+            let closestBuilding = null;
+            let minDistance = 140; // Trigger radius
+
+            depthGroup.children.iterate(function (child) {
+                if (child.info) { 
+                    const dist = Phaser.Math.Distance.Between(player.x, player.y, child.x, child.y);
+                    if (dist < minDistance) {
+                        closestBuilding = child;
+                        minDistance = dist;
+                    }
+                }
+            });
+
+            if (closestBuilding) {
+                if (currentActiveHouse !== closestBuilding) {
+                    showInfo("<i class='fas fa-map-marker-alt'></i> " + closestBuilding.info.title, closestBuilding.info.text);
+                    currentActiveHouse = closestBuilding;
+                }
+            } else {
+                if (currentActiveHouse !== null) {
+                    hideInfo();
+                    currentActiveHouse = null;
+                }
+            }
+        }
+
+        // --- UI HANDLING ---
+        const infoCard = document.getElementById("infoCard");
+
+        function showInfo(title, text) {
+            document.getElementById("infoTitle").innerHTML = title;
+            document.getElementById("infoText").innerHTML = text;
+            infoCard.style.display = "block";
+            setTimeout(() => { infoCard.classList.add('active'); }, 10); 
+        }
+
+        function hideInfo() {
+            infoCard.classList.remove('active');
+            setTimeout(() => {
+                if(!infoCard.classList.contains('active')){
+                   infoCard.style.display = "none";
+                }
+            }, 300);
+        }
+
+        // --- MOBILE CONTROLS ---
+        function setupMobileControls() {
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                let mobileContainer = document.getElementById('mobile-controls');
+                if(mobileContainer) mobileContainer.style.display = 'block';
+            }
+
+            const setupBtn = (id, startFn, endFn) => {
+                const btn = document.getElementById(id);
+                if (!btn) return; 
+                btn.addEventListener('touchstart', (e) => { e.preventDefault(); startFn(); });
+                btn.addEventListener('mousedown', (e) => { e.preventDefault(); startFn(); });
+                btn.addEventListener('touchend', (e) => { e.preventDefault(); endFn(); });
+                btn.addEventListener('mouseup', (e) => { e.preventDefault(); endFn(); });
+                btn.addEventListener('mouseleave', (e) => { e.preventDefault(); endFn(); });
+            };
+
+            setupBtn('btn-up', () => touchUp = true, () => touchUp = false);
+            setupBtn('btn-down', () => touchDown = true, () => touchDown = false);
+            setupBtn('btn-left', () => touchLeft = true, () => touchLeft = false);
+            setupBtn('btn-right', () => touchRight = true, () => touchRight = false);
+        }
+
+        window.addEventListener('resize', () => {
+            game.scale.resize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
