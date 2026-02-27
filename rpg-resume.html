@@ -159,17 +159,22 @@
         let activeKeys = { up: false, down: false, left: false, right: false };
         
         window.addEventListener('keydown', (e) => {
+            if(!e.key) return; // Safegaurd
             const k = e.key.toLowerCase();
-            // Prevent scrolling when pressing arrow keys
-            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) { e.preventDefault(); }
+            
+            // Prevent scrolling when pressing arrow keys or space
+            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight", " "].indexOf(e.code) > -1) { 
+                e.preventDefault(); 
+            }
             
             if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = true;
             if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = true;
             if (k === 's' || e.code === 'ArrowDown') activeKeys.down = true;
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = true;
-        });
+        }, { passive: false });
 
         window.addEventListener('keyup', (e) => {
+            if(!e.key) return;
             const k = e.key.toLowerCase();
             if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = false;
             if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = false;
@@ -279,7 +284,6 @@
             let velX = 0;
             let velY = 0;
 
-            // Using our new bulletproof Native Keys!
             if (activeKeys.left) velX = -moveSpeed;
             else if (activeKeys.right) velX = moveSpeed;
 
@@ -304,7 +308,7 @@
 
         function showDialogue(title, text) {
             isDialogueOpen = true;
-            activeKeys.up = false; activeKeys.down = false; activeKeys.left = false; activeKeys.right = false; // Reset keys
+            activeKeys.up = false; activeKeys.down = false; activeKeys.left = false; activeKeys.right = false; 
             const overlay = document.getElementById('dialogue-overlay');
             if(overlay) {
                 document.getElementById('dialogue-title').innerHTML = title;
@@ -334,11 +338,11 @@
                 const press = (e) => { e.preventDefault(); activeKeys[direction] = true; };
                 const release = (e) => { e.preventDefault(); activeKeys[direction] = false; };
                 
-                btn.addEventListener('touchstart', press);
-                btn.addEventListener('mousedown', press);
-                btn.addEventListener('touchend', release);
-                btn.addEventListener('mouseup', release);
-                btn.addEventListener('mouseleave', release);
+                btn.addEventListener('touchstart', press, {passive: false});
+                btn.addEventListener('mousedown', press, {passive: false});
+                btn.addEventListener('touchend', release, {passive: false});
+                btn.addEventListener('mouseup', release, {passive: false});
+                btn.addEventListener('mouseleave', release, {passive: false});
             };
 
             setupBtn('btn-up', 'up');
