@@ -20,7 +20,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .page-header { margin-bottom: 30px; }
         .page-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
         .page-header p { color: #6b7280; font-size: 0.95rem; }
@@ -33,10 +32,7 @@
         }
         .back-btn:hover { background: #e5e7eb; color: #111827; }
 
-        /* Main Layout */
         .layout-container { display: flex; gap: 24px; max-width: 1300px; margin: 0 auto; }
-
-        /* Left Side (Panels) */
         .left-column { width: 320px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
 
         .panel {
@@ -47,7 +43,6 @@
 
         .panel h3 { font-size: 0.75rem; color: #9ca3af; letter-spacing: 1px; margin-bottom: 16px; text-transform: uppercase; }
 
-        /* Keyboard Graphic */
         .keyboard-layout { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 16px; }
         .key-row { display: flex; gap: 6px; }
         .key {
@@ -57,18 +52,15 @@
         }
         .instruction-text { text-align: center; color: #6b7280; font-size: 0.85rem; line-height: 1.5; }
 
-        /* Right Side (Game Canvas) */
         .right-column { flex: 1; position: relative; }
 
         #game-wrapper {
             width: 100%; height: 650px; background: #f8fafc;
             border: 1px solid #e5e7eb; border-radius: 16px;
             overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-            position: relative; outline: none;
+            position: relative;
         }
-        #game-wrapper:focus { border-color: #cbd5e1; box-shadow: 0 0 0 3px rgba(226, 232, 240, 0.5); }
 
-        /* Minimalist Dialogue Box */
         #dialogue-overlay {
             position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 450px; background: rgba(255, 255, 255, 0.98);
@@ -87,7 +79,6 @@
         }
         #close-dialogue:hover { background: #e2e8f0; color: #1e293b; }
 
-        /* Mobile Controls */
         #mobile-controls {
             position: absolute; bottom: 20px; left: 20px; display: none; z-index: 5;
         }
@@ -127,7 +118,7 @@
                     <span style="color: #3b82f6; font-weight: 600;">Server:</span> Welcome! The game is now active.
                 </div>
                 <div style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 12px; border-radius: 8px; font-size: 0.85rem; align-self: flex-end;">
-                    <strong>Tip:</strong> Click the gray canvas first to activate your keyboard!
+                    <strong>Tip:</strong> You can now use WASD to walk, no clicking required!
                 </div>
             </div>
 
@@ -142,7 +133,7 @@
         </div>
 
         <div class="right-column">
-            <div id="game-wrapper" tabindex="0">
+            <div id="game-wrapper">
                 
                 <div id="dialogue-overlay">
                     <div id="dialogue-title">Building Name</div>
@@ -164,26 +155,42 @@
     </div>
 
     <script>
-        // A large, clean workspace to explore
+        // --- NATIVE KEYBOARD OVERRIDE (BULLETPROOF) ---
+        let activeKeys = { up: false, down: false, left: false, right: false };
+        
+        window.addEventListener('keydown', (e) => {
+            const k = e.key.toLowerCase();
+            // Prevent scrolling when pressing arrow keys
+            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) { e.preventDefault(); }
+            
+            if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = true;
+            if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = true;
+            if (k === 's' || e.code === 'ArrowDown') activeKeys.down = true;
+            if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = false;
+            if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = false;
+            if (k === 's' || e.code === 'ArrowDown') activeKeys.down = false;
+            if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = false;
+        });
+
+        // ----------------------------------------------
+
         const WORLD_WIDTH = 1600;
         const WORLD_HEIGHT = 1200;
 
         const resumeData = [
-            // Education (Left side)
             { id: 'elem', x: 300, y: 1000, title: "Primary Education", text: "<strong>Jose G. Peralta Memorial School</strong><br>Valedictorian (2011-2017)" },
             { id: 'jhs', x: 300, y: 800, title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>With Honor (2017-2021)" },
             { id: 'shs', x: 300, y: 600, title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>With High Honor (2021-2023)" },
             { id: 'college', x: 300, y: 400, title: "PUP College", text: "<strong>B.S. Electronics Engineering</strong><br>Affiliations: OECES, IECEP Batangas." },
-            
-            // Experience (Center Large Zone)
             { id: 'work', x: 800, y: 600, title: "Work Experience", text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." },
-
-            // Skills (Bottom Right)
             { id: 'skill_prog', x: 1300, y: 1000, title: "Programming", text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack applications.</em>" },
             { id: 'skill_hw', x: 1300, y: 800, title: "Embedded Sys", text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and circuitry.</em>" },
             { id: 'skill_sim', x: 1300, y: 600, title: "Simulation", text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex systems and blueprints.</em>" },
-
-            // Projects (Top Right)
             { id: 'proj_calc', x: 900, y: 200, title: "Eng. Tools", text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built to solve math problems.</em>" },
             { id: 'proj_game', x: 1100, y: 200, title: "Games", text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048.<br><em>Game development testing complex logic.</em>" },
             { id: 'proj_ai', x: 1300, y: 200, title: "Eiji AI", text: "<strong>Project:</strong> Eiji / D Dwarf Mini.<br><em>A sleek conversational assistant powered by Groq LPUs.</em>" }
@@ -191,38 +198,21 @@
 
         const config = {
             type: Phaser.AUTO,
-            scale: {
-                mode: Phaser.Scale.FIT,
-                parent: 'game-wrapper',
-                width: 800,
-                height: 600
-            },
-            backgroundColor: '#f8fafc', // Clean off-white
-            physics: {
-                default: 'arcade',
-                arcade: { gravity: { y: 0 }, debug: false }
-            },
+            scale: { mode: Phaser.Scale.FIT, parent: 'game-wrapper', width: 800, height: 600 },
+            backgroundColor: '#f8fafc',
+            physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
             scene: { create: create, update: update }
         };
 
         const game = new Phaser.Game(config);
 
         let player, playerLabel;
-        let cursors, keyW, keyA, keyS, keyD;
         let moveSpeed = 220; 
         let isDialogueOpen = false;
-        let touchUp = false, touchDown = false, touchLeft = false, touchRight = false;
 
         function create() {
             this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-            let gameWrapper = document.getElementById('game-wrapper');
-            gameWrapper.addEventListener('mouseenter', () => { gameWrapper.focus(); });
-            gameWrapper.addEventListener('mousedown', () => { gameWrapper.focus(); });
-            
-            this.input.keyboard.addCapture('W,A,S,D,UP,DOWN,LEFT,RIGHT');
-
-            // Subtle dot-grid background for that "blueprint" look
             let graphics = this.add.graphics();
             graphics.fillStyle(0xcbd5e1, 1);
             for(let i = 0; i < WORLD_WIDTH; i += 40) {
@@ -233,43 +223,23 @@
 
             const stations = this.physics.add.staticGroup();
 
-            // Minimalist Desk Generator
             function createDesk(scene, x, y, title) {
-                // Drop shadow
                 scene.add.rectangle(x, y + 8, 70, 40, 0x000000, 0.05);
-                
-                // Main Desk Body (White with gray border)
                 let desk = scene.add.rectangle(x, y, 70, 40, 0xffffff);
                 desk.setStrokeStyle(2, 0xcbd5e1);
-                
-                // Little monitor/keyboard detail
                 scene.add.rectangle(x, y - 8, 40, 12, 0xe2e8f0);
-
-                // Label floating beneath
-                scene.add.text(x, y + 30, title, { 
-                    fontFamily: 'Inter', fontSize: '12px', fill: '#475569', fontStyle: '600' 
-                }).setOrigin(0.5);
-
+                scene.add.text(x, y + 30, title, { fontFamily: 'Inter', fontSize: '12px', fill: '#475569', fontStyle: '600' }).setOrigin(0.5);
                 return desk;
             }
 
-            // Dotted Zone Generator (For the Work Experience box)
             function createDottedZone(scene, x, y, width, height, title) {
                 let fill = scene.add.rectangle(x, y, width, height, 0xf1f5f9, 0.6);
                 fill.setStrokeStyle(2, 0x94a3b8);
-                
-                scene.add.text(x, y - 20, title, { 
-                    fontFamily: 'Inter', fontSize: '15px', fill: '#1e293b', fontStyle: '700' 
-                }).setOrigin(0.5);
-                
-                scene.add.text(x, y + 10, "CodeCred.dev", { 
-                    fontFamily: 'Inter', fontSize: '11px', fill: '#64748b' 
-                }).setOrigin(0.5);
-
+                scene.add.text(x, y - 20, title, { fontFamily: 'Inter', fontSize: '15px', fill: '#1e293b', fontStyle: '700' }).setOrigin(0.5);
+                scene.add.text(x, y + 10, "CodeCred.dev", { fontFamily: 'Inter', fontSize: '11px', fill: '#64748b' }).setOrigin(0.5);
                 return fill;
             }
 
-            // Spawn all the desks and triggers
             resumeData.forEach(data => {
                 if(data.id === 'work') {
                     createDottedZone(this, data.x, data.y, 220, 120, data.title);
@@ -280,25 +250,16 @@
                 }
             });
 
-            // Clean Blue Square Player
             player = this.add.rectangle(800, 1000, 24, 24, 0x3b82f6);
             this.physics.add.existing(player);
             player.body.setCollideWorldBounds(true);
             
-            // Name Tag
             playerLabel = this.add.text(800, 1030, "Jon Lewyn", { 
                 fontFamily: 'Inter', fontSize: '12px', fill: '#3b82f6', fontStyle: '700',
             }).setOrigin(0.5);
 
-            // Camera Setup
             this.cameras.main.startFollow(player, true, 0.1, 0.1);
             this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-
-            cursors = this.input.keyboard.createCursorKeys();
-            keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-            keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-            keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-            keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
             setupMobileControls();
 
@@ -318,11 +279,12 @@
             let velX = 0;
             let velY = 0;
 
-            if (cursors.left.isDown || keyA.isDown || touchLeft) velX = -moveSpeed;
-            else if (cursors.right.isDown || keyD.isDown || touchRight) velX = moveSpeed;
+            // Using our new bulletproof Native Keys!
+            if (activeKeys.left) velX = -moveSpeed;
+            else if (activeKeys.right) velX = moveSpeed;
 
-            if (cursors.up.isDown || keyW.isDown || touchUp) velY = -moveSpeed;
-            else if (cursors.down.isDown || keyS.isDown || touchDown) velY = moveSpeed;
+            if (activeKeys.up) velY = -moveSpeed;
+            else if (activeKeys.down) velY = moveSpeed;
 
             player.body.setVelocity(velX, velY);
 
@@ -336,14 +298,13 @@
             scene.physics.add.existing(pad, true); 
 
             scene.physics.add.overlap(player, pad, () => {
-                if (!isDialogueOpen) {
-                    showDialogue(data.title, data.text);
-                }
+                if (!isDialogueOpen) { showDialogue(data.title, data.text); }
             });
         }
 
         function showDialogue(title, text) {
             isDialogueOpen = true;
+            activeKeys.up = false; activeKeys.down = false; activeKeys.left = false; activeKeys.right = false; // Reset keys
             const overlay = document.getElementById('dialogue-overlay');
             if(overlay) {
                 document.getElementById('dialogue-title').innerHTML = title;
@@ -357,7 +318,6 @@
             if(overlay) overlay.style.display = 'none';
             player.y += 15; 
             setTimeout(() => { isDialogueOpen = false; }, 200);
-            document.getElementById('game-wrapper').focus();
         }
 
         function setupMobileControls() {
@@ -368,20 +328,23 @@
                 if (pcInstructions) pcInstructions.style.display = 'none';
             }
 
-            const setupBtn = (id, startFn, endFn) => {
+            const setupBtn = (id, direction) => {
                 const btn = document.getElementById(id);
                 if (!btn) return; 
-                btn.addEventListener('touchstart', (e) => { e.preventDefault(); startFn(); });
-                btn.addEventListener('mousedown', (e) => { e.preventDefault(); startFn(); });
-                btn.addEventListener('touchend', (e) => { e.preventDefault(); endFn(); });
-                btn.addEventListener('mouseup', (e) => { e.preventDefault(); endFn(); });
-                btn.addEventListener('mouseleave', (e) => { e.preventDefault(); endFn(); });
+                const press = (e) => { e.preventDefault(); activeKeys[direction] = true; };
+                const release = (e) => { e.preventDefault(); activeKeys[direction] = false; };
+                
+                btn.addEventListener('touchstart', press);
+                btn.addEventListener('mousedown', press);
+                btn.addEventListener('touchend', release);
+                btn.addEventListener('mouseup', release);
+                btn.addEventListener('mouseleave', release);
             };
 
-            setupBtn('btn-up', () => touchUp = true, () => touchUp = false);
-            setupBtn('btn-down', () => touchDown = true, () => touchDown = false);
-            setupBtn('btn-left', () => touchLeft = true, () => touchLeft = false);
-            setupBtn('btn-right', () => touchRight = true, () => touchRight = false);
+            setupBtn('btn-up', 'up');
+            setupBtn('btn-down', 'down');
+            setupBtn('btn-left', 'left');
+            setupBtn('btn-right', 'right');
         }
     </script>
 </body>
