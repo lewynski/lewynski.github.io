@@ -122,7 +122,7 @@
                 </div>
             </div>
 
-            <div class="panel hidden-on-mobile" id="pc-instructions">
+            <div class="panel" id="pc-instructions">
                 <h3>Instructions</h3>
                 <div class="keyboard-layout">
                     <div class="key-row"><div class="key">W</div></div>
@@ -159,46 +159,45 @@
         let activeKeys = { up: false, down: false, left: false, right: false };
         
         window.addEventListener('keydown', (e) => {
-            if(!e.key) return; // Safegaurd
+            if (!e.key) return;
             const k = e.key.toLowerCase();
-            
-            // Prevent scrolling when pressing arrow keys or space
-            if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight", " "].indexOf(e.code) > -1) { 
-                e.preventDefault(); 
+            if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.code) > -1) {
+                e.preventDefault();
             }
-            
-            if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = true;
-            if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = true;
-            if (k === 's' || e.code === 'ArrowDown') activeKeys.down = true;
+            if (k === 'w' || e.code === 'ArrowUp')    activeKeys.up    = true;
+            if (k === 'a' || e.code === 'ArrowLeft')  activeKeys.left  = true;
+            if (k === 's' || e.code === 'ArrowDown')  activeKeys.down  = true;
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = true;
         }, { passive: false });
 
         window.addEventListener('keyup', (e) => {
-            if(!e.key) return;
+            if (!e.key) return;
             const k = e.key.toLowerCase();
-            if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = false;
-            if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = false;
-            if (k === 's' || e.code === 'ArrowDown') activeKeys.down = false;
+            if (k === 'w' || e.code === 'ArrowUp')    activeKeys.up    = false;
+            if (k === 'a' || e.code === 'ArrowLeft')  activeKeys.left  = false;
+            if (k === 's' || e.code === 'ArrowDown')  activeKeys.down  = false;
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = false;
         });
 
         // ----------------------------------------------
 
-        const WORLD_WIDTH = 1600;
+        const WORLD_WIDTH  = 1600;
         const WORLD_HEIGHT = 1200;
+        const MOVE_SPEED   = 220;
+        const DIAG_SPEED   = MOVE_SPEED / Math.SQRT2; // ~155.6 for true diagonal speed
 
         const resumeData = [
-            { id: 'elem', x: 300, y: 1000, title: "Primary Education", text: "<strong>Jose G. Peralta Memorial School</strong><br>Valedictorian (2011-2017)" },
-            { id: 'jhs', x: 300, y: 800, title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>With Honor (2017-2021)" },
-            { id: 'shs', x: 300, y: 600, title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>With High Honor (2021-2023)" },
-            { id: 'college', x: 300, y: 400, title: "PUP College", text: "<strong>B.S. Electronics Engineering</strong><br>Affiliations: OECES, IECEP Batangas." },
-            { id: 'work', x: 800, y: 600, title: "Work Experience", text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." },
-            { id: 'skill_prog', x: 1300, y: 1000, title: "Programming", text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack applications.</em>" },
-            { id: 'skill_hw', x: 1300, y: 800, title: "Embedded Sys", text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and circuitry.</em>" },
-            { id: 'skill_sim', x: 1300, y: 600, title: "Simulation", text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex systems and blueprints.</em>" },
-            { id: 'proj_calc', x: 900, y: 200, title: "Eng. Tools", text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built to solve math problems.</em>" },
-            { id: 'proj_game', x: 1100, y: 200, title: "Games", text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048.<br><em>Game development testing complex logic.</em>" },
-            { id: 'proj_ai', x: 1300, y: 200, title: "Eiji AI", text: "<strong>Project:</strong> Eiji / D Dwarf Mini.<br><em>A sleek conversational assistant powered by Groq LPUs.</em>" }
+            { id: 'elem',      x: 300,  y: 1000, title: "Primary Education",  text: "<strong>Jose G. Peralta Memorial School</strong><br>Valedictorian (2011-2017)" },
+            { id: 'jhs',       x: 300,  y: 800,  title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>With Honor (2017-2021)" },
+            { id: 'shs',       x: 300,  y: 600,  title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>With High Honor (2021-2023)" },
+            { id: 'college',   x: 300,  y: 400,  title: "PUP College",        text: "<strong>B.S. Electronics Engineering</strong><br>Affiliations: OECES, IECEP Batangas." },
+            { id: 'work',      x: 800,  y: 600,  title: "Work Experience",    text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." },
+            { id: 'skill_prog',x: 1300, y: 1000, title: "Programming",        text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack applications.</em>" },
+            { id: 'skill_hw',  x: 1300, y: 800,  title: "Embedded Sys",       text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and circuitry.</em>" },
+            { id: 'skill_sim', x: 1300, y: 600,  title: "Simulation",         text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex systems and blueprints.</em>" },
+            { id: 'proj_calc', x: 900,  y: 200,  title: "Eng. Tools",         text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built to solve math problems.</em>" },
+            { id: 'proj_game', x: 1100, y: 200,  title: "Games",              text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048.<br><em>Game development testing complex logic.</em>" },
+            { id: 'proj_ai',   x: 1300, y: 200,  title: "Eiji AI",            text: "<strong>Project:</strong> Eiji / D Dwarf Mini.<br><em>A sleek conversational assistant powered by Groq LPUs.</em>" }
         ];
 
         const config = {
@@ -212,142 +211,159 @@
         const game = new Phaser.Game(config);
 
         let player, playerLabel;
-        let moveSpeed = 220; 
         let isDialogueOpen = false;
 
         function create() {
             this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
+            // Dot-grid background
             let graphics = this.add.graphics();
             graphics.fillStyle(0xcbd5e1, 1);
-            for(let i = 0; i < WORLD_WIDTH; i += 40) {
-                for(let j = 0; j < WORLD_HEIGHT; j += 40) {
+            for (let i = 0; i < WORLD_WIDTH; i += 40) {
+                for (let j = 0; j < WORLD_HEIGHT; j += 40) {
                     graphics.fillPoint(i, j, 2);
                 }
             }
 
-            const stations = this.physics.add.staticGroup();
-
-            function createDesk(scene, x, y, title) {
+            // Helper: draw a desk sprite
+            const createDesk = (scene, x, y, title) => {
                 scene.add.rectangle(x, y + 8, 70, 40, 0x000000, 0.05);
                 let desk = scene.add.rectangle(x, y, 70, 40, 0xffffff);
                 desk.setStrokeStyle(2, 0xcbd5e1);
                 scene.add.rectangle(x, y - 8, 40, 12, 0xe2e8f0);
-                scene.add.text(x, y + 30, title, { fontFamily: 'Inter', fontSize: '12px', fill: '#475569', fontStyle: '600' }).setOrigin(0.5);
-                return desk;
-            }
+                scene.add.text(x, y + 30, title, {
+                    fontFamily: 'Inter', fontSize: '12px', fill: '#475569', fontStyle: '600'
+                }).setOrigin(0.5);
+            };
 
-            function createDottedZone(scene, x, y, width, height, title) {
+            // Helper: draw a dotted zone (for Work Experience)
+            const createDottedZone = (scene, x, y, width, height, title) => {
                 let fill = scene.add.rectangle(x, y, width, height, 0xf1f5f9, 0.6);
                 fill.setStrokeStyle(2, 0x94a3b8);
-                scene.add.text(x, y - 20, title, { fontFamily: 'Inter', fontSize: '15px', fill: '#1e293b', fontStyle: '700' }).setOrigin(0.5);
-                scene.add.text(x, y + 10, "CodeCred.dev", { fontFamily: 'Inter', fontSize: '11px', fill: '#64748b' }).setOrigin(0.5);
-                return fill;
-            }
+                scene.add.text(x, y - 20, title, {
+                    fontFamily: 'Inter', fontSize: '15px', fill: '#1e293b', fontStyle: '700'
+                }).setOrigin(0.5);
+                scene.add.text(x, y + 10, "CodeCred.dev", {
+                    fontFamily: 'Inter', fontSize: '11px', fill: '#64748b'
+                }).setOrigin(0.5);
+            };
 
+            // ── Draw all station visuals FIRST ──
             resumeData.forEach(data => {
-                if(data.id === 'work') {
+                if (data.id === 'work') {
                     createDottedZone(this, data.x, data.y, 220, 120, data.title);
-                    createTrigger(this, data.x, data.y, 220, 120, data);
                 } else {
                     createDesk(this, data.x, data.y, data.title);
-                    createTrigger(this, data.x, data.y, 70, 40, data);
                 }
             });
 
-            player = this.add.rectangle(800, 1000, 24, 24, 0x3b82f6);
+            // ── Create player SECOND so it renders above desks ──
+            player = this.add.rectangle(800, 1050, 24, 24, 0x3b82f6);
             this.physics.add.existing(player);
             player.body.setCollideWorldBounds(true);
-            
-            playerLabel = this.add.text(800, 1030, "Jon Lewyn", { 
-                fontFamily: 'Inter', fontSize: '12px', fill: '#3b82f6', fontStyle: '700',
+
+            playerLabel = this.add.text(800, 1075, "Jon Lewyn", {
+                fontFamily: 'Inter', fontSize: '12px', fill: '#3b82f6', fontStyle: '700'
             }).setOrigin(0.5);
+
+            // ── Register overlap triggers AFTER player exists ──
+            resumeData.forEach(data => {
+                const w = data.id === 'work' ? 220 : 70;
+                const h = data.id === 'work' ? 120 : 40;
+                createTrigger(this, data.x, data.y, w, h, data);
+            });
 
             this.cameras.main.startFollow(player, true, 0.1, 0.1);
             this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
             setupMobileControls();
 
-            let closeBtn = document.getElementById('close-dialogue');
-            if(closeBtn) { closeBtn.addEventListener('click', closeDialogue); }
+            document.getElementById('close-dialogue')
+                .addEventListener('click', closeDialogue);
         }
 
         function update() {
+            if (!player || !playerLabel) return;
+
             playerLabel.x = player.x;
             playerLabel.y = player.y + 25;
 
             if (isDialogueOpen) {
-                player.body.setVelocity(0);
+                player.body.setVelocity(0, 0);
                 return;
             }
 
-            let velX = 0;
-            let velY = 0;
+            const goLeft  = activeKeys.left;
+            const goRight = activeKeys.right;
+            const goUp    = activeKeys.up;
+            const goDown  = activeKeys.down;
 
-            if (activeKeys.left) velX = -moveSpeed;
-            else if (activeKeys.right) velX = moveSpeed;
+            const diagonal = (goLeft || goRight) && (goUp || goDown);
+            const speed    = diagonal ? DIAG_SPEED : MOVE_SPEED;
 
-            if (activeKeys.up) velY = -moveSpeed;
-            else if (activeKeys.down) velY = moveSpeed;
+            let velX = 0, velY = 0;
+            if (goLeft)  velX = -speed;
+            if (goRight) velX =  speed;
+            if (goUp)    velY = -speed;
+            if (goDown)  velY =  speed;
 
             player.body.setVelocity(velX, velY);
-
-            if (velX !== 0 && velY !== 0) {
-                player.body.velocity.normalize().scale(moveSpeed);
-            }
         }
 
         function createTrigger(scene, x, y, width, height, data) {
-            let pad = scene.add.rectangle(x, y, width + 20, height + 20, 0x000000, 0); 
-            scene.physics.add.existing(pad, true); 
+            // Slightly larger hitbox than visual for easier triggering
+            let pad = scene.add.rectangle(x, y, width + 20, height + 20, 0x000000, 0);
+            scene.physics.add.existing(pad, true);
 
             scene.physics.add.overlap(player, pad, () => {
-                if (!isDialogueOpen) { showDialogue(data.title, data.text); }
+                if (!isDialogueOpen) {
+                    showDialogue(data.title, data.text);
+                }
             });
         }
 
         function showDialogue(title, text) {
             isDialogueOpen = true;
-            activeKeys.up = false; activeKeys.down = false; activeKeys.left = false; activeKeys.right = false; 
-            const overlay = document.getElementById('dialogue-overlay');
-            if(overlay) {
-                document.getElementById('dialogue-title').innerHTML = title;
-                document.getElementById('dialogue-text').innerHTML = text;
-                overlay.style.display = 'block';
-            }
+            // Clear keys so player doesn't keep drifting direction after dialogue opens
+            activeKeys.up = false; activeKeys.down = false;
+            activeKeys.left = false; activeKeys.right = false;
+
+            document.getElementById('dialogue-title').innerHTML = title;
+            document.getElementById('dialogue-text').innerHTML  = text;
+            document.getElementById('dialogue-overlay').style.display = 'block';
         }
 
         function closeDialogue() {
-            const overlay = document.getElementById('dialogue-overlay');
-            if(overlay) overlay.style.display = 'none';
-            player.y += 15; 
-            setTimeout(() => { isDialogueOpen = false; }, 200);
+            document.getElementById('dialogue-overlay').style.display = 'none';
+
+            // Small delay before re-enabling movement so the overlap doesn't instantly
+            // re-trigger if the player is still standing on the zone
+            setTimeout(() => {
+                isDialogueOpen = false;
+            }, 400);
         }
 
         function setupMobileControls() {
             if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-                let mobileContainer = document.getElementById('mobile-controls');
-                if(mobileContainer) mobileContainer.style.display = 'block';
-                const pcInstructions = document.getElementById('pc-instructions');
-                if (pcInstructions) pcInstructions.style.display = 'none';
+                document.getElementById('mobile-controls').style.display = 'block';
+                document.getElementById('pc-instructions').style.display = 'none';
             }
 
             const setupBtn = (id, direction) => {
                 const btn = document.getElementById(id);
-                if (!btn) return; 
-                const press = (e) => { e.preventDefault(); activeKeys[direction] = true; };
+                if (!btn) return;
+                const press   = (e) => { e.preventDefault(); activeKeys[direction] = true;  };
                 const release = (e) => { e.preventDefault(); activeKeys[direction] = false; };
-                
-                btn.addEventListener('touchstart', press, {passive: false});
-                btn.addEventListener('mousedown', press, {passive: false});
-                btn.addEventListener('touchend', release, {passive: false});
-                btn.addEventListener('mouseup', release, {passive: false});
-                btn.addEventListener('mouseleave', release, {passive: false});
+                btn.addEventListener('touchstart', press,   { passive: false });
+                btn.addEventListener('mousedown',  press,   { passive: false });
+                btn.addEventListener('touchend',   release, { passive: false });
+                btn.addEventListener('mouseup',    release, { passive: false });
+                btn.addEventListener('mouseleave', release, { passive: false });
             };
 
-            setupBtn('btn-up', 'up');
-            setupBtn('btn-down', 'down');
-            setupBtn('btn-left', 'left');
+            setupBtn('btn-up',    'up');
+            setupBtn('btn-down',  'down');
+            setupBtn('btn-left',  'left');
             setupBtn('btn-right', 'right');
         }
     </script>
