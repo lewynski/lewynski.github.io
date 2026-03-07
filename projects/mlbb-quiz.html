@@ -4,53 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MLBB Quiz - Project</title>
-    <link rel="stylesheet" href="../style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Shared split-view styles */
-        body { background-color: #ffffff; }
+        :root {
+            --bg-color: #1e1e2f;
+            --panel-bg: #2a2a40;
+            --text-main: #f8f8f2;
+            --text-muted: #a8a8b2;
+            --retro-green: #4ade80;
+            --retro-blue: #3b82f6;
+            --retro-yellow: #f1fa8c;
+            --retro-purple: #bd93f9;
+            --retro-pink: #ff79c6;
+            --border-dark: #000000;
+        }
+
+        /* --- GLOBAL & CURSORS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.8;
+            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        a, button, .dropbtn { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background: var(--panel-bg);
+            border-bottom: 4px solid var(--border-dark);
+        }
+        .logo { color: var(--retro-green); font-size: 1rem; text-shadow: 3px 3px 0px var(--border-dark); }
+        .nav-links a, .dropbtn {
+            color: var(--text-main); text-decoration: none; font-size: 0.6rem;
+            margin-left: 20px; background: none; border: none; font-family: inherit;
+            text-transform: uppercase;
+        }
+        .nav-links a:hover, .dropbtn:hover { color: var(--retro-pink); }
+
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none; position: absolute; right: 0; top: 100%;
+            background: var(--panel-bg); border: 4px solid var(--border-dark);
+            box-shadow: 6px 6px 0px var(--border-dark); min-width: 250px; z-index: 100;
+        }
+        .dropdown-content a {
+            display: block; padding: 15px; margin: 0; text-align: left;
+            border-bottom: 2px solid var(--border-dark);
+        }
+        .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        /* --- PAGE HEADER --- */
+        .page-header { text-align: center; margin: 40px 20px; }
+        .page-header h1 { 
+            font-size: 1.5rem; color: var(--retro-yellow); 
+            text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 15px; line-height: 1.5;
+        }
+        .page-header p { font-size: 0.65rem; color: var(--text-muted); max-width: 800px; margin: 0 auto; line-height: 2; }
+
+        /* --- SPLIT VIEW CONTAINER --- */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
         .split-container {
-            display: flex; gap: 30px; height: 850px; 
+            display: flex; gap: 30px; height: 750px; 
             margin-top: 30px; margin-bottom: 50px;
         }
 
+        /* --- RETRO CODE TERMINAL --- */
         .code-view {
-            flex: 1; background: #1e1e1e; color: #d4d4d4; padding: 25px;
-            border-radius: 16px; overflow: auto; font-family: 'Consolas', monospace;
-            border: 1px solid #333; font-size: 0.9rem;
+            flex: 1; background: #0a0a12; color: #f8f8f2; padding: 25px;
+            border: 4px solid var(--border-dark);
+            box-shadow: 10px 10px 0px var(--border-dark);
+            overflow: auto; 
+            /* Using a cleaner monospace for code readability, but keeping it blocky */
+            font-family: 'Courier New', Courier, monospace; 
+            font-size: 1rem; font-weight: bold; line-height: 1.5;
         }
+        
+        /* Custom Terminal Scrollbar */
+        .code-view::-webkit-scrollbar { width: 12px; }
+        .code-view::-webkit-scrollbar-track { background: #0a0a12; border-left: 2px solid var(--border-dark); }
+        .code-view::-webkit-scrollbar-thumb { background: var(--retro-purple); border: 2px solid var(--border-dark); }
 
+        /* Retro Syntax Highlighting */
+        .k { color: var(--retro-pink); } /* Keyword */
+        .f { color: var(--retro-green); } /* Function */
+        .c { color: #6272a4; } /* Comment */
+        .s { color: var(--retro-yellow); } /* String */
+        .n { color: var(--retro-purple); } /* Number */
+
+        /* --- ARCADE IFRAME OUTPUT --- */
         .output-view {
-            flex: 1; border-radius: 16px; overflow: hidden;
-            border: 1px solid #e5e7eb; background: #0b1120;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            flex: 1; background: #000;
+            border: 4px solid var(--border-dark);
+            box-shadow: 10px 10px 0px var(--retro-blue);
+            position: relative;
+        }
+        /* Arcade screen glare effect */
+        .output-view::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+            pointer-events: none;
         }
 
         iframe { width: 100%; height: 100%; border: none; }
-        
-        /* Syntax Colors */
-        .k { color: #569cd6; font-weight: bold; } /* Keyword */
-        .f { color: #dcdcaa; } /* Function */
-        .c { color: #6a9955; font-style: italic; } /* Comment */
-        .s { color: #ce9178; } /* String */
 
         @media (max-width: 1000px) {
             .split-container { flex-direction: column; height: auto; }
             .code-view { height: 450px; }
             .output-view { height: 800px; }
         }
+        @media (max-width: 768px) {
+            nav { flex-direction: column; gap: 15px; }
+            .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .nav-links a, .dropbtn { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">Unfiltered</div>
+        <div class="logo">UNFILTERED</div>
         <div class="nav-links">
             <a href="../index.html">Home</a>
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
             
             <div class="dropdown">
-                <button class="dropbtn">Projects ▾</button>
+                <button class="dropbtn">Projects ▼</button>
                 <div class="dropdown-content">
                     <a href="calc-splainer.html">Calc Splainer</a>
                     <a href="determinants.html">Determinant Calc</a>
@@ -62,10 +152,10 @@
         </div>
     </nav>
 
-    <div class="container" style="display: block; max-width: 1200px;">
-        <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #fbbf24, #1e3a8a); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Mobile Legends Quiz</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">Test your game knowledge on the road to Mythic. Features a Mock API implementation to simulate async data loading.</p>
+    <div class="container">
+        <div class="page-header">
+            <h1>MOBILE LEGENDS QUIZ</h1>
+            <p>Test your game knowledge on the road to Mythic. Features a Mock API implementation to simulate async data loading.</p>
         </div>
 
         <div class="split-container">
