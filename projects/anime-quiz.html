@@ -3,134 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Quiz - Project</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>Anime Trivia - Arcade</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Shared split-view styles */
-        body { background-color: #ffffff; }
+        :root {
+            /* --- RETRO ANIME PALETTE --- */
+            --bg-color: #130b29;        /* Deep void purple */
+            --panel-bg: #1e1240;        /* Darker purple panel */
+            --text-main: #f8f8f2;       /* White text */
+            --text-muted: #a8a8b2;      /* Gray text */
+            --retro-gold: #facc15;      /* Super Saiyan Gold */
+            --retro-cyan: #00f3ff;      /* Energy Blast Cyan */
+            --retro-purple: #a855f7;    /* Magic Purple */
+            --retro-red: #ef4444;       /* Danger Red */
+            --retro-green: #4ade80;     /* Success Green */
+            --border-dark: #000000;     /* Pitch Black */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.8;
+            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+            /* Starfield Background */
+            background-image: 
+                radial-gradient(var(--retro-purple) 1px, transparent 1px),
+                radial-gradient(var(--text-main) 1px, transparent 1px);
+            background-size: 50px 50px, 80px 80px;
+            background-position: 0 0, 40px 40px;
+            padding-top: 20px;
+            min-height: 100vh;
+        }
+
+        button { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+
+        /* --- PAGE HEADER --- */
+        .page-header { text-align: center; margin: 20px 20px 40px 20px; }
+        .page-header h1 { 
+            font-size: 1.8rem; color: var(--retro-gold); 
+            text-shadow: 4px 4px 0px var(--border-dark), 0 0 15px rgba(250, 204, 21, 0.4); 
+            margin-bottom: 15px; line-height: 1.5;
+        }
+        .page-header p { font-size: 0.65rem; color: var(--retro-cyan); max-width: 800px; margin: 0 auto; line-height: 2; }
+
+        /* --- SPLIT VIEW CONTAINER --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .split-container {
-            display: flex; 
-            gap: 30px; 
-            /* Slightly taller to accommodate 4 quiz buttons comfortably */
-            height: 850px; 
-            margin-top: 30px; 
+            display: flex; gap: 30px; height: 600px; 
             margin-bottom: 50px;
         }
 
-        /* LEFT SIDE: The Code Snippet */
-        .code-view {
-            flex: 1; 
-            background: #1e1e1e; 
-            color: #d4d4d4; 
-            padding: 25px;
-            border-radius: 16px; 
-            overflow: auto; 
-            font-family: 'Consolas', monospace;
-            border: 1px solid #333; 
-            font-size: 0.9rem;
+        /* --- LEFT SIDE: LORE TERMINAL --- */
+        .info-panel {
+            flex: 1; background: var(--panel-bg); padding: 35px;
+            border: 4px solid var(--border-dark);
+            box-shadow: 10px 10px 0px var(--retro-purple);
+            overflow-y: auto; 
         }
-
-        /* RIGHT SIDE: The Live App */
-        .output-view {
-            flex: 1; 
-            border-radius: 16px; 
-            overflow: hidden;
-            border: 1px solid #e5e7eb; 
-            /* The app has its own dark background, so this doesn't matter much here */
-            background: #0f0c29;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-        }
-
-        iframe { width: 100%; height: 100%; border: none; }
         
-        /* Syntax Colors */
-        .k { color: #c586c0; font-weight: bold; } /* Keyword (purple for async) */
-        .f { color: #dcdcaa; } /* Function */
-        .c { color: #6a9955; font-style: italic; } /* Comment */
-        .s { color: #ce9178; } /* String */
+        .info-panel h2 { color: var(--retro-cyan); font-size: 1rem; margin-bottom: 20px; border-bottom: 4px dashed var(--retro-purple); padding-bottom: 10px; }
+        .info-panel h3 { color: var(--retro-gold); font-size: 0.8rem; margin-top: 25px; margin-bottom: 15px; text-shadow: 2px 2px 0px var(--border-dark); }
+        .info-panel p { font-size: 0.65rem; line-height: 2; color: var(--text-muted); margin-bottom: 10px; }
+        .info-panel strong { color: #fff; }
+        
+        /* Custom Scrollbar */
+        .info-panel::-webkit-scrollbar { width: 12px; }
+        .info-panel::-webkit-scrollbar-track { background: var(--bg-color); border-left: 4px solid var(--border-dark); }
+        .info-panel::-webkit-scrollbar-thumb { background: var(--retro-purple); border: 2px solid var(--border-dark); }
 
-        /* MOBILE FIX: Stack Code first, then Output */
+        .bounty-poster {
+            background: #2a1a4a; border: 4px solid var(--border-dark); padding: 15px;
+            text-align: center; margin-top: 20px; box-shadow: 4px 4px 0px var(--border-dark);
+        }
+        .bounty-poster h4 { color: var(--retro-red); font-size: 0.8rem; margin-bottom: 10px; }
+
+        /* --- RIGHT SIDE: PLAYABLE GAME CANVAS --- */
+        .game-view {
+            flex: 1; background: #000;
+            border: 4px solid var(--border-dark);
+            box-shadow: 10px 10px 0px var(--retro-cyan);
+            position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+
+        /* Arcade screen glare */
+        .game-view::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 50%);
+            pointer-events: none; z-index: 10;
+        }
+
+        /* HUD */
+        .hud {
+            position: absolute; top: 15px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between;
+            font-size: 0.7rem; color: var(--retro-cyan); z-index: 5;
+            border-bottom: 4px solid var(--border-dark); padding-bottom: 10px;
+        }
+
+        /* Quiz Elements */
+        #question-text {
+            font-size: 0.8rem; color: #fff; line-height: 1.6;
+            margin-bottom: 30px; margin-top: 40px; text-align: center;
+            text-shadow: 2px 2px 0px var(--border-dark);
+        }
+
+        .options-grid {
+            display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 400px; z-index: 5;
+        }
+
+        .btn {
+            background: var(--panel-bg); color: #fff;
+            border: 4px solid var(--border-dark); padding: 15px;
+            font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
+            box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
+            text-align: left;
+        }
+        .btn:hover:not(:disabled) { background: var(--retro-purple); transform: translateY(-2px); }
+        .btn:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        
+        .btn.correct { background: var(--retro-green); color: #000; }
+        .btn.wrong { background: var(--retro-red); color: #fff; }
+
+        /* Overlays */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 20;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+        .overlay h2 { color: var(--retro-gold); font-size: 1.2rem; margin-bottom: 20px; text-shadow: 3px 3px 0px var(--border-dark); line-height: 1.5; }
+        .overlay p { font-size: 0.7rem; color: var(--text-main); margin-bottom: 30px; line-height: 1.8;}
+        
+        .start-btn {
+            background: var(--retro-cyan); color: #000;
+            border: 4px solid var(--border-dark); padding: 15px 25px;
+            font-family: 'Press Start 2P', cursive; font-size: 0.7rem;
+            box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
+        }
+        .start-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
+        #quiz-screen, #result-screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center;}
+
         @media (max-width: 1000px) {
-            .split-container { 
-                flex-direction: column; 
-                height: auto; 
-            }
-            .code-view { height: 450px; }
-            /* Tall enough for quiz results screen */
-            .output-view { height: 800px; }
+            .split-container { flex-direction: column; height: auto; }
+            .info-panel { height: 450px; }
+            .game-view { height: 500px; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">Unfiltered</div>
-        <div class="nav-links">
-            <a href="../index.html">Home</a>
-            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
-            
-            <div class="dropdown">
-                <button class="dropbtn">Projects ▾</button>
-                <div class="dropdown-content">
-                    <a href="calc-splainer.html">Calc Splainer</a>
-                    <a href="determinants.html">Determinant Calc</a>
-                    <a href="matrix-ops.html">Matrix Ops</a>
-                    </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container" style="display: block; max-width: 1200px;">
-        <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Anime Trivia Ultimate</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A dynamic quiz app that fetches unique questions from the OpenTDB API. Features async data loading and state management.</p>
+    <div class="container">
+        <div class="page-header">
+            <h1>ANIME TRIVIA ULTIMATE</h1>
+            <p>Test your otaku knowledge in this fully interactive, native JavaScript arcade experience.</p>
         </div>
 
         <div class="split-container">
-            <div class="code-view">
-<pre>
-<span class="c">// --- Async Data Fetching ---</span>
-<span class="c">// Fetches fresh questions from the Open Trivia DB API</span>
+            <div class="info-panel">
+                <h2><i class="fas fa-book"></i> OTAKU ARCHIVES</h2>
+                <p><strong>STATUS:</strong> ONLINE</p>
+                <p><strong>MISSION:</strong> TEST MANGA & ANIME KNOWLEDGE</p>
 
-<span class="k">const</span> API_URL = <span class="s">"https://opentdb.com/api.php?amount=10&category=31&type=multiple"</span>;
+                <h3>> MAJOR GENRES</h3>
+                <p><strong>SHONEN:</strong> Action-packed adventures focusing on friendship, effort, and victory.</p>
+                <p><strong>ISEKAI:</strong> Protagonists transported to mysterious, fantasy worlds to fulfill grand destinies.</p>
+                <p><strong>SEINEN:</strong> Complex narratives targeting mature audiences with deep psychological themes.</p>
 
-<span class="k">async function</span> <span class="f">startQuiz</span>() {
-    <span class="c">// 1. Set UI to loading state</span>
-    loadingScreen.classList.remove(<span class="s">'hidden'</span>);
-    quizArea.classList.add(<span class="s">'hidden'</span>);
-    
-    score = 0;
-    currentQuestionIndex = 0;
+                <h3>> HIGH VALUE TARGETS</h3>
+                <div class="bounty-poster">
+                    <h4>WANTED DEAD OR ALIVE</h4>
+                    <p style="color: var(--retro-cyan); font-size: 0.7rem;">MARSHALL D. TEACH</p>
+                    <p style="font-size: 0.55rem; margin-top: 10px;">Alias: Blackbeard<br>Threat Level: Extreme<br>Known for wielding two Devil Fruits.</p>
+                </div>
 
-    <span class="k">try</span> {
-        <span class="c">// 2. Wait for API response</span>
-        <span class="k">const</span> response = <span class="k">await</span> <span class="f">fetch</span>(API_URL);
-        <span class="k">const</span> data = <span class="k">await</span> response.<span class="f">json</span>();
-
-        <span class="c">// 3. Check for API specific errors</span>
-        <span class="k">if</span>(data.response_code !== 0) <span class="k">throw new</span> <span class="f">Error</span>(<span class="s">"API Error"</span>);
-        
-        <span class="c">// 4. Store data and start game</span>
-        questions = data.results;
-        <span class="f">loadNextQuestion</span>();
-        
-        <span class="c">// 5. Hide loader, show quiz</span>
-        loadingScreen.classList.add(<span class="s">'hidden'</span>);
-        quizArea.classList.remove(<span class="s">'hidden'</span>);
-
-    } <span class="k">catch</span> (error) {
-        console.<span class="f">error</span>(<span class="s">"Failed to fetch questions"</span>);
-        // Handle error in UI...
-    }
-}
-</pre>
+                <div style="margin-top: 30px; border-top: 4px solid var(--border-dark); padding-top: 20px;">
+                    <p style="color: var(--retro-green);">/// INSTRUCTIONS ///</p>
+                    <p>Read the question on the arcade monitor.</p>
+                    <p>Click the correct terminal button to answer.</p>
+                    <p>Achieve an S-Rank to prove your knowledge.</p>
+                </div>
             </div>
 
-            <div class="output-view">
-                <iframe src="anime-quiz-app.html?v=1"></iframe>
+            <div class="game-view">
+                
+                <div id="start-screen" class="overlay">
+                    <h2>ANIME TRIVIA<br>CHAMPIONSHIP</h2>
+                    <p>Get ready to test your power level.</p>
+                    <button class="start-btn" onclick="startQuiz()">INSERT COIN</button>
+                </div>
+
+                <div id="quiz-screen">
+                    <div class="hud">
+                        <span id="score-tracker">SCORE: 0</span>
+                        <span id="question-tracker">Q: 1/5</span>
+                    </div>
+                    <h2 id="question-text">Question goes here?</h2>
+                    <div class="options-grid" id="options-grid">
+                        </div>
+                </div>
+
+                <div id="result-screen" class="overlay" style="display: none;">
+                    <h2 id="result-title">MATCH OVER</h2>
+                    <p id="final-score">YOUR SCORE: 0/5</p>
+                    <p id="rank-text" style="color: var(--retro-gold); margin-bottom: 30px; font-size: 0.8rem;">RANK: D-CLASS</p>
+                    <button class="start-btn" onclick="startQuiz()">PLAY AGAIN</button>
+                </div>
+
             </div>
         </div>
     </div>
+
+    <script>
+        // Custom Anime Quiz Database
+        const quizData = [
+            { question: "What is the name of the Nine-Tailed Fox inside Naruto Uzumaki?", options: ["Shukaku", "Matatabi", "Kurama", "Gyuki"], answer: 2 },
+            { question: "In One Piece, what is the true name of the pirate known as Blackbeard?", options: ["Marshall D. Teach", "Gol D. Roger", "Edward Newgate", "Rocks D. Xebec"], answer: 0 },
+            { question: "Which anime features brothers Edward and Alphonse seeking the Philosopher's Stone?", options: ["Demon Slayer", "Fullmetal Alchemist", "Bleach", "Hunter x Hunter"], answer: 1 },
+            { question: "What breathing style does Tanjiro Kamado primarily use at the start of Demon Slayer?", "options": ["Sun Breathing", "Thunder Breathing", "Water Breathing", "Beast Breathing"], answer: 2 },
+            { question: "In Attack on Titan, what is the name of the innermost wall protecting the capital?", options: ["Wall Maria", "Wall Rose", "Wall Sina", "Wall Titan"], answer: 2 },
+            { question: "Who is known as the 'One Punch Man'?", options: ["Genos", "Garou", "Saitama", "Bang"], answer: 2 },
+            { question: "In Jujutsu Kaisen, who is the King of Curses?", options: ["Mahito", "Jogo", "Sukuna", "Geto"], answer: 2 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let currentSessionQuestions = [];
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsGrid = document.getElementById('options-grid');
+        const scoreTracker = document.getElementById('score-tracker');
+        const questionTracker = document.getElementById('question-tracker');
+
+        function startQuiz() {
+            // Shuffle and pick 5 random questions
+            const shuffledPool = [...quizData].sort(() => Math.random() - 0.5);
+            currentSessionQuestions = shuffledPool.slice(0, 5);
+            
+            score = 0;
+            currentQuestionIndex = 0;
+            scoreTracker.innerText = `SCORE: 0`;
+
+            startScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+            quizScreen.style.display = 'flex';
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            optionsGrid.innerHTML = '';
+            
+            const currentQ = currentSessionQuestions[currentQuestionIndex];
+            questionText.innerText = currentQ.question;
+            questionTracker.innerText = `Q: ${currentQuestionIndex + 1}/5`;
+
+            currentQ.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = option;
+                btn.classList.add('btn');
+                btn.onclick = () => selectAnswer(index, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIndex, selectedBtn) {
+            const currentQ = currentSessionQuestions[currentQuestionIndex];
+            const allBtns = optionsGrid.children;
+
+            // Lock all buttons
+            for(let i = 0; i < allBtns.length; i++) {
+                allBtns[i].disabled = true;
+                if(i === currentQ.answer) {
+                    allBtns[i].classList.add('correct');
+                }
+            }
+
+            // Check answer
+            if (selectedIndex === currentQ.answer) {
+                score++;
+                scoreTracker.innerText = `SCORE: ${score * 100}`;
+            } else {
+                selectedBtn.classList.add('wrong');
+            }
+
+            // Delay next question
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentSessionQuestions.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1500); 
+        }
+
+        function showResults() {
+            quizScreen.style.display = 'none';
+            resultScreen.style.display = 'flex';
+            
+            document.getElementById('final-score').innerText = `FINAL SCORE: ${score * 100}`;
+            
+            let rank = "D-CLASS";
+            if(score === 5) rank = "S-CLASS HERO";
+            else if(score >= 4) rank = "A-CLASS";
+            else if(score >= 3) rank = "B-CLASS";
+            else if(score >= 2) rank = "C-CLASS";
+            
+            document.getElementById('rank-text').innerText = `RANK ACHIEVED:\n\n${rank}`;
+        }
+    </script>
 </body>
 </html>
