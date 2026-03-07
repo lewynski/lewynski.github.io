@@ -135,6 +135,34 @@
             font-size: 0.5rem; border: 2px solid #555;
         }
 
+        /* --- CONTACT FORM --- */
+        .contact-section { padding: 50px 20px; text-align: center; }
+        .contact-form {
+            background: var(--panel-bg); max-width: 600px; margin: 0 auto;
+            padding: 30px; border: 4px solid var(--border-dark);
+            box-shadow: 8px 8px 0px var(--border-dark);
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .contact-form input, .contact-form textarea {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--bg-color); color: var(--text-main);
+            border: 4px solid var(--border-dark); padding: 15px;
+            font-size: 0.6rem; outline: none; width: 100%;
+        }
+        .contact-form input:focus, .contact-form textarea:focus {
+            border-color: var(--retro-pink);
+        }
+        .contact-form textarea { resize: vertical; min-height: 150px; }
+        .contact-form button {
+            background: var(--retro-pink); color: #fff; border: 4px solid var(--border-dark);
+            padding: 15px; font-family: 'Press Start 2P', cursive; font-size: 0.7rem;
+            text-transform: uppercase; box-shadow: 6px 6px 0px var(--border-dark);
+            transition: all 0.1s; cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer;
+        }
+        .contact-form button:active {
+            transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark);
+        }
+
         /* --- FOOTER --- */
         footer {
             background: var(--panel-bg); border-top: 4px solid var(--border-dark);
@@ -159,6 +187,7 @@
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
+            <a href="#contact">Contact</a>
             
             <div class="dropdown">
                 <button class="dropbtn">Projects ▼</button>
@@ -186,7 +215,7 @@
             <div class="profile-frame">
                 <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
             </div>
-            <span class="badge">Lvl 99 ECE STUDENT</span>
+            <span class="badge">ECE STUDENT & WEB DEVELOPER</span>
             <h1>Hello, I'm <br><span class="gradient-text">Jon Lewyn</span></h1>
             <p class="bio-text">
                 An Electronics Engineering student at PUP Sto. Tomas with a passion for bridging the gap between hardware and software. 
@@ -245,6 +274,25 @@
                 </div>
             </div>
         </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <div class="section-title">
+            <h2>Start a Quest</h2>
+            <p>Send a transmission directly to my inbox.</p>
+        </div>
+        
+        <form action="https://formsubmit.co/lewynvllram@gmail.com" method="POST" class="contact-form">
+            <input type="hidden" name="_subject" value="New Message from Unfiltered Portfolio!">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_next" value="https://lewynski.github.io/">
+
+            <input type="text" name="name" placeholder="PLAYER NAME" required>
+            <input type="email" name="email" placeholder="EMAIL ADDRESS" required>
+            <textarea name="message" placeholder="ENTER YOUR MESSAGE..." required></textarea>
+            
+            <button type="submit">SEND MESSAGE ▶</button>
+        </form>
     </section>
 
     <footer>
