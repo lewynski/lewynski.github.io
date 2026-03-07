@@ -76,53 +76,66 @@
         /* --- SPLIT VIEW CONTAINER --- */
         .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
         .split-container {
-            display: flex; gap: 30px; height: 750px; 
+            display: flex; gap: 30px; height: 600px; 
             margin-top: 30px; margin-bottom: 50px;
         }
 
-        /* --- RETRO CODE TERMINAL --- */
-        .code-view {
-            flex: 1; background: #0a0a12; color: #f8f8f2; padding: 25px;
+        /* --- LEFT SIDE: MLBB INFO LOG --- */
+        .info-panel {
+            flex: 1; background: var(--panel-bg); color: var(--text-main); padding: 35px;
             border: 4px solid var(--border-dark);
             box-shadow: 10px 10px 0px var(--border-dark);
-            overflow: auto; 
-            /* Using a cleaner monospace for code readability, but keeping it blocky */
-            font-family: 'Courier New', Courier, monospace; 
-            font-size: 1rem; font-weight: bold; line-height: 1.5;
+            overflow-y: auto; 
         }
         
-        /* Custom Terminal Scrollbar */
-        .code-view::-webkit-scrollbar { width: 12px; }
-        .code-view::-webkit-scrollbar-track { background: #0a0a12; border-left: 2px solid var(--border-dark); }
-        .code-view::-webkit-scrollbar-thumb { background: var(--retro-purple); border: 2px solid var(--border-dark); }
+        .info-panel h2 { color: var(--retro-blue); font-size: 1rem; margin-bottom: 20px; border-bottom: 4px solid var(--border-dark); padding-bottom: 10px; }
+        .info-panel h3 { color: var(--retro-pink); font-size: 0.8rem; margin-top: 25px; margin-bottom: 15px; }
+        .info-panel p { font-size: 0.65rem; line-height: 2; color: var(--text-muted); }
+        .info-panel strong { color: #fff; }
 
-        /* Retro Syntax Highlighting */
-        .k { color: var(--retro-pink); } /* Keyword */
-        .f { color: var(--retro-green); } /* Function */
-        .c { color: #6272a4; } /* Comment */
-        .s { color: var(--retro-yellow); } /* String */
-        .n { color: var(--retro-purple); } /* Number */
+        .role-list { list-style-type: none; margin-top: 10px; }
+        .role-list li { font-size: 0.65rem; margin-bottom: 12px; color: var(--text-main); }
+        .role-list i { color: var(--retro-yellow); margin-right: 10px; }
 
-        /* --- ARCADE IFRAME OUTPUT --- */
+        /* Custom Scrollbar */
+        .info-panel::-webkit-scrollbar { width: 12px; }
+        .info-panel::-webkit-scrollbar-track { background: var(--bg-color); border-left: 4px solid var(--border-dark); }
+        .info-panel::-webkit-scrollbar-thumb { background: var(--retro-blue); border: 2px solid var(--border-dark); }
+
+
+        /* --- RIGHT SIDE: ARCADE ERROR SCREEN --- */
         .output-view {
-            flex: 1; background: #000;
+            flex: 1; background: #050510;
             border: 4px solid var(--border-dark);
-            box-shadow: 10px 10px 0px var(--retro-blue);
+            box-shadow: 10px 10px 0px var(--retro-pink);
             position: relative;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; overflow: hidden;
         }
-        /* Arcade screen glare effect */
+        
+        /* Arcade screen glare & CRT scanlines effect */
         .output-view::after {
             content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
             pointer-events: none;
         }
 
-        iframe { width: 100%; height: 100%; border: none; }
+        .error-icon { font-size: 4rem; color: var(--retro-pink); margin-bottom: 20px; text-shadow: 4px 4px 0px var(--border-dark); }
+        .error-code { font-size: 2rem; color: #fff; text-shadow: 4px 4px 0px var(--retro-pink); margin-bottom: 15px; }
+        .error-text { font-size: 0.8rem; color: var(--retro-yellow); margin-bottom: 10px; }
+        .error-file { font-size: 0.6rem; color: var(--text-muted); margin-bottom: 40px; }
+        
+        .blinking-cursor { 
+            font-size: 0.7rem; color: var(--retro-green); 
+            animation: blink 1.2s infinite step-end; 
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         @media (max-width: 1000px) {
             .split-container { flex-direction: column; height: auto; }
-            .code-view { height: 450px; }
-            .output-view { height: 800px; }
+            .info-panel { height: 500px; }
+            .output-view { height: 500px; }
         }
         @media (max-width: 768px) {
             nav { flex-direction: column; gap: 15px; }
@@ -155,49 +168,39 @@
     <div class="container">
         <div class="page-header">
             <h1>MOBILE LEGENDS QUIZ</h1>
-            <p>Test your game knowledge on the road to Mythic. Features a Mock API implementation to simulate async data loading.</p>
+            <p>Test your game knowledge on the road to Mythic. Currently undergoing system maintenance.</p>
         </div>
 
         <div class="split-container">
-            <div class="code-view">
-<pre>
-<span class="c">// --- Mock API Simulation ---</span>
-<span class="c">// Since MLBB has no public quiz API, we simulate</span>
-<span class="c">// a server fetch using Promises and setTimeout.</span>
+            <div class="info-panel">
+                <h2><i class="fas fa-database"></i> SYSTEM LOG</h2>
+                <p><strong>SUBJECT:</strong> Mobile Legends: Bang Bang</p>
+                <p><strong>GENRE:</strong> 5v5 MOBA</p>
+                <p><strong>OBJECTIVE:</strong> Destroy the enemy base.</p>
 
-<span class="k">function</span> <span class="f">fetchQuestionsMock</span>() {
-    <span class="k">return new</span> <span class="f">Promise</span>((resolve) => {
-        
-        <span class="c">// 1. Simulate Network Latency (1.5s)</span>
-        <span class="f">setTimeout</span>(() => {
-            
-            <span class="c">// 2. Shuffle the master database</span>
-            <span class="k">const</span> shuffled = [...MLBB_DATA]
-                .<span class="f">sort</span>(() => <span class="n">0.5</span> - Math.<span class="f">random</span>());
+                <h3>> BATTLE ROLES</h3>
+                <ul class="role-list">
+                    <li><i class="fas fa-shield-alt"></i> <strong>TANK:</strong> Frontline absorbers & crowd control.</li>
+                    <li><i class="fas fa-fist-raised"></i> <strong>FIGHTER:</strong> Melee bruisers holding the EXP lane.</li>
+                    <li><i class="fas fa-skull"></i> <strong>ASSASSIN:</strong> High burst damage junglers.</li>
+                    <li><i class="fas fa-magic"></i> <strong>MAGE:</strong> Magic damage dealers in the Mid lane.</li>
+                    <li><i class="fas fa-crosshairs"></i> <strong>MARKSMAN:</strong> Late-game ranged physical carry.</li>
+                    <li><i class="fas fa-medkit"></i> <strong>SUPPORT:</strong> Healers and utility providers.</li>
+                </ul>
 
-            <span class="c">// 3. Return random subset (10 questions)</span>
-            <span class="f">resolve</span>(shuffled.<span class="f">slice</span>(<span class="n">0</span>, <span class="n">10</span>));
-            
-        }, <span class="n">1500</span>);
-        
-    });
-}
-
-<span class="c">// --- Async Game Initialization ---</span>
-<span class="k">async function</span> <span class="f">initGame</span>() {
-    <span class="f">showLoadingScreen</span>();
-    
-    <span class="c">// The app waits here, just like a real API call</span>
-    <span class="k">const</span> questions = <span class="k">await</span> <span class="f">fetchQuestionsMock</span>();
-    
-    <span class="f">hideLoadingScreen</span>();
-    <span class="f">startGame</span>(questions);
-}
-</pre>
+                <h3>> RANKING SYSTEM</h3>
+                <p style="color: var(--retro-yellow);">
+                    Warrior ➔ Elite ➔ Master ➔ Grandmaster ➔ Epic ➔ Legend ➔ Mythic
+                </p>
             </div>
 
             <div class="output-view">
-                <iframe src="mlbb-quiz-app.html?v=1"></iframe>
+                <i class="fas fa-skull-crossbones error-icon"></i>
+                <div class="error-code">ERROR 404</div>
+                <div class="error-text">GAME FILE NOT FOUND</div>
+                <div class="error-file">Missing module: mlbb-quiz-app.html</div>
+                
+                <div class="blinking-cursor">_REBOOTING ARCADE SYSTEM...</div>
             </div>
         </div>
     </div>
