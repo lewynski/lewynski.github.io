@@ -3,87 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D Dwarf Mini AI - Project</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>Capy AI Terminal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { background-color: #ffffff; }
-        .split-container { display: flex; gap: 30px; height: 850px; margin-top: 30px; margin-bottom: 50px; }
-        .code-view { flex: 1; background: #1e1e1e; color: #d4d4d4; padding: 25px; border-radius: 16px; overflow: auto; font-family: 'Consolas', monospace; border: 1px solid #333; font-size: 0.9rem; }
-        .output-view { flex: 1; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb; background: #0f172a; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
-        iframe { width: 100%; height: 100%; border: none; }
-        .k { color: #569cd6; font-weight: bold; } .c { color: #6a9955; font-style: italic; } .n { color: #b5cea8; } .f { color: #dcdcaa; } .s { color: #ce9178; }
-        @media (max-width: 1000px) { .split-container { flex-direction: column; height: auto; } .code-view { height: 450px; } .output-view { height: 800px; } }
+        :root {
+            --bg-color: #1e1e2f;
+            --panel-bg: #2a2a40;
+            --text-main: #f8f8f2;
+            --retro-green: #4ade80;
+            --retro-blue: #3b82f6;
+            --retro-purple: #bd93f9;
+            --retro-pink: #ff79c6;
+            --border-dark: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            /* Subtle retro grid */
+            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
+            background-size: 30px 30px;
+            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+        }
+
+        button, input { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+
+        /* BACK BUTTON */
+        .back-btn {
+            position: absolute; top: 20px; left: 20px;
+            background: var(--panel-bg); color: var(--text-main);
+            padding: 10px 15px; text-decoration: none; font-size: 0.6rem;
+            border: 4px solid var(--border-dark);
+            box-shadow: 4px 4px 0px var(--border-dark);
+            transition: all 0.1s;
+        }
+        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
+        /* MAIN TERMINAL CONTAINER */
+        .terminal-container {
+            width: 100%; max-width: 800px; height: 85vh;
+            background: var(--panel-bg); border: 4px solid var(--border-dark);
+            box-shadow: 10px 10px 0px var(--border-dark);
+            display: flex; flex-direction: column;
+        }
+
+        /* TERMINAL HEADER */
+        .terminal-header {
+            background: var(--retro-blue); padding: 20px;
+            border-bottom: 4px solid var(--border-dark);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .terminal-header h1 { font-size: 1rem; color: #fff; text-shadow: 2px 2px 0px var(--border-dark); margin: 0; }
+        .status-light {
+            width: 15px; height: 15px; background: var(--retro-green);
+            border: 2px solid var(--border-dark); border-radius: 50%;
+            box-shadow: 0 0 10px var(--retro-green);
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* CHAT BOX AREA */
+        .chat-box {
+            flex: 1; padding: 20px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        
+        /* Custom Scrollbar for Chat */
+        .chat-box::-webkit-scrollbar { width: 12px; }
+        .chat-box::-webkit-scrollbar-track { background: var(--bg-color); border-left: 4px solid var(--border-dark); }
+        .chat-box::-webkit-scrollbar-thumb { background: var(--retro-blue); border: 2px solid var(--border-dark); }
+
+        /* MESSAGES */
+        .message {
+            max-width: 80%; padding: 15px; font-size: 0.7rem; line-height: 1.6;
+            border: 4px solid var(--border-dark); position: relative;
+        }
+        
+        .msg-capy {
+            background: #ffffff; color: #000; align-self: flex-start;
+            box-shadow: 6px 6px 0px var(--retro-green);
+            border-bottom-left-radius: 0; /* Retro speech bubble look */
+        }
+        .msg-capy::before { content: "CAPY"; display: block; font-size: 0.5rem; color: var(--retro-green); margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
+
+        .msg-user {
+            background: var(--retro-purple); color: #fff; align-self: flex-end;
+            box-shadow: -6px 6px 0px var(--border-dark);
+            border-bottom-right-radius: 0;
+        }
+        .msg-user::before { content: "PLAYER 1"; display: block; font-size: 0.5rem; color: #fff; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
+
+        /* TYPING INDICATOR */
+        .typing-indicator { font-size: 0.6rem; color: var(--retro-green); align-self: flex-start; display: none; margin-left: 10px; }
+
+        /* INPUT AREA */
+        .input-area {
+            display: flex; padding: 20px; background: var(--bg-color);
+            border-top: 4px solid var(--border-dark); gap: 10px;
+        }
+        .input-area input {
+            flex: 1; padding: 15px; font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem; background: #fff; color: #000;
+            border: 4px solid var(--border-dark); outline: none;
+        }
+        .input-area input:focus { border-color: var(--retro-pink); }
+        
+        .input-area button {
+            background: var(--retro-pink); color: #fff; padding: 0 20px;
+            font-family: 'Press Start 2P', cursive; font-size: 0.8rem;
+            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
+            transition: all 0.1s;
+        }
+        .input-area button:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
+        @media (max-width: 768px) {
+            .terminal-container { height: 90vh; border-width: 2px; }
+            .message { max-width: 95%; font-size: 0.6rem; }
+            .input-area { flex-direction: column; }
+            .input-area button { padding: 15px; }
+        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">Unfiltered</div>
-        <div class="nav-links">
-            <a href="../index.html">Home</a>
-            <a href="https://github.com/lewynski" target="_blank">GitHub</a>
-            
-            <div class="dropdown">
-                <button class="dropbtn">Projects ▾</button>
-                <div class="dropdown-content">
-                    <a href="calc-splainer.html">Calc Splainer</a>
-                    <a href="determinants.html">Determinant Calc</a>
-                    <a href="matrix-ops.html">Matrix Ops</a>
-                    <a href="anime-quiz.html">Anime Quiz</a>
-                    <a href="mlbb-quiz.html">MLBB Quiz</a>
-                    <a href="snake-game.html">Cyber Viper</a>
-                    <a href="flappy-bird.html">Neon Flap</a>
-                    <a href="tic-tac-toe.html">Minimax AI</a>
-                    <a href="2048.html">Neon 2048</a>
-                    <a href="rpg-game.html">RPG Engine</a>
-                    <a href="fishing-game.html">Neon Angler</a>
-                    <a href="claw-machine.html">Toy Kingdom</a>
-                    <a href="eiji-ai.html">D Dwarf Mini AI</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <a href="../index.html" class="back-btn">◀ RETURN</a>
 
-    <div class="container" style="display: block; max-width: 1200px;">
-        <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3rem; font-weight: 800; background: linear-gradient(to right, #3b82f6, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">D Dwarf Mini Assistant</h1>
-            <p style="color: #6b7280; font-size: 1.1rem; margin-top: 10px;">A sleek, conversational interface powered by <strong>Groq LPUs</strong> and Meta's <strong>Llama 3.3</strong>, parsing markdown data in real-time.</p>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <h1><i class="fas fa-robot"></i> CAPY OS v1.0</h1>
+            <div class="status-light" title="System Online"></div>
         </div>
 
-        <div class="split-container">
-            <div class="code-view">
-<pre>
-<span class="c">// --- Groq API Integration ---</span>
-<span class="c">// Utilizes Meta's Llama 3.3 via Groq LPU</span>
+        <div class="chat-box" id="chatBox">
+            <div class="message msg-capy">Hello Player 1! I am Capy, Jon Lewyn's personal AI assistant. What would you like to know about his projects or skills?</div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">Capy is typing...</div>
 
-<span class="k">async function</span> <span class="f">sendMessage</span>(text) {
-    
-    <span class="k">const</span> response = <span class="k">await</span> <span class="f">fetch</span>(<span class="s">"https://api.groq.com/openai/v1/chat/completions"</span>, {
-        method: <span class="s">"POST"</span>,
-        headers: { 
-            <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span>,
-            <span class="s">"Authorization"</span>: <span class="s">"Bearer "</span> + API_KEY
-        },
-        body: JSON.<span class="f">stringify</span>({
-            model: <span class="s">"llama-3.3-70b-versatile"</span>,
-            messages: [
-                { role: <span class="s">"system"</span>, content: SYSTEM_PROMPT },
-                { role: <span class="s">"user"</span>, content: text }
-            ]
-        })
-    });
-
-    <span class="c">// Parse OpenAI-compatible response</span>
-    <span class="k">const</span> data = <span class="k">await</span> response.<span class="f">json</span>();
-    <span class="k">return</span> data.choices[<span class="n">0</span>].message.content;
-}
-</pre>
-            </div>
-
-            <div class="output-view">
-                <iframe src="eiji-ai-app.html?v=6"></iframe>
-            </div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="COMMAND HERE..." autocomplete="off">
+            <button id="sendBtn">SEND</button>
         </div>
     </div>
+
+    <script>
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Function to add a message to the UI
+        function addMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.classList.add(sender === 'user' ? 'msg-user' : 'msg-capy');
+            msgDiv.innerText = text;
+            chatBox.appendChild(msgDiv);
+            
+            // Auto-scroll to the bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Main Send Function
+        async function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // 1. Show User Message
+            addMessage(text, 'user');
+            userInput.value = ''; // Clear input
+            
+            // 2. Show "Capy is typing..."
+            typingIndicator.style.display = 'block';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // 3. GET RESPONSE FROM API
+            /* ==============================================================
+               DEVELOPER NOTE: Put your Groq LPU / Llama 3 API fetch code here!
+               Currently, this uses a placeholder `setTimeout` to mimic AI lag.
+               ==============================================================
+            */
+            setTimeout(() => {
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+
+                // Placeholder Capy Response (Replace this variable with your API data)
+                let capyResponse = "Bleep bloop! I am currently running in offline display mode. To connect me to Groq LPUs, Jon needs to link my API keys!";
+                
+                // Show Capy Message
+                addMessage(capyResponse, 'capy');
+            }, 1500); // 1.5 second fake delay
+        }
+
+        // Listen for "Enter" key press
+        userInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleSend();
+            }
+        });
+
+        // Listen for Send Button click
+        sendBtn.addEventListener('click', handleSend);
+    </script>
+
 </body>
 </html>
