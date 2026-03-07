@@ -3,26 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unfiltered | Jon Lewyn Tanggaro</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Jon Lewyn | 8-Bit Portfolio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #1e1e2f;
+            --panel-bg: #2a2a40;
+            --text-main: #f8f8f2;
+            --text-muted: #a8a8b2;
+            --retro-green: #4ade80;
+            --retro-blue: #3b82f6;
+            --retro-purple: #bd93f9;
+            --retro-pink: #ff79c6;
+            --border-dark: #000000;
+        }
+
+        /* --- GLOBAL & CURSORS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.8;
+            /* Retro cursor from your game */
+            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+            /* Subtle grid background */
+            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        a, button, .dropbtn { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+
+        /* Typography sizing for chunky font */
+        h1 { font-size: 1.5rem; line-height: 1.5; margin-bottom: 10px; }
+        h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--retro-pink); text-shadow: 2px 2px 0px var(--border-dark);}
+        h3 { font-size: 0.8rem; margin-bottom: 10px; color: var(--retro-blue); }
+        p { font-size: 0.65rem; color: var(--text-muted); line-height: 2; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background: var(--panel-bg);
+            border-bottom: 4px solid var(--border-dark);
+        }
+        .logo { color: var(--retro-green); font-size: 1rem; text-shadow: 3px 3px 0px var(--border-dark); }
+        .nav-links a, .dropbtn {
+            color: var(--text-main); text-decoration: none; font-size: 0.6rem;
+            margin-left: 20px; background: none; border: none; font-family: inherit;
+            text-transform: uppercase;
+        }
+        .nav-links a:hover, .dropbtn:hover { color: var(--retro-pink); }
+
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none; position: absolute; right: 0; top: 100%;
+            background: var(--panel-bg); border: 4px solid var(--border-dark);
+            box-shadow: 6px 6px 0px var(--border-dark); min-width: 250px; z-index: 100;
+        }
+        .dropdown-content a {
+            display: block; padding: 15px; margin: 0; text-align: left;
+            border-bottom: 2px solid var(--border-dark);
+        }
+        .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        /* --- HERO SECTION --- */
+        .hero-container { text-align: center; padding: 60px 20px; }
+        .profile-frame { margin-bottom: 20px; }
+        .profile-pic {
+            width: 160px; height: 160px; object-fit: cover;
+            border: 4px solid var(--border-dark);
+            box-shadow: 8px 8px 0px var(--retro-blue);
+            /* Forces images to look blocky/pixelated */
+            image-rendering: pixelated; 
+        }
+        .badge {
+            display: inline-block; background: var(--retro-green); color: #000;
+            padding: 8px 12px; border: 4px solid var(--border-dark);
+            font-size: 0.6rem; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-dark);
+        }
+        .gradient-text { color: var(--retro-purple); text-shadow: 3px 3px 0px var(--border-dark); }
+        .bio-text { max-width: 700px; margin: 0 auto 30px auto; }
+
+        /* --- PIXEL BUTTONS --- */
+        .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
+        .btn-primary, .btn-secondary {
+            display: inline-block; padding: 12px 16px;
+            font-size: 0.6rem; text-decoration: none; text-transform: uppercase;
+            border: 4px solid var(--border-dark);
+            box-shadow: 6px 6px 0px var(--border-dark);
+            transition: all 0.1s; color: #fff;
+        }
+        .btn-primary { background: var(--retro-blue); }
+        .btn-secondary { background: var(--panel-bg); color: var(--text-main); }
+        
+        /* The special RPG Button */
+        .cta-buttons a[href="rpg-resume.html"] { background: var(--retro-green); color: #000; }
+
+        /* Button Press Animation */
+        .btn-primary:active, .btn-secondary:active, .cta-buttons a[href="rpg-resume.html"]:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px var(--border-dark);
+        }
+
+        /* --- SKILLS GRID --- */
+        .skills-section { padding: 50px 20px; text-align: center; }
+        .section-title { margin-bottom: 40px; }
+        .skills-grid {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1000px; margin: 0 auto;
+        }
+        
+        /* Pixel Cards */
+        .skill-card {
+            background: var(--panel-bg); width: 280px; padding: 25px;
+            border: 4px solid var(--border-dark);
+            box-shadow: 8px 8px 0px var(--border-dark);
+            transition: transform 0.2s;
+        }
+        .skill-card:hover { transform: translateY(-5px); }
+        .icon-box { font-size: 2.5rem; color: var(--retro-pink); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
+        
+        /* Badges */
+        .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .tags span {
+            background: #000; color: var(--retro-green); padding: 6px 8px;
+            font-size: 0.5rem; border: 2px solid #555;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--panel-bg); border-top: 4px solid var(--border-dark);
+            padding: 30px; text-align: center; margin-top: 50px;
+        }
+        .social-links { margin-top: 15px; display: flex; justify-content: center; gap: 20px; }
+        .social-links a { color: var(--text-main); font-size: 1.2rem; text-shadow: 2px 2px 0px var(--border-dark); transition: color 0.2s; }
+        .social-links a:hover { color: var(--retro-blue); }
+
+        @media (max-width: 768px) {
+            nav { flex-direction: column; gap: 15px; }
+            .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .nav-links a, .dropbtn { margin-left: 0; }
+            h1 { font-size: 1.2rem; }
+        }
+    </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">Unfiltered</div>
+        <div class="logo">UNFILTERED</div>
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
             
             <div class="dropdown">
-                <button class="dropbtn">Projects ▾</button>
+                <button class="dropbtn">Projects ▼</button>
                 <div class="dropdown-content">
                     <a href="projects/calc-splainer.html">Calc Splainer</a>
                     <a href="projects/determinants.html">Determinant Calc</a>
-                    <a href="projects/matrix-ops.html">Matrix Operations</a>
-                    
+                    <a href="projects/matrix-ops.html">Matrix Ops</a>
                     <a href="projects/anime-quiz.html">Anime Quiz</a>
                     <a href="projects/mlbb-quiz.html">MLBB Quiz</a>
                     <a href="projects/snake-game.html">Cyber Viper</a>
@@ -31,8 +174,7 @@
                     <a href="projects/2048.html">Neon 2048</a>
                     <a href="projects/rpg-game.html">RPG Engine</a>
                     <a href="projects/fishing-game.html">Neon Angler</a>
-                    <a href="projects/claw-machine.html">Toy Kingdom Claw</a>
-                    
+                    <a href="projects/claw-machine.html">Toy Kingdom</a>
                     <a href="projects/eiji-ai.html">D Dwarf Mini AI</a>
                 </div>
             </div>
@@ -44,26 +186,26 @@
             <div class="profile-frame">
                 <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
             </div>
-            <span class="badge">ECE STUDENT & DEVELOPER</span>
-            <h1>Hello, I'm <span class="gradient-text">Jon Lewyn</span></h1>
+            <span class="badge">Lvl 99 ECE STUDENT</span>
+            <h1>Hello, I'm <br><span class="gradient-text">Jon Lewyn</span></h1>
             <p class="bio-text">
-                An Electronics Engineering student at <strong>PUP Sto. Tomas</strong> with a passion for bridging the gap between hardware and software. 
+                An Electronics Engineering student at PUP Sto. Tomas with a passion for bridging the gap between hardware and software. 
                 I specialize in building computational tools, embedded systems, and full-stack web applications.
             </p>
             
             <div class="cta-buttons">
-                <a href="#skills" class="btn-primary">View My Tech Stack</a>
+                <a href="#skills" class="btn-primary">Tech Stack</a>
                 
                 <a href="https://github.com/lewynski" target="_blank" class="btn-secondary">
-                    <i class="fab fa-github"></i> GitHub Profile
+                    <i class="fab fa-github"></i> GitHub
                 </a>
                 
-                <a href="resume.html" class="btn-secondary" style="border-color: #4f46e5; color: #818cf8;">
-                    <i class="fas fa-file-alt"></i> My Resume
+                <a href="resume.html" class="btn-secondary">
+                    <i class="fas fa-file-alt"></i> Resume
                 </a>
 
-                <a href="rpg-resume.html" class="btn-primary" style="background: linear-gradient(to right, #10b981, #3b82f6); border: none; padding: 12px 24px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
-                    <i class="fas fa-gamepad"></i> My Life as RPG Game
+                <a href="rpg-resume.html" class="btn-primary">
+                    <i class="fas fa-gamepad"></i> START RPG
                 </a>
             </div>
         </div>
@@ -81,42 +223,32 @@
                 <h3>Programming</h3>
                 <p>Developing robust logic and efficient algorithms.</p>
                 <div class="tags">
-                    <span>Python</span>
-                    <span>JavaScript</span>
-                    <span>HTML/CSS</span>
-                    <span>Java</span>
-                    <span>C++</span>
+                    <span>Python</span> <span>JS</span> <span>HTML/CSS</span> <span>Java</span> <span>C++</span>
                 </div>
             </div>
 
             <div class="skill-card">
                 <div class="icon-box"><i class="fas fa-microchip"></i></div>
-                <h3>Embedded Systems</h3>
+                <h3>Hardware</h3>
                 <p>Bringing code to the physical world.</p>
                 <div class="tags">
-                    <span>Arduino</span>
-                    <span>FPGA</span>
-                    <span>TinkerCAD</span>
-                    <span>Proto Boarding</span>
+                    <span>Arduino</span> <span>FPGA</span> <span>TinkerCAD</span> <span>Proto Boarding</span>
                 </div>
             </div>
 
             <div class="skill-card">
                 <div class="icon-box"><i class="fas fa-drafting-compass"></i></div>
-                <h3>Simulation & Design</h3>
+                <h3>Simulation</h3>
                 <p>Modeling complex circuits and blueprints.</p>
                 <div class="tags">
-                    <span>AutoCAD</span>
-                    <span>MATLAB</span>
-                    <span>Multisim</span>
-                    <span>Proteus</span>
+                    <span>AutoCAD</span> <span>MATLAB</span> <span>Multisim</span> <span>Proteus</span>
                 </div>
             </div>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2026 Unfiltered Portfolio. Built by Jon Lewyn Villaram Tanggaro.</p>
+        <p>&copy; 2026 Unfiltered Portfolio.<br>Built by Jon Lewyn Villaram Tanggaro.</p>
         <div class="social-links">
             <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank"><i class="fab fa-linkedin"></i></a>
             <a href="https://github.com/lewynski" target="_blank"><i class="fab fa-github"></i></a>
