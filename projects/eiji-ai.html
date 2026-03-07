@@ -10,7 +10,7 @@
     
     <style>
         :root {
-            /* --- THE NEW NEON PINK PALETTE --- */
+            /* --- THE NEON PINK PALETTE --- */
             --bg-color: #2b0a1a;        /* Deep dark magenta background */
             --panel-bg: #4a152c;        /* Dark pink panel */
             --text-main: #ffe6f2;       /* Very pale pink text */
@@ -167,7 +167,7 @@
         const sendBtn = document.getElementById('sendBtn');
         const typingIndicator = document.getElementById('typingIndicator');
 
-        // BUG FIX: Array to give Capy a working memory of the conversation
+        // Capy's Memory Array
         let conversationHistory = [
             { 
                 role: "system", 
@@ -175,6 +175,7 @@
             }
         ];
 
+        // Function to create message bubbles
         function addMessage(text, sender) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message');
@@ -184,6 +185,7 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
+        // Main sending function
         async function handleSend() {
             const text = userInput.value.trim();
             if (!text) return;
@@ -191,13 +193,15 @@
             addMessage(text, 'user');
             userInput.value = ''; 
             
-            // Add user's message to Capy's memory
+            // Save user message to memory
             conversationHistory.push({ role: "user", content: text });
             
             typingIndicator.style.display = 'block';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // PUT YOUR NEW SECURE API KEY HERE
+            // ==========================================
+            // PUT YOUR SECURE API KEY HERE
+            // ==========================================
             const API_KEY = "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"; 
             
             try {
@@ -208,31 +212,43 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama3-8b-8192", 
-                        messages: conversationHistory // Passing the full memory instead of just 1 line!
+                        // Using the upgraded, highly capable Llama 3.3 model
+                        model: "llama-3.3-70b-versatile", 
+                        messages: conversationHistory 
                     })
                 });
 
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
 
+                // Robust Error Check - Prints exact error to the chat screen
+                if (!response.ok) {
+                    console.error("Groq Error Details:", data);
+                    addMessage(`GROQ ERROR: ${data.error?.message || 'Unknown API issue'}`, 'capy');
+                    conversationHistory.pop(); // Remove the failed message so user can try again
+                    return; 
+                }
+
+                // Show AI response
                 let capyResponse = data.choices[0].message.content;
                 addMessage(capyResponse, 'capy');
 
-                // Save Capy's response to the memory
+                // Save AI response to memory
                 conversationHistory.push({ role: "assistant", content: capyResponse });
 
             } catch (error) {
                 typingIndicator.style.display = 'none';
-                addMessage("SYSTEM ERROR: Connection failed. Check API Keys.", 'capy');
-                console.error("API Error:", error);
+                addMessage("SYSTEM ERROR: Total network failure. Check console.", 'capy');
+                console.error("Network Error:", error);
             }
         }
 
+        // Trigger send on "Enter" key
         userInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') handleSend();
         });
 
+        // Trigger send on button click
         sendBtn.addEventListener('click', handleSend);
     </script>
 
