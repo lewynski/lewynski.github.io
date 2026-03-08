@@ -3,96 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jon's Journey - Interactive Resume</title>
+    <title>Jon's Journey - GBA Edition</title>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        :root {
+            --gba-frame: #283593; /* Gameboy Advance Indigo */
+            --gba-screen: #98c870; /* Route Grass Green */
+            --poke-red: #e53935;
+            --text-dark: #1a1a1a;
+            --border-dark: #2a2a2a;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            background-color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            color: #111827;
+            background-color: var(--gba-frame);
+            background-image: linear-gradient(rgba(255,255,255,0.05) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(255,255,255,0.05) 2px, transparent 2px);
+            background-size: 30px 30px;
+            font-family: 'Press Start 2P', cursive;
+            color: #ffffff;
             padding: 40px;
             min-height: 100vh;
+            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
         }
 
-        .page-header { margin-bottom: 30px; }
-        .page-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
-        .page-header p { color: #6b7280; font-size: 0.95rem; }
+        .page-header { margin-bottom: 30px; text-align: center; }
+        .page-header h1 { font-size: 1.5rem; color: #ffcb05; text-shadow: 4px 4px 0px #3c5aa6; margin-bottom: 12px; line-height: 1.5; }
+        .page-header p { color: #e0e0e0; font-size: 0.6rem; line-height: 1.8; }
         
         .back-btn {
             display: inline-block; margin-bottom: 20px;
-            color: #4b5563; text-decoration: none; font-weight: 500;
-            background: #f3f4f6; padding: 8px 16px; border-radius: 8px;
-            transition: background 0.2s;
+            color: #ffffff; text-decoration: none; font-size: 0.6rem;
+            background: var(--poke-red); padding: 12px 16px; 
+            border: 4px solid var(--border-dark);
+            box-shadow: 4px 4px 0px var(--border-dark);
+            transition: transform 0.1s;
         }
-        .back-btn:hover { background: #e5e7eb; color: #111827; }
+        .back-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--border-dark); }
+        .back-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--border-dark); }
 
-        .layout-container { display: flex; gap: 24px; max-width: 1300px; margin: 0 auto; }
-        .left-column { width: 320px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
+        .layout-container { display: flex; gap: 30px; max-width: 1300px; margin: 0 auto; }
+        .left-column { width: 350px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
 
+        /* UI Panels styled like an in-game menu/Pokédex */
         .panel {
-            background: #ffffff; border: 1px solid #e5e7eb;
-            border-radius: 12px; padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            background: #f8f8f8; color: var(--text-dark);
+            border: 6px solid #505050; border-radius: 8px; padding: 24px;
+            box-shadow: inset 0 0 0 2px #d0d0d0, 8px 8px 0px rgba(0,0,0,0.3);
         }
 
-        .panel h3 { font-size: 0.75rem; color: #9ca3af; letter-spacing: 1px; margin-bottom: 16px; text-transform: uppercase; }
+        .panel h3 { font-size: 0.8rem; color: var(--poke-red); margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px dashed #a0a0a0; padding-bottom: 10px; }
+
+        .chat-msg {
+            background: #ffffff; border: 2px solid #a0a0a0; border-radius: 4px; 
+            padding: 12px; font-family: 'VT323', monospace; font-size: 1.2rem; color: #333; margin-bottom: 12px;
+        }
 
         .keyboard-layout { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 16px; }
         .key-row { display: flex; gap: 6px; }
         .key {
-            width: 40px; height: 40px; background: #ffffff; border: 1px solid #e5e7eb;
-            border-radius: 8px; display: flex; justify-content: center; align-items: center;
-            font-weight: 600; color: #374151; box-shadow: 0 2px 0 #e5e7eb;
+            width: 40px; height: 40px; background: #e0e0e0; border: 4px solid #808080;
+            border-radius: 4px; display: flex; justify-content: center; align-items: center;
+            font-size: 0.8rem; color: #333; box-shadow: inset -2px -2px 0px #a0a0a0;
         }
-        .instruction-text { text-align: center; color: #6b7280; font-size: 0.85rem; line-height: 1.5; }
+        .instruction-text { text-align: center; color: #555; font-family: 'VT323', monospace; font-size: 1.2rem; line-height: 1.2; }
 
         .right-column { flex: 1; position: relative; }
 
+        /* The Gameboy Screen */
         #game-wrapper {
-            width: 100%; height: 650px; background: #f8fafc;
-            border: 1px solid #e5e7eb; border-radius: 16px;
-            overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            width: 100%; height: 650px; background: #000;
+            border: 12px solid #111; border-radius: 16px 16px 40px 16px; /* GBA asymmetrical curve */
+            overflow: hidden; box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
             position: relative;
         }
 
+        /* Classic Pokémon Text Box */
         #dialogue-overlay {
-            position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 450px; background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: none; 
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); z-index: 10;
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 600px; 
+            background: #f8f8f8;
+            border: 6px solid #484848; border-radius: 8px;
+            box-shadow: inset 0 0 0 4px #b0b0b0, 0 8px 0px rgba(0,0,0,0.4);
+            padding: 20px; display: none; z-index: 10;
         }
         
-        #dialogue-title { font-size: 1.1rem; font-weight: 700; color: #111827; margin-bottom: 8px; }
-        #dialogue-text { font-size: 0.95rem; line-height: 1.6; color: #4b5563; }
-        #dialogue-text strong { color: #111827; font-weight: 600; }
+        #dialogue-title { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--poke-red); margin-bottom: 12px; text-transform: uppercase; }
+        #dialogue-text { font-family: 'VT323', monospace; font-size: 1.6rem; line-height: 1.4; color: var(--text-dark); }
+        #dialogue-text strong { color: #0050b0; } /* Highlighted text color */
 
         #close-dialogue {
-            margin-top: 16px; background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569;
-            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; transition: all 0.2s;
+            position: absolute; bottom: 15px; right: 20px;
+            background: none; border: none; color: var(--poke-red);
+            font-family: 'Press Start 2P', cursive; font-size: 0.8rem; cursor: pointer;
+            animation: blink 1s infinite;
         }
-        #close-dialogue:hover { background: #e2e8f0; color: #1e293b; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
+        /* Retro Nintendo D-Pad */
         #mobile-controls {
             position: absolute; bottom: 20px; left: 20px; display: none; z-index: 5;
         }
-        .d-pad { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 6px; }
-        .ctrl-btn {
-            background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; 
-            color: #4b5563; font-size: 20px; display: flex; justify-content: center; align-items: center; user-select: none;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        .d-pad { 
+            display: grid; grid-template-columns: repeat(3, 45px); grid-template-rows: repeat(3, 45px); 
+            background: #333; padding: 5px; border-radius: 50%; border: 4px solid #111;
         }
-        .ctrl-btn:active { background: #e5e7eb; color: #111827; }
-        #btn-up { grid-column: 2; grid-row: 1; }
-        #btn-left { grid-column: 1; grid-row: 2; }
-        #btn-right { grid-column: 3; grid-row: 2; }
-        #btn-down { grid-column: 2; grid-row: 3; }
+        .ctrl-btn {
+            background: #555; border: 2px solid #222;
+            color: #111; font-size: 20px; display: flex; justify-content: center; align-items: center; user-select: none;
+        }
+        .ctrl-btn:active { background: #333; }
+        #btn-up { grid-column: 2; grid-row: 1; border-radius: 8px 8px 0 0; border-bottom: none; }
+        #btn-left { grid-column: 1; grid-row: 2; border-radius: 8px 0 0 8px; border-right: none; }
+        #btn-right { grid-column: 3; grid-row: 2; border-radius: 0 8px 8px 0; border-left: none; }
+        #btn-down { grid-column: 2; grid-row: 3; border-radius: 0 0 8px 8px; border-top: none; }
+        .d-pad-center { grid-column: 2; grid-row: 2; background: #555; } /* Center of the cross */
 
         @media (max-width: 900px) {
             .layout-container { flex-direction: column; }
@@ -103,32 +134,32 @@
 </head>
 <body>
 
-    <a href="index.html" class="back-btn">← Exit Community</a>
+    <a href="index.html" class="back-btn">◀ EXIT SIMULATION</a>
 
     <div class="page-header">
-        <h1>Welcome to Jon's Community</h1>
-        <p>A minimalist interactive space to explore my background.</p>
+        <h1>JON'S JOURNEY</h1>
+        <p>A 16-bit interactive space to explore my background.</p>
     </div>
 
     <div class="layout-container">
         <div class="left-column">
             <div class="panel">
-                <h3>Chat Log</h3>
-                <div style="background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; color: #475569; margin-bottom: 12px;">
-                    <span style="color: #3b82f6; font-weight: 600;">Server:</span> Welcome! The game is now active.
+                <h3>SYSTEM LOG</h3>
+                <div class="chat-msg">
+                    <span style="color: var(--poke-red); font-weight: bold;">OAK:</span> Welcome to the world of Engineering! The simulation is active.
                 </div>
-                <div style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 12px; border-radius: 8px; font-size: 0.85rem; align-self: flex-end;">
-                    <strong>Tip:</strong> You can now use WASD to walk, no clicking required!
+                <div class="chat-msg" style="border-color: #3b82f6;">
+                    <span style="color: #3b82f6; font-weight: bold;">TIP:</span> Use WASD to explore the tall grass and read the signposts.
                 </div>
             </div>
 
             <div class="panel" id="pc-instructions">
-                <h3>Instructions</h3>
+                <h3>CONTROLS</h3>
                 <div class="keyboard-layout">
                     <div class="key-row"><div class="key">W</div></div>
                     <div class="key-row"><div class="key">A</div><div class="key">S</div><div class="key">D</div></div>
                 </div>
-                <p class="instruction-text">Hold <strong>WASD</strong> or Arrow keys to walk.<br>Step on the desks to read details.</p>
+                <p class="instruction-text">Hold WASD or Arrow keys to walk.<br><br>Step up to signposts to interact.</p>
             </div>
         </div>
 
@@ -136,17 +167,18 @@
             <div id="game-wrapper">
                 
                 <div id="dialogue-overlay">
-                    <div id="dialogue-title">Building Name</div>
+                    <div id="dialogue-title">Signpost</div>
                     <div id="dialogue-text">Details go here...</div>
-                    <button id="close-dialogue">Close</button>
+                    <button id="close-dialogue">▼</button>
                 </div>
 
                 <div id="mobile-controls">
                     <div class="d-pad">
-                        <div class="ctrl-btn" id="btn-up"><i class="fas fa-chevron-up"></i></div>
-                        <div class="ctrl-btn" id="btn-left"><i class="fas fa-chevron-left"></i></div>
-                        <div class="ctrl-btn" id="btn-right"><i class="fas fa-chevron-right"></i></div>
-                        <div class="ctrl-btn" id="btn-down"><i class="fas fa-chevron-down"></i></div>
+                        <div class="ctrl-btn" id="btn-up"><i class="fas fa-caret-up"></i></div>
+                        <div class="ctrl-btn" id="btn-left"><i class="fas fa-caret-left"></i></div>
+                        <div class="d-pad-center"></div>
+                        <div class="ctrl-btn" id="btn-right"><i class="fas fa-caret-right"></i></div>
+                        <div class="ctrl-btn" id="btn-down"><i class="fas fa-caret-down"></i></div>
                     </div>
                 </div>
 
@@ -155,19 +187,19 @@
     </div>
 
     <script>
-        // --- NATIVE KEYBOARD OVERRIDE (BULLETPROOF) ---
-        let activeKeys = { up: false, down: false, left: false, right: false };
+        // --- NATIVE KEYBOARD OVERRIDE ---
+        let activeKeys = { up: false, down: false, left: false, right: false, space: false };
         
         window.addEventListener('keydown', (e) => {
             if (!e.key) return;
             const k = e.key.toLowerCase();
-            if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.code) > -1) {
-                e.preventDefault();
-            }
+            if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.code) > -1) { e.preventDefault(); }
+            
             if (k === 'w' || e.code === 'ArrowUp')    activeKeys.up    = true;
             if (k === 'a' || e.code === 'ArrowLeft')  activeKeys.left  = true;
             if (k === 's' || e.code === 'ArrowDown')  activeKeys.down  = true;
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = true;
+            if (e.code === 'Space') activeKeys.space = true;
         }, { passive: false });
 
         window.addEventListener('keyup', (e) => {
@@ -177,14 +209,18 @@
             if (k === 'a' || e.code === 'ArrowLeft')  activeKeys.left  = false;
             if (k === 's' || e.code === 'ArrowDown')  activeKeys.down  = false;
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = false;
+            if (e.code === 'Space') {
+                activeKeys.space = false;
+                // Allow spacebar to close dialogue like the 'A' button
+                if (isDialogueOpen) closeDialogue();
+            }
         });
 
-        // ----------------------------------------------
-
+        // --- GAME CONSTANTS ---
         const WORLD_WIDTH  = 1600;
         const WORLD_HEIGHT = 1200;
-        const MOVE_SPEED   = 220;
-        const DIAG_SPEED   = MOVE_SPEED / Math.SQRT2; // ~155.6 for true diagonal speed
+        const MOVE_SPEED   = 200;
+        const DIAG_SPEED   = MOVE_SPEED / Math.SQRT2; 
 
         const resumeData = [
             { id: 'elem',      x: 300,  y: 1000, title: "Primary Education",  text: "<strong>Jose G. Peralta Memorial School</strong><br>Valedictorian (2011-2017)" },
@@ -192,10 +228,10 @@
             { id: 'shs',       x: 300,  y: 600,  title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>With High Honor (2021-2023)" },
             { id: 'college',   x: 300,  y: 400,  title: "PUP College",        text: "<strong>B.S. Electronics Engineering</strong><br>Affiliations: OECES, IECEP Batangas." },
             { id: 'work',      x: 800,  y: 600,  title: "Work Experience",    text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." },
-            { id: 'skill_prog',x: 1300, y: 1000, title: "Programming",        text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack applications.</em>" },
-            { id: 'skill_hw',  x: 1300, y: 800,  title: "Embedded Sys",       text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and circuitry.</em>" },
-            { id: 'skill_sim', x: 1300, y: 600,  title: "Simulation",         text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex systems and blueprints.</em>" },
-            { id: 'proj_calc', x: 900,  y: 200,  title: "Eng. Tools",         text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built to solve math problems.</em>" },
+            { id: 'skill_prog',x: 1300, y: 1000, title: "Programming",        text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack apps.</em>" },
+            { id: 'skill_hw',  x: 1300, y: 800,  title: "Embedded Sys",       text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and circuits.</em>" },
+            { id: 'skill_sim', x: 1300, y: 600,  title: "Simulation",         text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex blueprints.</em>" },
+            { id: 'proj_calc', x: 900,  y: 200,  title: "Eng. Tools",         text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built for math.</em>" },
             { id: 'proj_game', x: 1100, y: 200,  title: "Games",              text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048.<br><em>Game development testing complex logic.</em>" },
             { id: 'proj_ai',   x: 1300, y: 200,  title: "Eiji AI",            text: "<strong>Project:</strong> Eiji / D Dwarf Mini.<br><em>A sleek conversational assistant powered by Groq LPUs.</em>" }
         ];
@@ -203,73 +239,91 @@
         const config = {
             type: Phaser.AUTO,
             scale: { mode: Phaser.Scale.FIT, parent: 'game-wrapper', width: 800, height: 600 },
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#98c870', // Pokémon Grass Green
+            pixelArt: true, // Crisper rendering for retro shapes
             physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
             scene: { create: create, update: update }
         };
 
         const game = new Phaser.Game(config);
 
-        let player, playerLabel;
+        let player, playerShadow;
         let isDialogueOpen = false;
 
         function create() {
             this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-            // Dot-grid background
+            // Draw Tall Grass Texture
             let graphics = this.add.graphics();
-            graphics.fillStyle(0xcbd5e1, 1);
-            for (let i = 0; i < WORLD_WIDTH; i += 40) {
-                for (let j = 0; j < WORLD_HEIGHT; j += 40) {
-                    graphics.fillPoint(i, j, 2);
+            graphics.fillStyle(0x78a850, 1); // Darker green tufts
+            for (let i = 0; i < WORLD_WIDTH; i += 60) {
+                for (let j = 0; j < WORLD_HEIGHT; j += 60) {
+                    graphics.fillRect(i, j, 8, 8);
+                    graphics.fillRect(i + 8, j + 8, 8, 8);
                 }
             }
 
-            // Helper: draw a desk sprite
-            const createDesk = (scene, x, y, title) => {
-                scene.add.rectangle(x, y + 8, 70, 40, 0x000000, 0.05);
-                let desk = scene.add.rectangle(x, y, 70, 40, 0xffffff);
-                desk.setStrokeStyle(2, 0xcbd5e1);
-                scene.add.rectangle(x, y - 8, 40, 12, 0xe2e8f0);
-                scene.add.text(x, y + 30, title, {
-                    fontFamily: 'Inter', fontSize: '12px', fill: '#475569', fontStyle: '600'
+            // Draw "Paths" (Dirt routes) connecting areas
+            graphics.fillStyle(0xdfc898, 1); // Dirt brown
+            graphics.fillRect(250, 350, 100, 700); // Left path
+            graphics.fillRect(1250, 150, 100, 900); // Right path
+            graphics.fillRect(250, 600, 1100, 100); // Middle cross path
+            graphics.fillRect(800, 150, 500, 100); // Top cross path
+
+            // Helper: Draw a Pokémon-style wooden signpost
+            const createSignpost = (scene, x, y, title) => {
+                // Shadow
+                scene.add.ellipse(x, y + 25, 40, 15, 0x000000, 0.2);
+                // Post
+                scene.add.rectangle(x, y + 15, 10, 20, 0x5c4033);
+                // Wooden Board
+                let board = scene.add.rectangle(x, y, 50, 35, 0x8b5a2b);
+                board.setStrokeStyle(4, 0x5c4033);
+                // Text label hovering above
+                scene.add.text(x, y - 35, title, {
+                    fontFamily: '"Press Start 2P"', fontSize: '10px', fill: '#ffffff', 
+                    stroke: '#000000', strokeThickness: 4
                 }).setOrigin(0.5);
             };
 
-            // Helper: draw a dotted zone (for Work Experience)
-            const createDottedZone = (scene, x, y, width, height, title) => {
-                let fill = scene.add.rectangle(x, y, width, height, 0xf1f5f9, 0.6);
-                fill.setStrokeStyle(2, 0x94a3b8);
-                scene.add.text(x, y - 20, title, {
-                    fontFamily: 'Inter', fontSize: '15px', fill: '#1e293b', fontStyle: '700'
-                }).setOrigin(0.5);
-                scene.add.text(x, y + 10, "CodeCred.dev", {
-                    fontFamily: 'Inter', fontSize: '11px', fill: '#64748b'
+            // Helper: Draw a building/Gym for Work Experience
+            const createGymZone = (scene, x, y, width, height, title) => {
+                scene.add.rectangle(x, y + height/2, width + 20, 20, 0x000000, 0.2); // Shadow
+                let building = scene.add.rectangle(x, y, width, height, 0xd0d0d0);
+                building.setStrokeStyle(6, 0x505050);
+                // Roof
+                scene.add.rectangle(x, y - height/2 + 15, width + 10, 30, 0x3c5aa6); 
+                // Door
+                scene.add.rectangle(x, y + height/2 - 20, 40, 40, 0x5c4033); 
+                
+                scene.add.text(x, y - height/2 - 20, "GYM: " + title, {
+                    fontFamily: '"Press Start 2P"', fontSize: '14px', fill: '#ffcb05', 
+                    stroke: '#3c5aa6', strokeThickness: 6
                 }).setOrigin(0.5);
             };
 
-            // ── Draw all station visuals FIRST ──
+            // ── Draw Environment ──
             resumeData.forEach(data => {
                 if (data.id === 'work') {
-                    createDottedZone(this, data.x, data.y, 220, 120, data.title);
+                    createGymZone(this, data.x, data.y, 220, 120, data.title);
                 } else {
-                    createDesk(this, data.x, data.y, data.title);
+                    createSignpost(this, data.x, data.y, data.title);
                 }
             });
 
-            // ── Create player SECOND so it renders above desks ──
-            player = this.add.rectangle(800, 1050, 24, 24, 0x3b82f6);
+            // ── Create Retro "Trainer" Player ──
+            playerShadow = this.add.ellipse(800, 1065, 30, 15, 0x000000, 0.3);
+            
+            // Simple blocky character (Red hat/shirt vibe)
+            player = this.add.rectangle(800, 1050, 28, 36, 0xe53935);
+            player.setStrokeStyle(4, 0x8e0000);
             this.physics.add.existing(player);
             player.body.setCollideWorldBounds(true);
 
-            playerLabel = this.add.text(800, 1075, "Jon Lewyn", {
-                fontFamily: 'Inter', fontSize: '12px', fill: '#3b82f6', fontStyle: '700'
-            }).setOrigin(0.5);
-
-            // ── Register overlap triggers AFTER player exists ──
+            // ── Register Triggers ──
             resumeData.forEach(data => {
-                const w = data.id === 'work' ? 220 : 70;
-                const h = data.id === 'work' ? 120 : 40;
+                const w = data.id === 'work' ? 240 : 60;
+                const h = data.id === 'work' ? 140 : 60;
                 createTrigger(this, data.x, data.y, w, h, data);
             });
 
@@ -278,15 +332,16 @@
 
             setupMobileControls();
 
-            document.getElementById('close-dialogue')
-                .addEventListener('click', closeDialogue);
+            // Click listener for the dialogue overlay itself (to close easily)
+            document.getElementById('dialogue-overlay').addEventListener('click', closeDialogue);
         }
 
         function update() {
-            if (!player || !playerLabel) return;
+            if (!player || !playerShadow) return;
 
-            playerLabel.x = player.x;
-            playerLabel.y = player.y + 25;
+            // Keep shadow attached to player feet
+            playerShadow.x = player.x;
+            playerShadow.y = player.y + 15;
 
             if (isDialogueOpen) {
                 player.body.setVelocity(0, 0);
@@ -308,11 +363,15 @@
             if (goDown)  velY =  speed;
 
             player.body.setVelocity(velX, velY);
+            
+            // Simple "walking" bob animation
+            if (velX !== 0 || velY !== 0) {
+                player.y += Math.sin(this.time.now / 50) * 1.5;
+            }
         }
 
         function createTrigger(scene, x, y, width, height, data) {
-            // Slightly larger hitbox than visual for easier triggering
-            let pad = scene.add.rectangle(x, y, width + 20, height + 20, 0x000000, 0);
+            let pad = scene.add.rectangle(x, y, width, height, 0x000000, 0);
             scene.physics.add.existing(pad, true);
 
             scene.physics.add.overlap(player, pad, () => {
@@ -324,7 +383,6 @@
 
         function showDialogue(title, text) {
             isDialogueOpen = true;
-            // Clear keys so player doesn't keep drifting direction after dialogue opens
             activeKeys.up = false; activeKeys.down = false;
             activeKeys.left = false; activeKeys.right = false;
 
@@ -335,12 +393,8 @@
 
         function closeDialogue() {
             document.getElementById('dialogue-overlay').style.display = 'none';
-
-            // Small delay before re-enabling movement so the overlap doesn't instantly
-            // re-trigger if the player is still standing on the zone
-            setTimeout(() => {
-                isDialogueOpen = false;
-            }, 400);
+            // Small cooldown so you don't instantly re-trigger the sign
+            setTimeout(() => { isDialogueOpen = false; }, 400);
         }
 
         function setupMobileControls() {
