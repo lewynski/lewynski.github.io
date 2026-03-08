@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lewyn's Journey - GBA Edition</title>
+    <title>Jon's Journey - GBA Edition</title>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     
@@ -137,8 +137,8 @@
     <a href="index.html" class="back-btn">◀ EXIT SIMULATION</a>
 
     <div class="page-header">
-        <h1>LEWYN'S JOURNEY</h1>
-        <p>A 18-bit interactive space to explore my background.</p>
+        <h1>JON'S JOURNEY</h1>
+        <p>A 16-bit interactive space to explore my background.</p>
     </div>
 
     <div class="layout-container">
@@ -211,7 +211,7 @@
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = false;
             if (e.code === 'Space') {
                 activeKeys.space = false;
-                // Allow spacebar to close dialogue like the 'A' button
+                // Allow spacebar to close dialogue
                 if (isDialogueOpen) closeDialogue();
             }
         });
@@ -239,8 +239,8 @@
         const config = {
             type: Phaser.AUTO,
             scale: { mode: Phaser.Scale.FIT, parent: 'game-wrapper', width: 800, height: 600 },
-            backgroundColor: '#98c870', // Pokémon Grass Green
-            pixelArt: true, // Crisper rendering for retro shapes
+            backgroundColor: '#98c870', 
+            pixelArt: true, 
             physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
             scene: { create: create, update: update }
         };
@@ -248,14 +248,16 @@
         const game = new Phaser.Game(config);
 
         let player, playerShadow;
+        
+        // BUG FIX: Two separate flags for the UI and the Trigger Pads
         let isDialogueOpen = false;
+        let triggerCooldown = false; 
 
         function create() {
             this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-            // Draw Tall Grass Texture
             let graphics = this.add.graphics();
-            graphics.fillStyle(0x78a850, 1); // Darker green tufts
+            graphics.fillStyle(0x78a850, 1); 
             for (let i = 0; i < WORLD_WIDTH; i += 60) {
                 for (let j = 0; j < WORLD_HEIGHT; j += 60) {
                     graphics.fillRect(i, j, 8, 8);
@@ -263,46 +265,35 @@
                 }
             }
 
-            // Draw "Paths" (Dirt routes) connecting areas
-            graphics.fillStyle(0xdfc898, 1); // Dirt brown
-            graphics.fillRect(250, 350, 100, 700); // Left path
-            graphics.fillRect(1250, 150, 100, 900); // Right path
-            graphics.fillRect(250, 600, 1100, 100); // Middle cross path
-            graphics.fillRect(800, 150, 500, 100); // Top cross path
+            graphics.fillStyle(0xdfc898, 1); 
+            graphics.fillRect(250, 350, 100, 700); 
+            graphics.fillRect(1250, 150, 100, 900); 
+            graphics.fillRect(250, 600, 1100, 100); 
+            graphics.fillRect(800, 150, 500, 100); 
 
-            // Helper: Draw a Pokémon-style wooden signpost
             const createSignpost = (scene, x, y, title) => {
-                // Shadow
                 scene.add.ellipse(x, y + 25, 40, 15, 0x000000, 0.2);
-                // Post
                 scene.add.rectangle(x, y + 15, 10, 20, 0x5c4033);
-                // Wooden Board
                 let board = scene.add.rectangle(x, y, 50, 35, 0x8b5a2b);
                 board.setStrokeStyle(4, 0x5c4033);
-                // Text label hovering above
                 scene.add.text(x, y - 35, title, {
                     fontFamily: '"Press Start 2P"', fontSize: '10px', fill: '#ffffff', 
                     stroke: '#000000', strokeThickness: 4
                 }).setOrigin(0.5);
             };
 
-            // Helper: Draw a building/Gym for Work Experience
             const createGymZone = (scene, x, y, width, height, title) => {
-                scene.add.rectangle(x, y + height/2, width + 20, 20, 0x000000, 0.2); // Shadow
+                scene.add.rectangle(x, y + height/2, width + 20, 20, 0x000000, 0.2); 
                 let building = scene.add.rectangle(x, y, width, height, 0xd0d0d0);
                 building.setStrokeStyle(6, 0x505050);
-                // Roof
                 scene.add.rectangle(x, y - height/2 + 15, width + 10, 30, 0x3c5aa6); 
-                // Door
                 scene.add.rectangle(x, y + height/2 - 20, 40, 40, 0x5c4033); 
-                
                 scene.add.text(x, y - height/2 - 20, "GYM: " + title, {
                     fontFamily: '"Press Start 2P"', fontSize: '14px', fill: '#ffcb05', 
                     stroke: '#3c5aa6', strokeThickness: 6
                 }).setOrigin(0.5);
             };
 
-            // ── Draw Environment ──
             resumeData.forEach(data => {
                 if (data.id === 'work') {
                     createGymZone(this, data.x, data.y, 220, 120, data.title);
@@ -311,16 +302,12 @@
                 }
             });
 
-            // ── Create Retro "Trainer" Player ──
             playerShadow = this.add.ellipse(800, 1065, 30, 15, 0x000000, 0.3);
-            
-            // Simple blocky character (Red hat/shirt vibe)
             player = this.add.rectangle(800, 1050, 28, 36, 0xe53935);
             player.setStrokeStyle(4, 0x8e0000);
             this.physics.add.existing(player);
             player.body.setCollideWorldBounds(true);
 
-            // ── Register Triggers ──
             resumeData.forEach(data => {
                 const w = data.id === 'work' ? 240 : 60;
                 const h = data.id === 'work' ? 140 : 60;
@@ -332,17 +319,16 @@
 
             setupMobileControls();
 
-            // Click listener for the dialogue overlay itself (to close easily)
             document.getElementById('dialogue-overlay').addEventListener('click', closeDialogue);
         }
 
         function update() {
             if (!player || !playerShadow) return;
 
-            // Keep shadow attached to player feet
             playerShadow.x = player.x;
             playerShadow.y = player.y + 15;
 
+            // If the text box is open, lock player movement
             if (isDialogueOpen) {
                 player.body.setVelocity(0, 0);
                 return;
@@ -364,7 +350,6 @@
 
             player.body.setVelocity(velX, velY);
             
-            // Simple "walking" bob animation
             if (velX !== 0 || velY !== 0) {
                 player.y += Math.sin(this.time.now / 50) * 1.5;
             }
@@ -375,7 +360,8 @@
             scene.physics.add.existing(pad, true);
 
             scene.physics.add.overlap(player, pad, () => {
-                if (!isDialogueOpen) {
+                // BUG FIX: Check both flags before opening
+                if (!isDialogueOpen && !triggerCooldown) {
                     showDialogue(data.title, data.text);
                 }
             });
@@ -393,8 +379,13 @@
 
         function closeDialogue() {
             document.getElementById('dialogue-overlay').style.display = 'none';
-            // Small cooldown so you don't instantly re-trigger the sign
-            setTimeout(() => { isDialogueOpen = false; }, 400);
+            
+            // 1. Instantly unfreeze the player so they can walk away
+            isDialogueOpen = false; 
+            
+            // 2. Start a 1-second cooldown so the sign doesn't instantly re-trigger
+            triggerCooldown = true;
+            setTimeout(() => { triggerCooldown = false; }, 1000);
         }
 
         function setupMobileControls() {
