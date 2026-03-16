@@ -67,7 +67,7 @@
         }
         .logo { color: var(--retro-green); font-size: 1rem; text-shadow: 3px 3px 0px var(--border-dark); }
         
-        /* Pushes the links and the theme button to the far right */
+        /* Desktop Navigation Links */
         .nav-links { 
             display: flex; align-items: center; gap: 25px; 
             margin-left: auto; 
@@ -95,13 +95,19 @@
         .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* Theme button styling and spacing */
         .theme-toggle-btn {
             background: none; border: none; font-size: 1.2rem;
             color: var(--retro-gold); margin-left: 30px;
             transition: transform 0.2s ease; display: flex; align-items: center;
         }
         .theme-toggle-btn:hover { transform: scale(1.2) rotate(15deg); color: var(--retro-pink); }
+
+        /* Hidden Mobile Hamburger Icon by default */
+        .mobile-menu-btn {
+            display: none; background: none; border: none; font-size: 1.5rem;
+            color: var(--text-main); cursor: pointer; margin-left: 20px; transition: color 0.2s;
+        }
+        .mobile-menu-btn:hover { color: var(--retro-pink); }
 
         /* --- HERO SECTION WITH PARTICLES --- */
         .hero-container { 
@@ -135,10 +141,14 @@
             image-rendering: pixelated; 
         }
         
+        /* Fixed width ensures box doesn't resize while typing */
         .status-badge {
-            display: inline-block; background: #000; color: var(--retro-green);
+            display: inline-flex; align-items: center; justify-content: flex-start;
+            background: #000; color: var(--retro-green);
             padding: 10px 15px; border: 2px solid var(--retro-green);
-            font-size: 0.6rem; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-dark);
+            font-size: 0.6rem; margin: 0 auto 20px auto; 
+            box-shadow: 4px 4px 0px var(--border-dark);
+            min-width: 280px; height: 38px; text-align: left;
         }
         .blinking-cursor {
             display: inline-block; width: 8px; height: 10px; background-color: var(--retro-green);
@@ -222,31 +232,37 @@
 
         /* --- RESPONSIVE MOBILE FIX --- */
         @media (max-width: 900px) {
-            nav { padding: 20px; }
-            .logo { width: auto; order: 1; }
+            nav { padding: 15px 20px; }
+            .logo { font-size: 1.2rem; order: 1; }
             
-            /* Theme button stays next to logo */
-            .theme-toggle-btn { margin-left: auto; order: 2; } 
+            /* Show theme & hamburger menu on the right */
+            .theme-toggle-btn { margin-left: auto; order: 2; font-size: 1.5rem; } 
+            .mobile-menu-btn { display: block; order: 3; }
             
-            /* Nav links stack neatly below */
+            /* Hide nav links behind the hamburger menu */
             .nav-links { 
+                display: none; 
                 width: 100%; flex-direction: column; gap: 0; align-items: stretch;
-                margin-top: 25px; border: 4px solid var(--border-dark);
-                background: var(--bg-color); box-shadow: 6px 6px 0px var(--border-dark);
-                margin-left: 0; order: 3;
+                margin-top: 20px; border: 4px solid var(--border-dark);
+                background: var(--panel-bg); box-shadow: 6px 6px 0px var(--border-dark);
+                margin-left: 0; order: 4; border-radius: 8px; overflow: hidden;
             }
-            .nav-links a, .dropbtn { 
-                width: 100%; padding: 20px; justify-content: flex-start;
-                border-bottom: 2px solid var(--border-dark);
-            }
-            .nav-links > *:last-child { border-bottom: none; }
+            .nav-links.show { display: flex; } /* Toggled by JS */
             
-            .dropdown { width: 100%; flex-direction: column; align-items: flex-start; }
-            .dropdown-content { 
-                position: relative; width: 100%; border: none; box-shadow: none;
-                border-top: 2px dashed var(--border-dark); background: rgba(0,0,0,0.1);
+            .nav-links a, .dropbtn { 
+                width: 100%; padding: 18px; justify-content: center;
+                border-bottom: 2px solid var(--border-dark); font-size: 0.7rem;
             }
-            .dropdown:hover .dropdown-content { display: block; }
+            .nav-links > *:last-child, .nav-links > *:last-child .dropbtn { border-bottom: none; }
+            
+            .dropdown { width: 100%; flex-direction: column; align-items: stretch; }
+            .dropbtn { width: 100%; justify-content: center; }
+            .dropdown-content { 
+                position: static; width: 100%; border: none; box-shadow: none;
+                border-top: 2px dashed var(--border-dark); background: var(--bg-color);
+                display: none;
+            }
+            .dropdown.active .dropdown-content { display: block; } /* Toggled by JS */
             
             h1 { font-size: 1.2rem; }
         }
@@ -257,6 +273,13 @@
     <nav>
         <div class="logo">UNFILTERED</div>
         
+        <button id="theme-btn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
+            <i class="fas fa-sun"></i>
+        </button>
+        <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
@@ -272,10 +295,6 @@
                 </div>
             </div>
         </div>
-
-        <button id="theme-btn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
-            <i class="fas fa-sun"></i>
-        </button>
     </nav>
 
     <header class="hero-container">
@@ -286,8 +305,10 @@
                 <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
             </div>
             
-            <div class="status-badge">
-                > <span id="typewriter-text"></span><span class="blinking-cursor"></span>
+            <div class="status-badge-container">
+                <div class="status-badge">
+                    > <span id="typewriter-text"></span><span class="blinking-cursor"></span>
+                </div>
             </div>
 
             <h1>Hello, I'm <br><span class="gradient-text">Jon Lewyn</span></h1>
@@ -403,7 +424,31 @@
             }
         });
 
-        // --- 1. TYPEWRITER EFFECT ---
+        // --- 1. MOBILE HAMBURGER MENU ---
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const navMenu = document.querySelector('.nav-links');
+        
+        mobileBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('show');
+            const icon = mobileBtn.querySelector('i');
+            if(navMenu.classList.contains('show')) {
+                icon.classList.replace('fa-bars', 'fa-times');
+            } else {
+                icon.classList.replace('fa-times', 'fa-bars');
+            }
+        });
+
+        // Toggles Dropdown on Mobile click
+        const dropBtn = document.querySelector('.dropbtn');
+        const dropdown = document.querySelector('.dropdown');
+        dropBtn.addEventListener('click', (e) => {
+            if(window.innerWidth <= 900) {
+                e.preventDefault();
+                dropdown.classList.toggle('active');
+            }
+        });
+
+        // --- 2. TYPEWRITER EFFECT ---
         const statuses = [
             "STATUS: AVAILABLE", 
             "BUILDING NEW PROJECTS", 
@@ -439,7 +484,7 @@
         }
         typeEffect();
 
-        // --- 2. PIXEL PARTICLES GENERATOR ---
+        // --- 3. PIXEL PARTICLES GENERATOR ---
         const particleCanvas = document.getElementById('particle-canvas');
         const colors = ['#4ade80', '#3b82f6', '#bd93f9', '#ff79c6']; 
 
