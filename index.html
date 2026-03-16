@@ -47,7 +47,7 @@
             linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
             background-size: 30px 30px;
             overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s; /* Smooth theme transition */
+            transition: background-color 0.3s, color 0.3s;
         }
 
         a, button, .dropbtn { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
@@ -66,15 +66,19 @@
             transition: background-color 0.3s;
         }
         .logo { color: var(--retro-green); font-size: 1rem; text-shadow: 3px 3px 0px var(--border-dark); }
-        .nav-links { display: flex; align-items: center; }
+        
+        /* Fixed Alignment for Desktop Links */
+        .nav-links { display: flex; align-items: center; gap: 25px; }
         .nav-links a, .dropbtn {
             color: var(--text-main); text-decoration: none; font-size: 0.6rem;
-            margin-left: 20px; background: none; border: none; font-family: inherit;
+            background: none; border: none; font-family: inherit;
             text-transform: uppercase; transition: color 0.3s;
+            display: inline-flex; align-items: center; /* Locks vertical alignment */
+            height: 100%;
         }
         .nav-links a:hover, .dropbtn:hover { color: var(--retro-pink); }
 
-        .dropdown { position: relative; display: inline-block; }
+        .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
         .dropdown-content {
             display: none; position: absolute; right: 0; top: 100%;
             background: var(--panel-bg); border: 4px solid var(--border-dark);
@@ -82,16 +86,15 @@
         }
         .dropdown-content a {
             display: block; padding: 15px; margin: 0; text-align: left;
-            border-bottom: 2px solid var(--border-dark);
+            border-bottom: 2px solid var(--border-dark); width: 100%;
         }
         .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* THEME TOGGLE BUTTON */
         .theme-toggle-btn {
-            background: none; border: none; font-size: 1rem;
-            color: var(--retro-gold); margin-left: 25px;
-            transition: transform 0.2s ease;
+            background: none; border: none; font-size: 1.2rem;
+            color: var(--retro-gold); margin-left: 10px;
+            transition: transform 0.2s ease; display: flex; align-items: center;
         }
         .theme-toggle-btn:hover { transform: scale(1.2) rotate(15deg); color: var(--retro-pink); }
 
@@ -127,7 +130,6 @@
             image-rendering: pixelated; 
         }
         
-        /* Interactive Typing Badge */
         .status-badge {
             display: inline-block; background: #000; color: var(--retro-green);
             padding: 10px 15px; border: 2px solid var(--retro-green);
@@ -213,11 +215,33 @@
         .social-links a { color: var(--text-main); font-size: 1.2rem; text-shadow: 2px 2px 0px var(--border-dark); transition: color 0.2s; }
         .social-links a:hover { color: var(--retro-blue); }
 
-        @media (max-width: 768px) {
-            nav { flex-direction: column; gap: 15px; }
-            .nav-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; }
-            .nav-links a, .dropbtn { margin-left: 0; }
-            .theme-toggle-btn { margin-left: 10px; }
+        /* --- RESPONSIVE MOBILE FIX --- */
+        @media (max-width: 900px) {
+            nav { flex-wrap: wrap; padding: 20px; }
+            .logo { width: auto; }
+            
+            /* Push the theme button to the top right next to the logo on mobile */
+            .theme-toggle-btn { margin-left: auto; } 
+            
+            /* Transform the nav links into a cool retro command box */
+            .nav-links { 
+                width: 100%; flex-direction: column; gap: 0; align-items: stretch;
+                margin-top: 25px; border: 4px solid var(--border-dark);
+                background: var(--bg-color); box-shadow: 6px 6px 0px var(--border-dark);
+            }
+            .nav-links a, .dropbtn { 
+                width: 100%; padding: 20px; justify-content: flex-start;
+                border-bottom: 2px solid var(--border-dark);
+            }
+            .nav-links > *:last-child { border-bottom: none; }
+            
+            .dropdown { width: 100%; flex-direction: column; align-items: flex-start; }
+            .dropdown-content { 
+                position: relative; width: 100%; border: none; box-shadow: none;
+                border-top: 2px dashed var(--border-dark); background: rgba(0,0,0,0.1);
+            }
+            .dropdown:hover .dropdown-content { display: block; }
+            
             h1 { font-size: 1.2rem; }
         }
     </style>
@@ -226,6 +250,11 @@
 
     <nav>
         <div class="logo">UNFILTERED</div>
+        
+        <button id="theme-btn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
+            <i class="fas fa-sun"></i>
+        </button>
+
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
@@ -240,10 +269,6 @@
                     <a href="projects/eiji-ai.html">Capy os AI</a>
                 </div>
             </div>
-            
-            <button id="theme-btn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
-                <i class="fas fa-sun"></i>
-            </button>
         </div>
     </nav>
 
@@ -351,7 +376,6 @@
         const themeIcon = themeBtn.querySelector('i');
         const body = document.documentElement;
 
-        // Check if user previously saved a theme preference
         const savedTheme = localStorage.getItem('arcade-theme');
         if (savedTheme === 'light') {
             body.setAttribute('data-theme', 'light');
@@ -361,13 +385,11 @@
 
         themeBtn.addEventListener('click', () => {
             if (body.getAttribute('data-theme') === 'light') {
-                // Switch to Dark
                 body.removeAttribute('data-theme');
                 localStorage.setItem('arcade-theme', 'dark');
                 themeIcon.classList.replace('fa-moon', 'fa-sun');
                 themeIcon.style.color = 'var(--retro-gold)';
             } else {
-                // Switch to Light
                 body.setAttribute('data-theme', 'light');
                 localStorage.setItem('arcade-theme', 'light');
                 themeIcon.classList.replace('fa-sun', 'fa-moon');
