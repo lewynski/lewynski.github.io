@@ -29,17 +29,15 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.8;
-            /* Retro cursor from your game */
             cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
-            /* Subtle grid background */
             background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
             linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
             background-size: 30px 30px;
+            overflow-x: hidden;
         }
 
         a, button, .dropbtn { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
 
-        /* Typography sizing for chunky font */
         h1 { font-size: 1.5rem; line-height: 1.5; margin-bottom: 10px; }
         h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--retro-pink); text-shadow: 2px 2px 0px var(--border-dark);}
         h3 { font-size: 0.8rem; margin-bottom: 10px; color: var(--retro-blue); }
@@ -50,6 +48,7 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 20px 40px; background: var(--panel-bg);
             border-bottom: 4px solid var(--border-dark);
+            position: relative; z-index: 10;
         }
         .logo { color: var(--retro-green); font-size: 1rem; text-shadow: 3px 3px 0px var(--border-dark); }
         .nav-links a, .dropbtn {
@@ -72,21 +71,50 @@
         .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* --- HERO SECTION --- */
-        .hero-container { text-align: center; padding: 60px 20px; }
+        /* --- HERO SECTION WITH PARTICLES --- */
+        .hero-container { 
+            position: relative; text-align: center; padding: 80px 20px; 
+            overflow: hidden; /* Keeps particles inside */
+        }
+        .hero-content { position: relative; z-index: 2; }
+        
+        #particle-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; /* Lets you click buttons through particles */
+        }
+
+        .pixel-particle {
+            position: absolute; width: 6px; height: 6px; opacity: 0.6;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0; }
+            100% { transform: translateY(-150px); opacity: 0; }
+        }
+
         .profile-frame { margin-bottom: 20px; }
         .profile-pic {
             width: 160px; height: 160px; object-fit: cover;
             border: 4px solid var(--border-dark);
             box-shadow: 8px 8px 0px var(--retro-blue);
-            /* Forces images to look blocky/pixelated */
             image-rendering: pixelated; 
         }
-        .badge {
-            display: inline-block; background: var(--retro-green); color: #000;
-            padding: 8px 12px; border: 4px solid var(--border-dark);
+        
+        /* Interactive Typing Badge */
+        .status-badge {
+            display: inline-block; background: #000; color: var(--retro-green);
+            padding: 10px 15px; border: 2px solid var(--retro-green);
             font-size: 0.6rem; margin-bottom: 20px; box-shadow: 4px 4px 0px var(--border-dark);
         }
+        .blinking-cursor {
+            display: inline-block; width: 8px; height: 10px; background-color: var(--retro-green);
+            margin-left: 5px; animation: blink 1s step-end infinite; vertical-align: middle;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
         .gradient-text { color: var(--retro-purple); text-shadow: 3px 3px 0px var(--border-dark); }
         .bio-text { max-width: 700px; margin: 0 auto 30px auto; }
 
@@ -102,23 +130,20 @@
         .btn-primary { background: var(--retro-blue); }
         .btn-secondary { background: var(--panel-bg); color: var(--text-main); }
         
-        /* The special RPG Button */
         .cta-buttons a[href="rpg-resume.html"] { background: var(--retro-green); color: #000; }
 
-        /* Button Press Animation */
         .btn-primary:active, .btn-secondary:active, .cta-buttons a[href="rpg-resume.html"]:active {
             transform: translate(4px, 4px);
             box-shadow: 2px 2px 0px var(--border-dark);
         }
 
         /* --- SKILLS GRID --- */
-        .skills-section { padding: 50px 20px; text-align: center; }
+        .skills-section { padding: 50px 20px; text-align: center; position: relative; z-index: 2; }
         .section-title { margin-bottom: 40px; }
         .skills-grid {
             display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1000px; margin: 0 auto;
         }
         
-        /* Pixel Cards */
         .skill-card {
             background: var(--panel-bg); width: 280px; padding: 25px;
             border: 4px solid var(--border-dark);
@@ -128,7 +153,6 @@
         .skill-card:hover { transform: translateY(-5px); }
         .icon-box { font-size: 2.5rem; color: var(--retro-pink); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
         
-        /* Badges */
         .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
         .tags span {
             background: #000; color: var(--retro-green); padding: 6px 8px;
@@ -149,9 +173,7 @@
             border: 4px solid var(--border-dark); padding: 15px;
             font-size: 0.6rem; outline: none; width: 100%;
         }
-        .contact-form input:focus, .contact-form textarea:focus {
-            border-color: var(--retro-pink);
-        }
+        .contact-form input:focus, .contact-form textarea:focus { border-color: var(--retro-pink); }
         .contact-form textarea { resize: vertical; min-height: 150px; }
         .contact-form button {
             background: var(--retro-pink); color: #fff; border: 4px solid var(--border-dark);
@@ -159,9 +181,7 @@
             text-transform: uppercase; box-shadow: 6px 6px 0px var(--border-dark);
             transition: all 0.1s; cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer;
         }
-        .contact-form button:active {
-            transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark);
-        }
+        .contact-form button:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
 
         /* --- FOOTER --- */
         footer {
@@ -202,11 +222,17 @@
     </nav>
 
     <header class="hero-container">
+        <div id="particle-canvas"></div>
+
         <div class="hero-content">
             <div class="profile-frame">
                 <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
             </div>
-            <span class="badge">ECE STUDENT & WEB DEVELOPER</span>
+            
+            <div class="status-badge">
+                > <span id="typewriter-text"></span><span class="blinking-cursor"></span>
+            </div>
+
             <h1>Hello, I'm <br><span class="gradient-text">Jon Lewyn</span></h1>
             <p class="bio-text">
                 An Electronics Engineering student at Polytechnic University of the Philippines Santo Tomas Campus with a passion for bridging the gap between hardware and software. 
@@ -215,19 +241,15 @@
             
             <div class="cta-buttons">
                 <a href="#skills" class="btn-primary">Tech Stack</a>
-                
                 <a href="https://github.com/lewynski" target="_blank" class="btn-secondary">
                     <i class="fab fa-github"></i> GitHub
                 </a>
-                
                 <a href="resume.html" class="btn-secondary">
                     <i class="fas fa-file-alt"></i> Resume
                 </a>
-
                 <a href="certificate.html" class="btn-secondary">
                     <i class="fas fa-certificate"></i> Certificate
                 </a>
-
                 <a href="rpg-resume.html" class="btn-primary">
                     <i class="fas fa-gamepad"></i> My life as a Game
                 </a>
@@ -250,7 +272,6 @@
                     <span>Python</span> <span>JS</span> <span>HTML/CSS</span> <span>Java</span> <span>C++</span>
                 </div>
             </div>
-
             <div class="skill-card">
                 <div class="icon-box"><i class="fas fa-microchip"></i></div>
                 <h3>Hardware</h3>
@@ -259,7 +280,6 @@
                     <span>Arduino</span> <span>FPGA</span> <span>TinkerCAD</span> <span>Proto Boarding</span>
                 </div>
             </div>
-
             <div class="skill-card">
                 <div class="icon-box"><i class="fas fa-drafting-compass"></i></div>
                 <h3>Simulation</h3>
@@ -299,5 +319,70 @@
         </div>
     </footer>
 
+    <script>
+        // --- 1. TYPEWRITER EFFECT ---
+        const statuses = [
+            "STATUS: AVAILABLE", 
+            "BUILDING NEW PROJECTS", 
+            "ECE STUDENT MODE: ACTIVE"
+        ];
+        let statusIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typeTarget = document.getElementById("typewriter-text");
+
+        function typeEffect() {
+            const currentText = statuses[statusIndex];
+            
+            if (isDeleting) {
+                typeTarget.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typeTarget.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            // Typing speeds
+            let typeSpeed = isDeleting ? 40 : 100;
+
+            // Logic for pausing at the end of a phrase and switching
+            if (!isDeleting && charIndex === currentText.length) {
+                typeSpeed = 2000; // Pause for 2 seconds when finished typing
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                statusIndex = (statusIndex + 1) % statuses.length; // Move to next phrase
+                typeSpeed = 500; // Pause before starting the next word
+            }
+
+            setTimeout(typeEffect, typeSpeed);
+        }
+        
+        // Start the typing animation
+        typeEffect();
+
+        // --- 2. PIXEL PARTICLES GENERATOR ---
+        const particleCanvas = document.getElementById('particle-canvas');
+        const colors = ['#4ade80', '#3b82f6', '#bd93f9', '#ff79c6']; // Green, Blue, Purple, Pink
+
+        function createParticles() {
+            for(let i = 0; i < 40; i++) {
+                let particle = document.createElement('div');
+                particle.className = 'pixel-particle';
+                
+                // Randomize position, color, and animation speed
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + 10 + '%'; // Start slightly below
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDuration = (Math.random() * 3 + 2) + 's'; // 2 to 5 seconds
+                particle.style.animationDelay = (Math.random() * 4) + 's';
+                
+                particleCanvas.appendChild(particle);
+            }
+        }
+
+        // Initialize particles
+        createParticles();
+    </script>
 </body>
 </html>
