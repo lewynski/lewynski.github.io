@@ -549,7 +549,7 @@
 
         // --- 4. GROQ AI CHAT INTEGRATION ---
         // ⚠️ DANGER: DO NOT LEAVE YOUR REAL API KEY HERE IF UPLOADING TO PUBLIC GITHUB ⚠️
-        const GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE"; 
+        const GROQ_API_KEY = "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"; 
         
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
@@ -600,7 +600,7 @@
             chatMessages.appendChild(loadingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            if (GROQ_API_KEY === "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") {
+            if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
                 document.getElementById(loadingId).textContent = "Error: Groq API Key not configured. Please add it to the code.";
                 return;
             }
