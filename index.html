@@ -70,7 +70,7 @@
         /* Desktop Navigation Links */
         .nav-links { 
             display: flex; align-items: center; gap: 25px; 
-            margin-left: auto; 
+            margin-left: auto; /* Pushes the links AND the buttons to the right */
         }
         
         .nav-links a, .dropbtn {
@@ -95,6 +95,7 @@
         .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
         .dropdown:hover .dropdown-content { display: block; }
 
+        /* PC Theme Button - Now on the far right */
         .theme-toggle-btn {
             background: none; border: none; font-size: 1.2rem;
             color: var(--retro-gold); margin-left: 30px;
@@ -141,7 +142,6 @@
             image-rendering: pixelated; 
         }
         
-        /* Fixed width ensures box doesn't resize while typing */
         .status-badge {
             display: inline-flex; align-items: center; justify-content: flex-start;
             background: #000; color: var(--retro-green);
@@ -233,10 +233,10 @@
         /* --- RESPONSIVE MOBILE FIX --- */
         @media (max-width: 900px) {
             nav { padding: 15px 20px; }
-            .logo { font-size: 1.2rem; order: 1; }
             
-            /* Show theme & hamburger menu on the right */
-            .theme-toggle-btn { margin-left: auto; order: 2; font-size: 1.5rem; } 
+            /* Logo stays left, Theme & Menu snap right */
+            .logo { font-size: 1.2rem; order: 1; margin-right: auto; }
+            .theme-toggle-btn { margin-left: 0; order: 2; font-size: 1.5rem; } 
             .mobile-menu-btn { display: block; order: 3; }
             
             /* Hide nav links behind the hamburger menu */
@@ -247,7 +247,7 @@
                 background: var(--panel-bg); box-shadow: 6px 6px 0px var(--border-dark);
                 margin-left: 0; order: 4; border-radius: 8px; overflow: hidden;
             }
-            .nav-links.show { display: flex; } /* Toggled by JS */
+            .nav-links.show { display: flex; } 
             
             .nav-links a, .dropbtn { 
                 width: 100%; padding: 18px; justify-content: center;
@@ -262,7 +262,7 @@
                 border-top: 2px dashed var(--border-dark); background: var(--bg-color);
                 display: none;
             }
-            .dropdown.active .dropdown-content { display: block; } /* Toggled by JS */
+            .dropdown.active .dropdown-content { display: block; }
             
             h1 { font-size: 1.2rem; }
         }
@@ -272,13 +272,6 @@
 
     <nav>
         <div class="logo">UNFILTERED</div>
-        
-        <button id="theme-btn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
-            <i class="fas fa-sun"></i>
-        </button>
-        <button id="mobile-menu-btn" class="mobile-menu-btn">
-            <i class="fas fa-bars"></i>
-        </button>
 
         <div class="nav-links">
             <a href="index.html">Home</a>
@@ -295,6 +288,13 @@
                 </div>
             </div>
         </div>
+
+        <button id="theme-btn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
+            <i class="fas fa-sun"></i>
+        </button>
+        <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
     </nav>
 
     <header class="hero-container">
