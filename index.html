@@ -180,7 +180,9 @@
         /* --- SKILLS GRID --- */
         .skills-section { padding: 50px 20px; text-align: center; position: relative; z-index: 2; }
         .section-title { margin-bottom: 40px; }
-        .skills-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1000px; margin: 0 auto; }
+        
+        /* Expanded max-width to allow 4 cards to sit in a row */
+        .skills-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1250px; margin: 0 auto; }
         
         .skill-card {
             background: var(--panel-bg); width: 280px; padding: 25px;
@@ -342,6 +344,7 @@
         </div>
 
         <div class="skills-grid">
+            
             <div class="skill-card">
                 <div class="icon-box"><i class="fas fa-code"></i></div>
                 <h3>Programming</h3>
@@ -350,6 +353,7 @@
                     <span>Python</span> <span>JS</span> <span>HTML/CSS</span> <span>Java</span> <span>C++</span>
                 </div>
             </div>
+            
             <div class="skill-card">
                 <div class="icon-box"><i class="fas fa-microchip"></i></div>
                 <h3>Hardware</h3>
@@ -358,6 +362,7 @@
                     <span>Arduino</span> <span>FPGA</span> <span>TinkerCAD</span> <span>Proto Boarding</span>
                 </div>
             </div>
+            
             <div class="skill-card">
                 <div class="icon-box"><i class="fas fa-drafting-compass"></i></div>
                 <h3>Simulation</h3>
@@ -366,6 +371,16 @@
                     <span>AutoCAD</span> <span>MATLAB</span> <span>Multisim</span> <span>Proteus</span>
                 </div>
             </div>
+
+            <div class="skill-card">
+                <div class="icon-box"><i class="fas fa-cogs"></i></div>
+                <h3>Productivity & Automation</h3>
+                <p>Data analysis, documentation, and task automation.</p>
+                <div class="tags">
+                    <span>MS Word</span> <span>Excel</span> <span>PowerPoint</span> <span>Macro</span>
+                </div>
+            </div>
+
         </div>
     </section>
 
