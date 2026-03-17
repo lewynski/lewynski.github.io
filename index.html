@@ -42,7 +42,6 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.8;
-            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
             background-image: linear-gradient(var(--grid-color) 2px, transparent 2px),
             linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
             background-size: 30px 30px;
@@ -50,7 +49,7 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        a, button, .dropbtn { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+        a, button, .dropbtn { cursor: pointer; }
 
         h1 { font-size: 1.5rem; line-height: 1.5; margin-bottom: 10px; }
         h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--retro-pink); text-shadow: 2px 2px 0px var(--border-dark);}
@@ -204,10 +203,9 @@
         }
         .chat-messages {
             height: 300px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
-            background: var(--bg-color); font-family: 'Arial', sans-serif; /* Readable font for chat */
+            background: var(--bg-color); font-family: 'Arial', sans-serif;
             font-size: 0.9rem; text-align: left;
         }
-        /* Scrollbar styling for chat */
         .chat-messages::-webkit-scrollbar { width: 8px; }
         .chat-messages::-webkit-scrollbar-thumb { background: var(--border-dark); }
 
@@ -224,7 +222,7 @@
         .chat-input-area button {
             background: var(--retro-green); color: #000; border: 4px solid var(--border-dark);
             padding: 0 20px; margin-left: 10px; font-family: 'Press Start 2P', cursive; font-size: 0.8rem;
-            transition: transform 0.1s;
+            transition: transform 0.1s; cursor: pointer;
         }
         .chat-input-area button:active { transform: translateY(2px); }
 
@@ -250,7 +248,7 @@
             background: var(--retro-pink); color: #fff; border: 4px solid var(--border-dark);
             padding: 15px; font-family: 'Press Start 2P', cursive; font-size: 0.7rem;
             text-transform: uppercase; box-shadow: 6px 6px 0px var(--border-dark);
-            transition: all 0.1s; cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer;
+            transition: all 0.1s; cursor: pointer;
         }
         .contact-form button:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
 
@@ -549,13 +547,12 @@
 
         // --- 4. GROQ AI CHAT INTEGRATION ---
         // ⚠️ DANGER: DO NOT LEAVE YOUR REAL API KEY HERE IF UPLOADING TO PUBLIC GITHUB ⚠️
-        const GROQ_API_KEY = "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"; 
+        const GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE"; 
         
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
 
-        // The AI Persona Context
         const systemPrompt = `You are Eiji AI, the personal AI assistant for Jon Lewyn Villaram Tanggaro. 
         You are embedded on his developer portfolio website. Keep answers concise, friendly, and slightly retro/cyberpunk in tone.
         
@@ -569,7 +566,6 @@
         
         If the user asks a question about Jon, answer accurately based on this data. If they just want to chat, be conversational and polite. Never output code formatting or markdown in your responses.`;
 
-        // Array to hold conversation history
         let conversationHistory = [
             { role: "system", content: systemPrompt }
         ];
@@ -579,19 +575,17 @@
             msgDiv.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-ai');
             msgDiv.textContent = message;
             chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight; 
         }
 
         async function handleSend() {
             const userText = chatInput.value.trim();
             if (!userText) return;
 
-            // Add user message to UI and History
             addMessageToUI(userText, 'user');
             conversationHistory.push({ role: "user", content: userText });
             chatInput.value = '';
 
-            // Add loading indicator
             const loadingId = "loading-" + Date.now();
             const loadingDiv = document.createElement('div');
             loadingDiv.classList.add('message', 'msg-ai');
@@ -601,12 +595,11 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
-                document.getElementById(loadingId).textContent = "Error: Groq API Key not configured. Please add it to the code.";
+                document.getElementById(loadingId).textContent = "Error: Groq API Key not configured.";
                 return;
             }
 
             try {
-                // Call Groq API
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: {
@@ -614,31 +607,35 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama3-8b-8192", // Fast, lightweight model perfect for chat
+                        model: "mixtral-8x7b-32768", 
                         messages: conversationHistory,
                         temperature: 0.7,
-                        max_tokens: 150 // Keep responses snappy
+                        max_tokens: 150 
                     })
                 });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    console.error("🔍 GROQ DETAILED ERROR:", errorDetails);
+                    throw new Error(`Groq rejected the request: ${errorDetails.error?.message || "Unknown 400 Error"}`);
+                }
 
                 const data = await response.json();
                 
                 if (data.choices && data.choices.length > 0) {
                     const aiResponse = data.choices[0].message.content;
                     
-                    // Remove loading and add real message
                     document.getElementById(loadingId).remove();
                     addMessageToUI(aiResponse, 'ai');
                     
-                    // Save to history so it remembers context
                     conversationHistory.push({ role: "assistant", content: aiResponse });
                 } else {
-                    throw new Error("Invalid API response");
+                    throw new Error("Invalid API response format");
                 }
 
             } catch (error) {
                 console.error("Chat Error:", error);
-                document.getElementById(loadingId).textContent = "System error: Connection to Groq servers lost.";
+                document.getElementById(loadingId).textContent = error.message;
             }
         }
 
