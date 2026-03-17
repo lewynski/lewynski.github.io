@@ -4,198 +4,196 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume | Jon Lewyn Tanggaro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Modern Dark Theme */
+        /* Retro Arcade Theme */
         :root {
-            --bg-main: #0f172a;
-            --bg-card: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-blue: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.5);
-            --border-color: #334155;
+            --bg-color: #1e1e2f;
+            --panel-bg: #2a2a40;
+            --text-main: #f8f8f2;
+            --text-muted: #a8a8b2;
+            --retro-green: #4ade80;
+            --retro-blue: #3b82f6;
+            --retro-purple: #bd93f9;
+            --retro-pink: #ff79c6;
+            --retro-gold: #facc15;
+            --border-dark: #000000;
         }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background-color: var(--bg-main);
+            background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: 'Inter', sans-serif;
+            font-family: 'VT323', monospace; /* Highly readable retro font for body */
+            font-size: 1.2rem;
             line-height: 1.6;
-            margin: 0;
+            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
+            background-size: 30px 30px;
             padding: 40px 20px;
         }
 
+        a, button { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+
+        .back-btn {
+            display: inline-block; margin-bottom: 30px;
+            background: var(--panel-bg); color: var(--text-main);
+            padding: 12px 16px; text-decoration: none; 
+            font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
+            border: 4px solid var(--border-dark);
+            box-shadow: 4px 4px 0px var(--border-dark);
+            transition: all 0.1s;
+        }
+        .back-btn:hover { background: var(--retro-blue); }
+        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
         .resume-container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            overflow: hidden;
+            background: var(--panel-bg);
+            border: 6px solid var(--border-dark);
+            box-shadow: 15px 15px 0px var(--border-dark);
             position: relative;
         }
 
         /* Top Header */
         .header {
-            padding: 50px 40px;
-            border-bottom: 1px solid var(--border-color);
-            position: relative;
-            background: radial-gradient(circle at top left, #1e3a8a 0%, var(--bg-card) 60%);
+            padding: 40px;
+            border-bottom: 6px dashed var(--border-dark);
+            background: #1e1e2f;
             display: flex;
             align-items: center;
             gap: 30px;
+            position: relative;
         }
 
         .header-pic {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent-blue);
-            box-shadow: 0 0 20px var(--accent-glow);
+            width: 140px; height: 140px; object-fit: cover;
+            border: 4px solid var(--border-dark);
+            box-shadow: 6px 6px 0px var(--retro-blue);
+            image-rendering: pixelated;
+            background: #000;
         }
 
         .header-content { flex: 1; }
 
         h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin: 0 0 5px 0;
-            background: linear-gradient(to right, #60a5fa, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.3rem; color: var(--retro-gold);
+            text-shadow: 3px 3px 0px var(--border-dark);
+            margin: 0 0 15px 0; line-height: 1.4;
         }
 
         .title {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 15px;
-            font-family: 'Fira Code', monospace;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem; color: var(--retro-green);
+            margin-bottom: 20px;
         }
 
         .contact-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
+            display: flex; flex-wrap: wrap; gap: 15px;
+            font-size: 1.1rem; color: var(--text-main);
         }
 
         .contact-info a, .contact-info span {
-            color: var(--text-muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: var(--text-main); text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
             transition: color 0.2s;
         }
-
-        .contact-info a:hover { color: var(--accent-blue); }
+        .contact-info i { color: var(--retro-pink); }
+        .contact-info a:hover { color: var(--retro-blue); }
 
         /* PDF Download Button */
         .download-btn {
-            position: absolute;
-            top: 40px;
-            right: 40px;
-            background: var(--accent-blue);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 15px var(--accent-glow);
+            position: absolute; top: 30px; right: 30px;
+            background: var(--retro-purple); color: #fff;
+            padding: 15px; border: 4px solid var(--border-dark);
+            box-shadow: 6px 6px 0px var(--border-dark);
+            text-decoration: none; font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem; display: flex; align-items: center; gap: 8px;
+            transition: all 0.1s;
         }
-
-        .download-btn:hover { background: #2563eb; transform: translateY(-2px); }
+        .download-btn:hover { background: var(--retro-pink); }
+        .download-btn:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
 
         /* Layout Grid */
         .content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 40px;
-            padding: 40px;
+            display: grid; grid-template-columns: 2fr 1fr;
+            gap: 40px; padding: 40px;
         }
 
         /* Sections */
         .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem; color: var(--retro-blue);
+            margin-bottom: 30px; display: flex; align-items: center; gap: 15px;
+            border-bottom: 4px solid var(--border-dark);
+            padding-bottom: 15px; text-shadow: 2px 2px 0px var(--border-dark);
         }
-
-        .section-title i { color: var(--accent-blue); }
+        .section-title i { color: var(--retro-gold); }
 
         /* Items */
-        .item { margin-bottom: 30px; }
-        .item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-        .item-title { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
-        .item-subtitle { color: var(--accent-blue); font-weight: 600; font-size: 0.95rem; }
-        .item-date { color: var(--text-muted); font-size: 0.85rem; font-family: 'Fira Code', monospace; }
-        .item-desc { color: var(--text-muted); font-size: 0.95rem; margin-top: 10px; }
-        .item-desc ul { padding-left: 20px; margin-top: 5px; }
-        .item-desc li { margin-bottom: 6px; }
+        .item { margin-bottom: 40px; }
+        .item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;}
+        
+        .item-title { 
+            font-family: 'Press Start 2P', cursive; 
+            font-size: 0.7rem; color: var(--retro-green); 
+            line-height: 1.4;
+        }
+        .item-subtitle { color: #fff; font-weight: bold; font-size: 1.3rem; margin-top: 5px; }
+        .item-date { color: var(--retro-pink); font-family: 'Press Start 2P', cursive; font-size: 0.55rem; }
+        
+        .item-desc { color: var(--text-muted); font-size: 1.1rem; margin-top: 10px; }
+        .item-desc ul { list-style: none; padding: 0; margin-top: 10px; }
+        .item-desc li { position: relative; padding-left: 20px; margin-bottom: 8px; }
+        .item-desc li::before {
+            content: "►"; position: absolute; left: 0; top: 2px;
+            color: var(--retro-purple); font-size: 0.9rem;
+        }
 
         /* Sidebar Elements */
-        .sidebar-section { margin-bottom: 40px; }
+        .sidebar-section { margin-bottom: 50px; }
         
         .skills-list { list-style: none; padding: 0; margin: 0; }
         .skills-list li {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
+            position: relative; padding-left: 25px; margin-bottom: 15px;
+            font-size: 1.1rem; color: var(--text-main);
         }
         .skills-list li::before {
-            content: "▹";
-            position: absolute;
-            left: 0;
-            color: var(--accent-blue);
-            font-weight: bold;
+            content: "■"; position: absolute; left: 0; top: 2px;
+            color: var(--retro-gold); font-size: 0.8rem;
         }
 
-        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
         .tag {
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: #e2e8f0;
-            font-family: 'Fira Code', monospace;
-            transition: border-color 0.2s;
+            background: #000; border: 2px solid var(--retro-blue);
+            color: var(--retro-cyan); font-family: 'Press Start 2P', cursive;
+            font-size: 0.55rem; padding: 10px;
+            box-shadow: 3px 3px 0px var(--border-dark);
+            transition: all 0.2s;
         }
-        .tag:hover { border-color: var(--accent-blue); }
+        .tag:hover { background: var(--retro-blue); color: #fff; transform: translateY(-2px); }
 
-        @media (max-width: 768px) {
-            .content { grid-template-columns: 1fr; }
+        @media (max-width: 900px) {
+            .content { grid-template-columns: 1fr; gap: 20px; padding: 20px;}
             .header { flex-direction: column; text-align: center; padding: 30px 20px; }
             .contact-info { justify-content: center; }
-            .download-btn { position: relative; top: 0; right: 0; display: inline-flex; margin-top: 20px; }
+            .download-btn { position: relative; top: 0; right: 0; display: inline-flex; margin-top: 20px; justify-content: center; width: 100%;}
             .item-header { flex-direction: column; }
+            h1 { font-size: 1rem; line-height: 1.6;}
         }
     </style>
 </head>
 <body>
 
-    <a href="index.html" style="display: inline-block; margin-bottom: 20px; color: #94a3b8; text-decoration: none; font-weight: 500; font-family: 'Inter', sans-serif;">
-        <i class="fas fa-arrow-left"></i> Back to Portfolio
+    <a href="index.html" class="back-btn">
+        ◀ RETURN TO BASE
     </a>
 
     <div class="resume-container">
@@ -204,20 +202,20 @@
             <img src="me.jpg" alt="Jon Lewyn Tanggaro" class="header-pic">
             
             <div class="header-content">
-                <h1>JON LEWYN VILLARAM TANGGARO</h1>
-                <div class="title">&gt; Electronics Engineering Student & Developer</div>
+                <h1>JON LEWYN V. TANGGARO</h1>
+                <div class="title">&gt; ECE STUDENT & DEVELOPER_</div>
                 
                 <div class="contact-info">
-                    <span><i class="fas fa-map-marker-alt"></i> Talaga, Tanauan City, Batangas City</span>
+                    <span><i class="fas fa-map-marker-alt"></i> Talaga, Tanauan City</span>
                     <a href="mailto:lewynvllram@gmail.com"><i class="fas fa-envelope"></i> lewynvllram@gmail.com</a>
                     <a href="tel:+639707210609"><i class="fas fa-phone"></i> +63 970 721 0609</a>
-                    <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank"><i class="fab fa-linkedin"></i> linkedin.com/in/jon-lewyn-tanggaro</a>
-                    <a href="https://lewynski.github.io" target="_blank"><i class="fas fa-globe"></i> lewynski.github.io</a>
+                    <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    <a href="https://lewynski.github.io" target="_blank"><i class="fas fa-globe"></i> Portfolio</a>
                 </div>
             </div>
 
             <a href="Tanggaro_Resume.pdf" target="_blank" class="download-btn">
-                <i class="fas fa-download"></i> Download PDF
+                <i class="fas fa-download"></i> PRINT PDF
             </a>
         </header>
 
@@ -226,12 +224,12 @@
             <div class="main-column">
                 
                 <section>
-                    <h2 class="section-title"><i class="fas fa-briefcase"></i> Professional Experience</h2>
+                    <h2 class="section-title"><i class="fas fa-briefcase"></i> EXPERIENCE</h2>
                     
                     <div class="item">
                         <div class="item-header">
                             <span class="item-title">Electronics Engineering Intern (OJT)</span>
-                            <span class="item-date">July 14, 2025 – August 29, 2025</span>
+                            <span class="item-date">JUL 2025 – AUG 2025</span>
                         </div>
                         <div class="item-subtitle">Bandai Wireharness Philippines INC.</div>
                         <div class="item-desc">
@@ -245,7 +243,7 @@
                     <div class="item">
                         <div class="item-header">
                             <span class="item-title">Secondary Education Work Immersion</span>
-                            <span class="item-date">April 26 – May 11, 2023</span>
+                            <span class="item-date">APR 2023 – MAY 2023</span>
                         </div>
                         <div class="item-subtitle">Negros Occidental Electric Cooperative (NOCECO)</div>
                         <div class="item-desc">
@@ -257,16 +255,16 @@
                 </section>
 
                 <section>
-                    <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Education</h2>
+                    <h2 class="section-title"><i class="fas fa-graduation-cap"></i> EDUCATION</h2>
                     
                     <div class="item">
                         <div class="item-header">
-                            <span class="item-title">Bachelor of Science in Electronics Engineering</span>
-                            <span class="item-date">2023 – Present</span>
+                            <span class="item-title">B.S. Electronics Engineering</span>
+                            <span class="item-date">2023 – PRESENT</span>
                         </div>
                         <div class="item-subtitle">Polytechnic University of the Philippines</div>
                         <div class="item-desc">
-                            <p style="margin-top: 5px; color: #e2e8f0; font-weight: 500;">AFFILIATIONS:</p>
+                            <p style="margin-top: 10px; color: var(--retro-gold); font-weight: bold;">[ AFFILIATIONS ]</p>
                             <ul>
                                 <li>Organization of Electronics Engineering Students (OECES) of PUP - Sto. Tomas Campus.</li>
                                 <li>Special Project Officer for OECES at PUP Sto. Tomas Campus.</li>
@@ -277,13 +275,13 @@
 
                     <div class="item">
                         <div class="item-header">
-                            <span class="item-title">Science, Technology, Engineering, and Mathematics (STEM)</span>
+                            <span class="item-title">Senior High School (STEM)</span>
                             <span class="item-date">2021 – 2023</span>
                         </div>
                         <div class="item-subtitle">Fellowship Baptist College</div>
                         <div class="item-desc">
                             <ul>
-                                <li>Graduated With High Honor</li>
+                                <li style="color: var(--retro-green);">Graduated With High Honor</li>
                             </ul>
                         </div>
                     </div>
@@ -296,7 +294,7 @@
                         <div class="item-subtitle">Fellowship Baptist College</div>
                         <div class="item-desc">
                             <ul>
-                                <li>Graduated With Honor</li>
+                                <li style="color: var(--retro-green);">Graduated With Honor</li>
                             </ul>
                         </div>
                     </div>
@@ -309,7 +307,7 @@
                         <div class="item-subtitle">Jose G. Peralta Memorial School</div>
                         <div class="item-desc">
                             <ul>
-                                <li>Graduated Valedictorian</li>
+                                <li style="color: var(--retro-gold); text-shadow: 1px 1px 0px #000;">Graduated Valedictorian</li>
                             </ul>
                         </div>
                     </div>
@@ -320,7 +318,7 @@
             <div class="side-column">
                 
                 <div class="sidebar-section">
-                    <h2 class="section-title"><i class="fas fa-microchip"></i> Technical Expertise</h2>
+                    <h2 class="section-title"><i class="fas fa-microchip"></i> TECH SPECS</h2>
                     <div class="tags">
                         <span class="tag">Arduino Uno</span>
                         <span class="tag">AutoCAD</span>
@@ -333,7 +331,7 @@
                         <span class="tag">Livewire</span>
                         <span class="tag">Everycircuit</span>
                         <span class="tag">Falstad</span>
-                        <span class="tag">MS Office Suite</span>
+                        <span class="tag">MS Office</span>
                         <span class="tag">Replit</span>
                         <span class="tag">Render</span>
                         <span class="tag">Railway</span>
@@ -342,25 +340,25 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Skills</h2>
+                    <h2 class="section-title"><i class="fas fa-clipboard-list"></i> PASSIVES</h2>
                     <ul class="skills-list">
                         <li>Ability to adapt and be flexible in dynamic circumstances.</li>
                         <li>Diligent and capable of working independently with minimal supervision.</li>
                         <li>Motivated by enthusiasm and a strong sense of curiosity.</li>
-                        <li>Proficient in <strong>Python</strong> and <strong>JavaScript</strong>, with practical experience in <strong>HTML</strong> and <strong>CSS</strong> for web development.</li>
-                        <li>Familiar with utilizing <strong>Gmail, Google Docs, Google Sheets</strong>, and <strong>Google Forms</strong>.</li>
-                        <li>Proficient in Microsoft Office Suite, including <strong>Word, Excel, PowerPoint, Outlook</strong>, and other related software.</li>
-                        <li>Skilled in graphic design and capable of creating visual content using <strong>Canva</strong> and other design software.</li>
+                        <li>Proficient in <strong style="color: var(--retro-pink);">Python</strong> and <strong style="color: var(--retro-pink);">JavaScript</strong>, with practical experience in HTML and CSS for web development.</li>
+                        <li>Familiar with utilizing Google Workspace (Docs, Sheets, Forms).</li>
+                        <li>Proficient in Microsoft Office Suite.</li>
+                        <li>Skilled in graphic design and capable of creating visual content using Canva.</li>
                     </ul>
                 </div>
 
                 <div class="sidebar-section">
-                    <h2 class="section-title"><i class="fas fa-certificate"></i> Professional Development</h2>
-                    <ul class="skills-list" style="font-size: 0.85rem;">
-                        <li><strong>ELECTRONEXT:</strong> Empowering the Next Generation with a Comprehensive Guide to Radio Transceiver Regulations, Permitting, and Professional Practice in Electronics Engineering.</li>
-                        <li><strong>First Batangas ECE Student Summit:</strong> Role of Electronics in Building a Sustainable Future Seminar.</li>
-                        <li><strong>First Batangas ECE Student Summit:</strong> Innovation Topic Seminar.</li>
-                        <li><strong>Second Batangas ECE Student Summit:</strong> The Crucial Role of Electronics Engineers in Shaping a Sustainable Future Seminar.</li>
+                    <h2 class="section-title"><i class="fas fa-certificate"></i> QUEST LOG</h2>
+                    <ul class="skills-list">
+                        <li><strong>ELECTRONEXT:</strong> Guide to Radio Transceiver Regulations & Professional Practice.</li>
+                        <li><strong>1st Batangas ECE Summit:</strong> Role of Electronics in Building a Sustainable Future.</li>
+                        <li><strong>1st Batangas ECE Summit:</strong> Innovation Topic Seminar.</li>
+                        <li><strong>2nd Batangas ECE Summit:</strong> Shaping a Sustainable Future Seminar.</li>
                     </ul>
                 </div>
 
