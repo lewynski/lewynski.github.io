@@ -123,12 +123,13 @@
         .bg-maya { background: var(--retro-green); color: #000; }
         .bg-bank { background: var(--retro-gold); color: #000; }
 
+        /* INDIVIDUAL DELETE BUTTON [X] */
         .btn-del {
             background: var(--retro-red); color: #fff; border: 2px solid var(--border-dark); width: 30px; height: 30px;
             font-family: 'Press Start 2P', cursive; font-size: 0.6rem; cursor: pointer; transition: transform 0.1s;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px var(--border-dark);
         }
-        .btn-del:active { transform: scale(0.9); }
+        .btn-del:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--border-dark); }
 
         /* --- AI & VISUALS --- */
         .ai-section { background: #000; border: 4px solid var(--retro-green); padding: 20px; box-shadow: inset 0 0 15px rgba(74, 222, 128, 0.2), 6px 6px 0px var(--border-dark); display: flex; flex-direction: column; }
@@ -150,21 +151,21 @@
     <div class="app-container">
         <header>
             <h1><i class="fas fa-wallet"></i> CAPYSAVE</h1>
-            <div class="subtitle">Personal Finance Hub v4.1</div>
+            <div class="subtitle">Personal Finance Hub v4.2</div>
         </header>
 
         <div class="settings-bar">
             <div class="setting-group">
                 <label>BUDGET LIMIT (₱)</label>
-                <input type="number" id="set-budget" min="0" step="500">
+                <input type="number" id="set-budget" min="0" step="500" placeholder="0">
             </div>
             <div class="setting-group">
                 <label>SAVINGS GOAL NAME</label>
-                <input type="text" id="set-goal-name" placeholder="e.g. Emergency Fund">
+                <input type="text" id="set-goal-name" placeholder="Name your goal...">
             </div>
             <div class="setting-group">
                 <label>GOAL TARGET (₱)</label>
-                <input type="number" id="set-goal-target" min="0" step="1000">
+                <input type="number" id="set-goal-target" min="0" step="1000" placeholder="0">
             </div>
             <button class="btn-update" id="btn-update-settings">SAVE CONFIG</button>
         </div>
@@ -233,7 +234,11 @@
             </div>
 
             <div class="panel">
-                <h2><i class="fas fa-list-alt"></i> SYSTEM LOGS</h2>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--border-dark); margin-bottom: 20px; padding-bottom: 10px;">
+                    <h2 style="border: none; padding: 0; margin: 0;"><i class="fas fa-list-alt"></i> SYSTEM LOGS</h2>
+                    <button id="btn-reset" style="background: transparent; color: var(--retro-red); border: none; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; cursor: pointer; text-decoration: underline;">PURGE ALL DATA</button>
+                </div>
+                
                 <ul id="transaction-list"></ul>
             </div>
         </div>
@@ -245,7 +250,7 @@
                     <button class="btn-analyze" id="btn-analyze">ANALYZE HABITS</button>
                 </div>
                 <div class="ai-terminal">
-                    <span id="ai-output">> System initialized. Awaiting user commands...</span><span class="cursor"></span>
+                    <span id="ai-output">> System initialized. Start logging data to generate financial diagnostics...</span><span class="cursor"></span>
                 </div>
             </div>
 
@@ -262,21 +267,22 @@
         const GROQ_API_KEY = "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"; 
 
         // --- STATE MANAGEMENT ---
-        // Using new local storage keys to ensure a clean slate for the universal version
+        // Clean slate default starting at zero
         let transactions = JSON.parse(localStorage.getItem('capysave-tx-gen')) || [];
-        let config = JSON.parse(localStorage.getItem('capysave-cfg-gen')) || { budget: 15000, goalName: 'Emergency Fund', goalTarget: 50000 };
+        let config = JSON.parse(localStorage.getItem('capysave-cfg-gen')) || { budget: 0, goalName: '', goalTarget: 0 };
 
         // DOM Elements
         const form = document.getElementById('tx-form');
         const list = document.getElementById('transaction-list');
         const aiOutput = document.getElementById('ai-output');
         const btnAnalyze = document.getElementById('btn-analyze');
+        const btnReset = document.getElementById('btn-reset');
         let typeWriterTimeout;
 
         // Init Form Settings
-        document.getElementById('set-budget').value = config.budget;
+        document.getElementById('set-budget').value = config.budget > 0 ? config.budget : '';
         document.getElementById('set-goal-name').value = config.goalName;
-        document.getElementById('set-goal-target').value = config.goalTarget;
+        document.getElementById('set-goal-target').value = config.goalTarget > 0 ? config.goalTarget : '';
 
         const formatMoney = (amt) => '₱' + amt.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -316,11 +322,15 @@
             document.getElementById('val-budget').textContent = formatMoney(budgetLeft);
             
             let healthGrade = 'S (Optimal)'; let color = 'var(--retro-green)';
-            const spentPct = (expenses / config.budget) * 100;
-            if(expenses === 0) { healthGrade = '-'; color = 'var(--text-muted)'; }
-            else if(spentPct > 100) { healthGrade = 'F (Deficit)'; color = 'var(--retro-red)'; }
-            else if(spentPct > 85) { healthGrade = 'C (Warning)'; color = 'var(--retro-gold)'; }
-            else if(spentPct > 50) { healthGrade = 'B (Stable)'; color = 'var(--retro-blue)'; }
+            if (config.budget === 0) {
+                healthGrade = 'No Budget Set'; color = 'var(--text-muted)';
+            } else {
+                const spentPct = (expenses / config.budget) * 100;
+                if(expenses === 0) { healthGrade = 'Perfect'; color = 'var(--retro-green)'; }
+                else if(spentPct > 100) { healthGrade = 'F (Deficit)'; color = 'var(--retro-red)'; }
+                else if(spentPct > 85) { healthGrade = 'C (Warning)'; color = 'var(--retro-gold)'; }
+                else if(spentPct > 50) { healthGrade = 'B (Stable)'; color = 'var(--retro-blue)'; }
+            }
             
             document.getElementById('val-health').textContent = `Health Grade: ${healthGrade}`;
             document.getElementById('val-health').style.color = color;
@@ -328,7 +338,7 @@
 
             // Goal Progress
             const goalPct = config.goalTarget > 0 ? Math.min(100, (saved / config.goalTarget) * 100) : 0;
-            document.getElementById('val-goal-title').textContent = config.goalName.toUpperCase();
+            document.getElementById('val-goal-title').textContent = config.goalName ? config.goalName.toUpperCase() : 'NO GOAL SET';
             document.getElementById('val-goal-prog').textContent = `${goalPct.toFixed(1)}%`;
             document.getElementById('val-goal-amt').textContent = `${formatMoney(saved)} / ${formatMoney(config.goalTarget)}`;
 
@@ -341,7 +351,7 @@
             }
         }
 
-        // --- RENDER LIST & DELETE ---
+        // --- RENDER LIST & THE [X] DELETE BUTTON ---
         function renderList() {
             list.innerHTML = '';
             if (transactions.length === 0) { list.innerHTML = '<div class="empty-state">No logs.</div>'; return; }
@@ -362,16 +372,18 @@
                         <p><span class="badge ${badge}">${tx.platform}</span> ${tx.date}</p>
                     </div>
                     <div class="tx-amount ${colorClass}">${sign}${formatMoney(parseFloat(tx.amount))}</div>
-                    <button class="btn-del" onclick="deleteTx(${tx.id})"><i class="fas fa-times"></i></button>
+                    <button class="btn-del" onclick="deleteTx(${tx.id})" title="Delete Transaction"><i class="fas fa-times"></i></button>
                 `;
                 list.appendChild(li);
             });
         }
 
+        // Individual Delete Feature
         window.deleteTx = function(id) {
             transactions = transactions.filter(t => t.id !== id);
-            saveData(); updateAll();
-            typeWriter("> Log purged from database.");
+            saveData(); 
+            updateAll();
+            typeWriter("> Log purged from database. Numbers recalculated.");
         }
 
         // --- CHART JS ---
@@ -403,7 +415,7 @@
         // --- FORM HANDLING ---
         document.getElementById('btn-update-settings').addEventListener('click', () => {
             config.budget = parseFloat(document.getElementById('set-budget').value) || 0;
-            config.goalName = document.getElementById('set-goal-name').value || 'Savings';
+            config.goalName = document.getElementById('set-goal-name').value || '';
             config.goalTarget = parseFloat(document.getElementById('set-goal-target').value) || 0;
             localStorage.setItem('capysave-cfg-gen', JSON.stringify(config));
             updateAll(); typeWriter("> Configuration saved. Dashboards updated.");
@@ -420,6 +432,26 @@
             transactions.push(newTx); saveData(); updateAll();
             document.getElementById('tx-amount').value = ''; document.getElementById('tx-note').value = '';
             typeWriter("> Log accepted. Data sync complete.");
+        });
+
+        // The TRUE Factory Reset
+        btnReset.addEventListener('click', function() {
+            const confirmPurge = confirm("CRITICAL WARNING: This will permanently wipe all financial records AND your settings. Are you sure you want to proceed?");
+            if (confirmPurge) {
+                transactions = [];
+                config = { budget: 0, goalName: '', goalTarget: 0 };
+                
+                localStorage.removeItem('capysave-tx-gen');
+                localStorage.removeItem('capysave-cfg-gen');
+                
+                // Clear the visual input boxes
+                document.getElementById('set-budget').value = '';
+                document.getElementById('set-goal-name').value = '';
+                document.getElementById('set-goal-target').value = '';
+
+                updateAll();
+                typeWriter("> Memory wiped. System restored to absolute zero.");
+            }
         });
 
         function saveData() { localStorage.setItem('capysave-tx-gen', JSON.stringify(transactions)); }
