@@ -172,18 +172,37 @@
             box-shadow: 2px 2px 0px var(--border-dark);
         }
 
-        /* --- SKILLS GRID --- */
-        .skills-section { padding: 50px 20px; text-align: center; position: relative; z-index: 2; }
+        /* --- SKILLS GRID WITH SCROLL ANIMATION --- */
+        .skills-section { padding: 50px 20px; text-align: center; position: relative; z-index: 2; overflow: hidden; }
         .section-title { margin-bottom: 40px; }
         
         .skills-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1250px; margin: 0 auto; }
         
+        /* The custom pop-in animation */
+        @keyframes popInReveal {
+            0% { opacity: 0; transform: translateY(60px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
         .skill-card {
             background: var(--panel-bg); width: 280px; padding: 25px;
             border: 4px solid var(--border-dark);
             box-shadow: 8px 8px 0px var(--border-dark);
             transition: transform 0.2s, background-color 0.3s;
+            opacity: 0; /* Hidden by default until JS triggers it */
         }
+
+        /* The class JS will add when the card enters the screen */
+        .skill-card.show {
+            animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Staggering the domino effect */
+        .skill-card:nth-child(1).show { animation-delay: 0.1s; }
+        .skill-card:nth-child(2).show { animation-delay: 0.3s; }
+        .skill-card:nth-child(3).show { animation-delay: 0.5s; }
+        .skill-card:nth-child(4).show { animation-delay: 0.7s; }
+
         .skill-card:hover { transform: translateY(-5px); }
         .icon-box { font-size: 2.5rem; color: var(--retro-pink); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
         
@@ -546,7 +565,8 @@
         createParticles();
 
         // --- 4. GROQ AI CHAT INTEGRATION ---
-        const GROQ_API_KEY = "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"; 
+        // Insert your API key here to test locally
+        const GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE"; 
         
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
@@ -606,7 +626,6 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        // Updated to the newest, stable Llama 3.1 model on Groq
                         model: "llama-3.1-8b-instant", 
                         messages: conversationHistory,
                         temperature: 0.7,
@@ -642,6 +661,25 @@
         chatSendBtn.addEventListener('click', handleSend);
         chatInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') handleSend();
+        });
+
+        // --- 5. SCROLL REVEAL ANIMATIONS FOR TECH STACK ---
+        const observerOptions = {
+            threshold: 0.2 // Trigger animation when 20% of the card is visible
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    observer.unobserve(entry.target); // Stop observing once revealed
+                }
+            });
+        }, observerOptions);
+
+        const skillCards = document.querySelectorAll('.skill-card');
+        skillCards.forEach(card => {
+            observer.observe(card);
         });
     </script>
 </body>
