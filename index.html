@@ -546,7 +546,6 @@
         createParticles();
 
         // --- 4. GROQ AI CHAT INTEGRATION ---
-        // ⚠️ DANGER: DO NOT LEAVE YOUR REAL API KEY HERE IF UPLOADING TO PUBLIC GITHUB ⚠️
         const GROQ_API_KEY = "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"; 
         
         const chatMessages = document.getElementById('chat-messages');
@@ -607,7 +606,8 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "mixtral-8x7b-32768", 
+                        // Updated to the newest, stable Llama 3.1 model on Groq
+                        model: "llama-3.1-8b-instant", 
                         messages: conversationHistory,
                         temperature: 0.7,
                         max_tokens: 150 
