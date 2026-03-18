@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
             --bg-color: #1e1e2f;
@@ -52,7 +54,7 @@
         .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
 
         .app-container {
-            max-width: 900px; margin: 0 auto;
+            max-width: 1000px; margin: 0 auto;
             background: var(--panel-bg); border: 6px solid var(--border-dark);
             box-shadow: 12px 12px 0px var(--border-dark); padding: 30px;
         }
@@ -76,9 +78,13 @@
         .wallet-card h3 { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 15px; }
         .wallet-card .amount { font-size: 2.2rem; font-weight: bold; color: #fff; }
 
-        /* --- MAIN LAYOUT --- */
+        /* --- MAIN LAYOUT GRIDS --- */
         .main-content { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; margin-bottom: 30px;}
-        @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
+        .bottom-content { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; }
+        
+        @media (max-width: 768px) { 
+            .main-content, .bottom-content { grid-template-columns: 1fr; } 
+        }
 
         /* --- FORM SECTION --- */
         .form-section { background: rgba(0,0,0,0.2); border: 4px solid var(--border-dark); padding: 20px; }
@@ -131,7 +137,6 @@
         
         .empty-state { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.5rem;}
 
-        /* Reset Button */
         .btn-reset {
             width: 100%; background: transparent; color: var(--retro-pink);
             padding: 10px; border: 2px dashed var(--retro-pink);
@@ -144,13 +149,13 @@
         .ai-section {
             background: #000; border: 4px solid var(--retro-green); padding: 20px;
             box-shadow: inset 0 0 15px rgba(74, 222, 128, 0.2), 6px 6px 0px var(--border-dark);
-            position: relative;
+            display: flex; flex-direction: column;
         }
         .ai-header {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
             border-bottom: 2px dashed var(--retro-green); padding-bottom: 10px; margin-bottom: 15px;
         }
-        .ai-header h2 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--retro-green); margin: 0;}
+        .ai-header h2 { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--retro-green); margin: 0;}
         
         .btn-analyze {
             background: var(--retro-green); color: #000; border: 2px solid var(--retro-green);
@@ -161,10 +166,23 @@
         .btn-analyze:active { transform: translateY(2px); }
 
         .ai-terminal {
-            min-height: 80px; color: var(--retro-green); font-size: 1.3rem; line-height: 1.5;
-            text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+            flex-grow: 1; color: var(--retro-green); font-size: 1.2rem; line-height: 1.5;
+            text-shadow: 0 0 5px rgba(74, 222, 128, 0.5); overflow-y: auto; max-height: 250px;
         }
         .cursor { display: inline-block; width: 10px; height: 15px; background: var(--retro-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;}
+
+        /* --- CHART VISUALIZER SECTION --- */
+        .visualizer-section {
+            background: rgba(0,0,0,0.2); border: 4px solid var(--border-dark); padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .visualizer-section h2 { 
+            font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--retro-gold); 
+            margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px; width: 100%; text-align: left;
+        }
+        .chart-container {
+            position: relative; width: 100%; max-width: 250px; height: 250px;
+        }
     </style>
 </head>
 <body>
@@ -174,7 +192,7 @@
     <div class="app-container">
         <header>
             <h1><i class="fas fa-coins"></i> CAPYSAVE</h1>
-            <div class="subtitle">Virtual Wealth Terminal v2.0 (Neural Linked)</div>
+            <div class="subtitle">Virtual Wealth Terminal v3.0 (Visualizer Active)</div>
         </header>
 
         <div class="dashboard">
@@ -199,8 +217,8 @@
                     <div class="form-group">
                         <label>TYPE</label>
                         <select id="tx-type" required>
-                            <option value="income">INCOME (+)</option>
                             <option value="expense">EXPENSE (-)</option>
+                            <option value="income">INCOME (+)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -215,8 +233,8 @@
                         <input type="number" id="tx-amount" min="1" step="0.01" placeholder="e.g. 500" required>
                     </div>
                     <div class="form-group">
-                        <label>DESCRIPTION</label>
-                        <input type="text" id="tx-desc" placeholder="e.g. Load, Food, Salary..." required autocomplete="off">
+                        <label>DESCRIPTION (Category)</label>
+                        <input type="text" id="tx-desc" placeholder="e.g. Food, Bills, Games..." required autocomplete="off">
                     </div>
                     <button type="submit" class="btn-submit">SAVE ENTRY</button>
                 </form>
@@ -225,18 +243,26 @@
             <div class="history-section">
                 <h2>SYSTEM LOGS</h2>
                 <ul id="transaction-list"></ul>
-                
                 <button id="btn-reset" class="btn-reset"><i class="fas fa-trash-alt"></i> PURGE ALL DATA</button>
             </div>
         </div>
 
-        <div class="ai-section">
-            <div class="ai-header">
-                <h2><i class="fas fa-robot"></i> CAPY-AI CO-PROCESSOR</h2>
-                <button class="btn-analyze" id="btn-analyze">ANALYZE LOGS</button>
+        <div class="bottom-content">
+            <div class="ai-section">
+                <div class="ai-header">
+                    <h2><i class="fas fa-robot"></i> CAPY-AI CO-PROCESSOR</h2>
+                    <button class="btn-analyze" id="btn-analyze">ANALYZE LOGS</button>
+                </div>
+                <div class="ai-terminal">
+                    <span id="ai-output">> Awaiting manual trigger for financial diagnostic...</span><span class="cursor"></span>
+                </div>
             </div>
-            <div class="ai-terminal">
-                <span id="ai-output">> Awaiting manual trigger for financial diagnostic...</span><span class="cursor"></span>
+
+            <div class="visualizer-section">
+                <h2><i class="fas fa-chart-pie"></i> EXPENSE RADAR</h2>
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -264,7 +290,73 @@
             return '₱' + amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         };
 
-        // --- 2. UI UPDATES ---
+        // --- 2. CHART.JS INITIALIZATION ---
+        // Configure global retro fonts for Chart.js
+        Chart.defaults.font.family = "'Press Start 2P', cursive";
+        Chart.defaults.color = "#a8a8b2";
+
+        const ctx = document.getElementById('expenseChart').getContext('2d');
+        let expenseChart = new Chart(ctx, {
+            type: 'doughnut', // 'pie' or 'doughnut' look best
+            data: {
+                labels: ['No Data'],
+                datasets: [{
+                    data: [1],
+                    backgroundColor: ['#2a2a40'], // Empty state color
+                    borderColor: '#000000',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }, // Hiding legend to save space
+                    tooltip: {
+                        backgroundColor: '#1e1e2f',
+                        titleFont: { size: 10, family: "'Press Start 2P', cursive" },
+                        bodyFont: { size: 14, family: "'VT323', monospace" },
+                        borderColor: '#bd93f9',
+                        borderWidth: 2,
+                        padding: 10
+                    }
+                }
+            }
+        });
+
+        // Function to process data and redraw chart
+        function updateChart() {
+            const expenseData = {};
+            let hasExpenses = false;
+
+            // Group all expenses by their Description
+            transactions.forEach(tx => {
+                if (tx.type === 'expense') {
+                    hasExpenses = true;
+                    const category = tx.desc.toUpperCase(); // Normalize names (Food == FOOD)
+                    expenseData[category] = (expenseData[category] || 0) + parseFloat(tx.amount);
+                }
+            });
+
+            if (!hasExpenses) {
+                // Reset to empty state
+                expenseChart.data.labels = ['No Data'];
+                expenseChart.data.datasets[0].data = [1];
+                expenseChart.data.datasets[0].backgroundColor = ['#2a2a40'];
+                expenseChart.update();
+                return;
+            }
+
+            // Apply Retro Cyberpunk Colors
+            const retroColors = ['#ff79c6', '#bd93f9', '#3b82f6', '#4ade80', '#facc15', '#ff5555'];
+            
+            expenseChart.data.labels = Object.keys(expenseData);
+            expenseChart.data.datasets[0].data = Object.values(expenseData);
+            expenseChart.data.datasets[0].backgroundColor = retroColors;
+            expenseChart.update();
+        }
+
+        // --- 3. UI UPDATES ---
         function updateDashboard() {
             let gcashTotal = 0;
             let mayaTotal = 0;
@@ -315,7 +407,7 @@
             });
         }
 
-        // --- 3. EVENT LISTENERS ---
+        // --- 4. EVENT LISTENERS ---
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const type = document.getElementById('tx-type').value;
@@ -330,14 +422,14 @@
 
             updateDashboard();
             renderList();
+            updateChart(); // Trigger chart update!
 
             document.getElementById('tx-amount').value = '';
             document.getElementById('tx-desc').value = '';
             
-            typeWriter("> New data logged. Run analysis for updated metrics.");
+            typeWriter("> New data logged. Radar updated.");
         });
 
-        // Factory Reset Logic
         btnReset.addEventListener('click', function() {
             const confirmPurge = confirm("CRITICAL WARNING: This will permanently wipe all financial records. Are you sure you want to proceed?");
             if (confirmPurge) {
@@ -345,16 +437,15 @@
                 localStorage.removeItem('capysave-data');
                 updateDashboard();
                 renderList();
+                updateChart(); // Reset chart to empty
                 typeWriter("> Memory wiped successfully. System restored to factory settings.");
             }
         });
 
-        // Typewriter Animation logic
         function typeWriter(text) {
             clearTimeout(typeWriterTimeout);
             aiOutput.textContent = "";
             let i = 0;
-
             function type() {
                 if (i < text.length) {
                     aiOutput.textContent += text.charAt(i);
@@ -365,7 +456,7 @@
             type();
         }
 
-        // --- 4. GROQ AI LOGIC INTEGRATION ---
+        // --- 5. GROQ AI LOGIC INTEGRATION ---
         async function runAIAnalysis() {
             btnAnalyze.disabled = true;
             btnAnalyze.style.opacity = '0.5';
@@ -386,7 +477,6 @@
 
             typeWriter("> Booting Capy-AI Neural Net... Establishing connection to Groq Servers...");
 
-            // Process Data to send to Groq
             let totalIncome = 0;
             let totalExpense = 0;
             let topExpense = { desc: 'None', amount: 0 };
@@ -403,7 +493,6 @@
                 }
             });
 
-            // Instructing Groq on what to do
             const systemPrompt = `You are Capy-AI, a cyberpunk-themed financial advisor embedded in a retro web terminal. 
             Your job is to look at the user's financial data and give them ONE specific piece of actionable advice on what to do about their financial situation. 
             Keep your response under 3 sentences. Be analytical and direct. Do NOT use markdown or bullet points.`;
@@ -440,7 +529,7 @@
                 
                 if (data.choices && data.choices.length > 0) {
                     const aiResponse = data.choices[0].message.content;
-                    typeWriter("> " + aiResponse); // Type out the actual Groq AI response!
+                    typeWriter("> " + aiResponse); 
                 }
 
             } catch (error) {
@@ -454,9 +543,10 @@
 
         btnAnalyze.addEventListener('click', runAIAnalysis);
 
-        // --- 5. INIT ---
+        // --- 6. INIT ---
         updateDashboard();
         renderList();
+        updateChart(); // Initialize chart on page load
     </script>
 </body>
 </html>
