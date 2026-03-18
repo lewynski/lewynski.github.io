@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapySave | Student Wallet Monitor</title>
+    <title>CapySave | Personal Finance Terminal</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,7 +61,7 @@
         .stat-card .val { font-size: 2rem; font-weight: bold; color: #fff; }
         .stat-card .sub-val { font-size: 1rem; color: var(--retro-gold); margin-top: 5px;}
 
-        /* --- STUDENT SETTINGS --- */
+        /* --- USER SETTINGS --- */
         .settings-bar {
             background: rgba(0,0,0,0.3); border: 4px solid var(--border-dark); padding: 15px; margin-bottom: 30px;
             display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end;
@@ -121,7 +121,7 @@
         .badge { display: inline-block; padding: 2px 6px; font-size: 0.8rem; border: 1px solid var(--border-dark); margin-right: 8px; }
         .bg-gcash { background: var(--retro-blue); color: #fff; }
         .bg-maya { background: var(--retro-green); color: #000; }
-        .bg-cat { background: var(--retro-purple); color: #fff; }
+        .bg-bank { background: var(--retro-gold); color: #000; }
 
         .btn-del {
             background: var(--retro-red); color: #fff; border: 2px solid var(--border-dark); width: 30px; height: 30px;
@@ -150,21 +150,21 @@
     <div class="app-container">
         <header>
             <h1><i class="fas fa-wallet"></i> CAPYSAVE</h1>
-            <div class="subtitle">Student Financial Hub v4.0</div>
+            <div class="subtitle">Personal Finance Hub v4.1</div>
         </header>
 
         <div class="settings-bar">
             <div class="setting-group">
-                <label>WEEKLY ALLOWANCE (₱)</label>
-                <input type="number" id="set-allowance" min="0" step="50">
+                <label>BUDGET LIMIT (₱)</label>
+                <input type="number" id="set-budget" min="0" step="500">
             </div>
             <div class="setting-group">
                 <label>SAVINGS GOAL NAME</label>
-                <input type="text" id="set-goal-name" placeholder="e.g. S.A.B.A. Capstone Fund">
+                <input type="text" id="set-goal-name" placeholder="e.g. Emergency Fund">
             </div>
             <div class="setting-group">
                 <label>GOAL TARGET (₱)</label>
-                <input type="number" id="set-goal-target" min="0" step="100">
+                <input type="number" id="set-goal-target" min="0" step="1000">
             </div>
             <button class="btn-update" id="btn-update-settings">SAVE CONFIG</button>
         </div>
@@ -173,10 +173,10 @@
             <div class="stat-card primary">
                 <h3>NET WORTH</h3>
                 <div class="val" id="val-networth">₱0</div>
-                <div class="sub-val" id="val-platforms">G: ₱0 | M: ₱0</div>
+                <div class="sub-val" id="val-platforms">G: ₱0 | M: ₱0 | B: ₱0</div>
             </div>
             <div class="stat-card warning" id="card-allowance">
-                <h3>WEEKLY BUDGET LEFT</h3>
+                <h3>BUDGET REMAINING</h3>
                 <div class="val" id="val-budget">₱0</div>
                 <div class="sub-val" id="val-health">Health Grade: -</div>
             </div>
@@ -200,21 +200,23 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>PLATFORM</label>
+                        <label>PLATFORM / ACCOUNT</label>
                         <select id="tx-platform">
                             <option value="GCash">GCash</option>
                             <option value="Maya">Maya</option>
+                            <option value="Bank">Bank Account</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>CATEGORY</label>
                         <select id="tx-category">
-                            <option value="Food">Food / Meals</option>
+                            <option value="Food">Food & Dining</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Utilities">Bills & Utilities</option>
                             <option value="Transport">Transportation</option>
-                            <option value="Academics">Academics / School</option>
-                            <option value="Load">Load / Data</option>
-                            <option value="Bills">Bills</option>
-                            <option value="Entertainment">Entertainment / Games</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Shopping">Shopping & Retail</option>
+                            <option value="Entertainment">Entertainment</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
@@ -260,8 +262,9 @@
         const GROQ_API_KEY = "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"; 
 
         // --- STATE MANAGEMENT ---
-        let transactions = JSON.parse(localStorage.getItem('capysave-tx')) || [];
-        let config = JSON.parse(localStorage.getItem('capysave-cfg')) || { allowance: 1500, goalName: 'S.A.B.A. Capstone Fund', goalTarget: 5000 };
+        // Using new local storage keys to ensure a clean slate for the universal version
+        let transactions = JSON.parse(localStorage.getItem('capysave-tx-gen')) || [];
+        let config = JSON.parse(localStorage.getItem('capysave-cfg-gen')) || { budget: 15000, goalName: 'Emergency Fund', goalTarget: 50000 };
 
         // DOM Elements
         const form = document.getElementById('tx-form');
@@ -271,7 +274,7 @@
         let typeWriterTimeout;
 
         // Init Form Settings
-        document.getElementById('set-allowance').value = config.allowance;
+        document.getElementById('set-budget').value = config.budget;
         document.getElementById('set-goal-name').value = config.goalName;
         document.getElementById('set-goal-target').value = config.goalTarget;
 
@@ -279,7 +282,7 @@
 
         // --- UPDATE DASHBOARD ---
         function updateDashboard() {
-            let gcash = 0, maya = 0, expenses = 0, saved = 0;
+            let gcash = 0, maya = 0, bank = 0, expenses = 0, saved = 0;
             const categoryTotals = {};
 
             transactions.forEach(tx => {
@@ -287,27 +290,33 @@
                 
                 if (tx.type === 'savings') {
                     saved += amt;
-                    tx.platform === 'GCash' ? gcash -= amt : maya -= amt; 
+                    if(tx.platform === 'GCash') gcash -= amt;
+                    else if(tx.platform === 'Maya') maya -= amt;
+                    else bank -= amt;
                 } else if (tx.type === 'income') {
-                    tx.platform === 'GCash' ? gcash += amt : maya += amt;
+                    if(tx.platform === 'GCash') gcash += amt;
+                    else if(tx.platform === 'Maya') maya += amt;
+                    else bank += amt;
                 } else if (tx.type === 'expense') {
                     expenses += amt;
-                    tx.platform === 'GCash' ? gcash -= amt : maya -= amt;
+                    if(tx.platform === 'GCash') gcash -= amt;
+                    else if(tx.platform === 'Maya') maya -= amt;
+                    else bank -= amt;
                     categoryTotals[tx.category] = (categoryTotals[tx.category] || 0) + amt;
                 }
             });
 
             // Net Worth
-            const netWorth = Math.max(0, gcash) + Math.max(0, maya) + saved;
+            const netWorth = Math.max(0, gcash) + Math.max(0, maya) + Math.max(0, bank) + saved;
             document.getElementById('val-networth').textContent = formatMoney(netWorth);
-            document.getElementById('val-platforms').textContent = `G: ${formatMoney(Math.max(0, gcash))} | M: ${formatMoney(Math.max(0, maya))}`;
+            document.getElementById('val-platforms').textContent = `G: ${formatMoney(Math.max(0, gcash))} | M: ${formatMoney(Math.max(0, maya))} | B: ${formatMoney(Math.max(0, bank))}`;
 
             // Budget & Health Score
-            const budgetLeft = config.allowance - expenses;
+            const budgetLeft = config.budget - expenses;
             document.getElementById('val-budget').textContent = formatMoney(budgetLeft);
             
-            let healthGrade = 'S (Perfect)'; let color = 'var(--retro-green)';
-            const spentPct = (expenses / config.allowance) * 100;
+            let healthGrade = 'S (Optimal)'; let color = 'var(--retro-green)';
+            const spentPct = (expenses / config.budget) * 100;
             if(expenses === 0) { healthGrade = '-'; color = 'var(--text-muted)'; }
             else if(spentPct > 100) { healthGrade = 'F (Deficit)'; color = 'var(--retro-red)'; }
             else if(spentPct > 85) { healthGrade = 'C (Warning)'; color = 'var(--retro-gold)'; }
@@ -339,7 +348,10 @@
 
             [...transactions].reverse().forEach(tx => {
                 const li = document.createElement('li'); li.className = 'tx-item';
-                const badge = tx.platform === 'GCash' ? 'bg-gcash' : 'bg-maya';
+                let badge = 'bg-gcash';
+                if(tx.platform === 'Maya') badge = 'bg-maya';
+                if(tx.platform === 'Bank') badge = 'bg-bank';
+
                 let sign = '-', colorClass = 'expense';
                 if(tx.type === 'income') { sign = '+'; colorClass = 'income'; }
                 if(tx.type === 'savings') { sign = '▲'; colorClass = 'income'; }
@@ -384,16 +396,16 @@
 
             expenseChart.data.labels = Object.keys(expData);
             expenseChart.data.datasets[0].data = Object.values(expData);
-            expenseChart.data.datasets[0].backgroundColor = ['#ff79c6', '#bd93f9', '#3b82f6', '#4ade80', '#facc15', '#ff5555', '#ffffff'];
+            expenseChart.data.datasets[0].backgroundColor = ['#ff79c6', '#bd93f9', '#3b82f6', '#4ade80', '#facc15', '#ff5555', '#ffffff', '#8be9fd'];
             expenseChart.update();
         }
 
         // --- FORM HANDLING ---
         document.getElementById('btn-update-settings').addEventListener('click', () => {
-            config.allowance = parseFloat(document.getElementById('set-allowance').value) || 0;
+            config.budget = parseFloat(document.getElementById('set-budget').value) || 0;
             config.goalName = document.getElementById('set-goal-name').value || 'Savings';
             config.goalTarget = parseFloat(document.getElementById('set-goal-target').value) || 0;
-            localStorage.setItem('capysave-cfg', JSON.stringify(config));
+            localStorage.setItem('capysave-cfg-gen', JSON.stringify(config));
             updateAll(); typeWriter("> Configuration saved. Dashboards updated.");
         });
 
@@ -410,7 +422,7 @@
             typeWriter("> Log accepted. Data sync complete.");
         });
 
-        function saveData() { localStorage.setItem('capysave-tx', JSON.stringify(transactions)); }
+        function saveData() { localStorage.setItem('capysave-tx-gen', JSON.stringify(transactions)); }
         function updateAll() { updateDashboard(); renderList(); updateChart(); }
 
         // --- AI LOGIC ---
@@ -428,7 +440,7 @@
                 btnAnalyze.disabled = false; btnAnalyze.style.opacity = '1'; return;
             }
 
-            typeWriter("> Booting Capy-AI... Analyzing student spending vectors...");
+            typeWriter("> Booting Capy-AI... Analyzing financial vectors...");
 
             let expTotal = 0; let savedTotal = 0; const cats = {};
             transactions.forEach(t => { 
@@ -438,11 +450,11 @@
             });
             let topCat = Object.keys(cats).length > 0 ? Object.keys(cats).reduce((a,b)=>cats[a]>cats[b]?a:b) : 'None';
 
-            const sysPrompt = `You are Capy-AI, a cyberpunk financial advisor for an Engineering student.
-            Your job is to give short, highly specific advice. Generate a "What-If" prediction.
-            Keep response under 4 sentences. NO markdown formatting. NO bullet points. Be analytical and cool.`;
+            const sysPrompt = `You are Capy-AI, a cyberpunk personal financial advisor.
+            Your job is to give short, highly specific advice based on the user's spending data. Generate a "What-If" prediction for wealth growth.
+            Keep response under 4 sentences. NO markdown formatting. NO bullet points. Be analytical and direct.`;
 
-            const usrPrompt = `Student Data: Weekly Allowance: ₱${config.allowance}. Goal: ${config.goalName} (Target: ₱${config.goalTarget}, Current: ₱${savedTotal}). 
+            const usrPrompt = `User Data: Budget Limit: ₱${config.budget}. Goal: ${config.goalName} (Target: ₱${config.goalTarget}, Current: ₱${savedTotal}). 
             Expenses: ₱${expTotal}. Highest spending category: ${topCat} (₱${cats[topCat] || 0}). 
             Give me a specific health evaluation and a "What if" scenario to help me reach my goal faster based on my highest expense.`;
 
