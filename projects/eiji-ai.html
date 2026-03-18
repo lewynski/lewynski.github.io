@@ -141,13 +141,27 @@
         /* DISCLAIMER */
         .disclaimer { text-align: center; font-size: 0.9rem; color: var(--text-muted); padding: 5px; background: #000; }
 
+        /* --- RESPONSIVE MOBILE FIX --- */
         @media (max-width: 900px) {
-            .os-container { flex-direction: column; }
-            .sidebar { width: 100%; height: 250px; border-right: none; border-bottom: 4px solid var(--border-dark); }
-            .message { max-width: 95%; }
-            .action-btns { flex-direction: column; }
-            .btn-action { width: 100%; height: 40px; }
-            .input-area { flex-direction: column; }
+            /* Remove fixed height constraints on mobile so layout can flow naturally */
+            body { height: auto; min-height: 100vh; overflow-y: auto; display: block; }
+            .os-container { flex-direction: column; height: auto; overflow: visible; }
+            
+            /* Sidebar takes full width and stacks on top */
+            .sidebar { width: 100%; height: auto; max-height: none; border-right: none; border-bottom: 4px solid var(--border-dark); padding: 15px; }
+            
+            /* Give terminal a fixed height so you can still scroll inside the chat box */
+            .main-terminal { height: 80vh; }
+            
+            /* Resize the chunky text and boxes for mobile screens */
+            .message { max-width: 95%; font-size: 1.1rem; padding: 12px; }
+            .sugg-pill { font-size: 0.9rem; padding: 6px 10px; }
+            
+            /* Rearrange the input area to be more thumb-friendly */
+            .input-area { flex-direction: column; padding: 15px; }
+            .input-area textarea { height: 60px; font-size: 1.1rem; }
+            .action-btns { flex-direction: row; width: 100%; }
+            .btn-action { flex: 1; height: 50px; }
         }
     </style>
 </head>
@@ -311,7 +325,6 @@
             if (voiceSelect.value === 'on' && 'speechSynthesis' in window) {
                 const synth = window.speechSynthesis;
                 const utterance = new SpeechSynthesisUtterance(text);
-                // Try to find a robotic or distinct voice
                 const voices = synth.getVoices();
                 utterance.voice = voices.find(v => v.name.includes('Google') || v.name.includes('Zira')) || voices[0];
                 utterance.rate = 1.1;
@@ -332,7 +345,7 @@
                 }
             }
 
-            addMessage(userInput.value.trim(), 'user'); // Show only user text, not appended pad data in UI
+            addMessage(userInput.value.trim(), 'user'); 
             userInput.value = ''; 
             
             typingIndicator.style.display = 'block';
