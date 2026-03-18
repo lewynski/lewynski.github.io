@@ -34,7 +34,7 @@
             --grid-color: rgba(0, 0, 0, 0.05);
         }
 
-        /* --- GLOBAL & CURSORS --- */
+        /* --- GLOBAL, CURSORS & ALIVE ANIMATIONS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
@@ -47,6 +47,20 @@
             background-size: 30px 30px;
             overflow-x: hidden;
             transition: background-color 0.3s, color 0.3s;
+            /* NEW: Moving Grid Animation */
+            animation: scrollGrid 20s linear infinite;
+        }
+
+        @keyframes scrollGrid {
+            0% { background-position: 0px 0px; }
+            100% { background-position: 60px 60px; }
+        }
+
+        /* NEW: Global CRT Scanline Overlay */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px; z-index: 9999; pointer-events: none;
         }
 
         a, button, .dropbtn { cursor: pointer; }
@@ -130,12 +144,28 @@
             100% { transform: translateY(-150px); opacity: 0; }
         }
 
-        .profile-frame { margin-bottom: 20px; }
+        .profile-frame { margin-bottom: 20px; display: inline-block; }
+        
+        /* NEW: Glitch Hover on Profile Pic */
         .profile-pic {
             width: 160px; height: 160px; object-fit: cover;
             border: 4px solid var(--border-dark);
             box-shadow: 8px 8px 0px var(--retro-blue);
             image-rendering: pixelated; 
+            transition: all 0.1s;
+        }
+        .profile-frame:hover .profile-pic {
+            animation: glitch-anim 0.3s infinite;
+            border-color: var(--retro-pink);
+            box-shadow: 8px 8px 0px var(--retro-green);
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
         }
         
         .status-badge {
@@ -178,7 +208,6 @@
         
         .skills-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1250px; margin: 0 auto; }
         
-        /* The custom pop-in animation */
         @keyframes popInReveal {
             0% { opacity: 0; transform: translateY(60px) scale(0.9); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -189,15 +218,10 @@
             border: 4px solid var(--border-dark);
             box-shadow: 8px 8px 0px var(--border-dark);
             transition: transform 0.2s, background-color 0.3s;
-            opacity: 0; /* Hidden by default until JS triggers it */
+            opacity: 0; 
         }
 
-        /* The class JS will add when the card enters the screen */
-        .skill-card.show {
-            animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        /* Staggering the domino effect */
+        .skill-card.show { animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .skill-card:nth-child(1).show { animation-delay: 0.1s; }
         .skill-card:nth-child(2).show { animation-delay: 0.3s; }
         .skill-card:nth-child(3).show { animation-delay: 0.5s; }
@@ -209,40 +233,77 @@
         .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
         .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid #555; }
 
-        /* --- AI CHAT SECTION --- */
+        /* --- NEW: COOL AI TERMINAL HUD REDESIGN --- */
         .ai-chat-section { padding: 50px 20px; text-align: center; }
-        .chat-container {
-            background: var(--panel-bg); max-width: 800px; margin: 0 auto;
-            border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark);
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-        .chat-header {
-            background: #000; padding: 15px; color: var(--retro-green); border-bottom: 4px solid var(--border-dark);
-            display: flex; align-items: center; gap: 10px; font-size: 0.8rem; text-align: left;
-        }
-        .chat-messages {
-            height: 300px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
-            background: var(--bg-color); font-family: 'Arial', sans-serif;
-            font-size: 0.9rem; text-align: left;
-        }
-        .chat-messages::-webkit-scrollbar { width: 8px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: var(--border-dark); }
-
-        .message { padding: 12px 15px; border-radius: 8px; max-width: 80%; line-height: 1.5; border: 2px solid var(--border-dark); }
-        .msg-ai { background: var(--panel-bg); color: var(--text-main); align-self: flex-start; box-shadow: 3px 3px 0px var(--border-dark); }
-        .msg-user { background: var(--retro-blue); color: #fff; align-self: flex-end; box-shadow: -3px 3px 0px var(--border-dark); }
         
-        .chat-input-area { display: flex; padding: 15px; background: var(--panel-bg); border-top: 4px solid var(--border-dark); }
+        .chat-container {
+            background: rgba(13, 13, 26, 0.85); /* Very dark, semi-transparent */
+            max-width: 850px; margin: 0 auto;
+            border: 2px solid var(--retro-pink); 
+            box-shadow: 0 0 25px rgba(255, 121, 198, 0.3), inset 0 0 15px rgba(255, 121, 198, 0.1);
+            display: flex; flex-direction: column; overflow: hidden;
+            backdrop-filter: blur(4px);
+        }
+
+        .chat-header {
+            background: var(--retro-pink); padding: 10px 15px; color: #000; 
+            display: flex; align-items: center; justify-content: space-between; 
+            font-size: 0.7rem; font-weight: bold; text-align: left;
+        }
+        .chat-header .dots { display: flex; gap: 6px; }
+        .chat-header .dot { width: 10px; height: 10px; background: #000; border-radius: 50%; opacity: 0.5;}
+        
+        .sys-readout { font-family: 'Arial', sans-serif; font-size: 0.7rem; opacity: 0.8;}
+
+        .chat-messages {
+            height: 350px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
+            /* Inner terminal grid */
+            background-image: linear-gradient(rgba(255, 121, 198, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 121, 198, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-family: 'Arial', sans-serif; font-size: 0.95rem; text-align: left;
+        }
+        
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--retro-pink); }
+
+        .message { 
+            padding: 12px 18px; max-width: 85%; line-height: 1.6; 
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .msg-ai { 
+            color: var(--retro-green); align-self: flex-start; 
+            border-left: 4px solid var(--retro-green);
+            box-shadow: -4px 0 15px rgba(74, 222, 128, 0.2);
+        }
+        .msg-ai::before { content: "[EIJI-AI]: "; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: #fff; margin-bottom: 5px; display: block;}
+
+        .msg-user { 
+            color: var(--retro-blue); align-self: flex-end; 
+            border-right: 4px solid var(--retro-blue); text-align: right;
+            box-shadow: 4px 0 15px rgba(59, 130, 246, 0.2);
+        }
+        .msg-user::before { content: "[PLAYER_1]: "; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: #fff; margin-bottom: 5px; display: block;}
+        
+        .chat-input-area { 
+            display: flex; padding: 15px; background: rgba(0,0,0,0.8); 
+            border-top: 1px solid var(--retro-pink); align-items: center; gap: 10px;
+        }
+        .prompt-symbol { font-size: 1rem; color: var(--retro-pink); animation: blink 1s step-end infinite; }
+        
         .chat-input-area input {
-            flex: 1; padding: 12px; font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
-            background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark);
+            flex: 1; padding: 12px; font-family: 'VT323', monospace; font-size: 1.2rem;
+            background: transparent; color: var(--text-main); border: none;
             outline: none;
         }
         .chat-input-area button {
-            background: var(--retro-green); color: #000; border: 4px solid var(--border-dark);
-            padding: 0 20px; margin-left: 10px; font-family: 'Press Start 2P', cursive; font-size: 0.8rem;
-            transition: transform 0.1s; cursor: pointer;
+            background: transparent; color: var(--retro-pink); border: 2px solid var(--retro-pink);
+            padding: 10px 20px; font-family: 'Press Start 2P', cursive; font-size: 0.7rem;
+            transition: all 0.2s; cursor: pointer;
         }
+        .chat-input-area button:hover { background: var(--retro-pink); color: #000; box-shadow: 0 0 10px var(--retro-pink);}
         .chat-input-area button:active { transform: translateY(2px); }
 
         /* --- CONTACT FORM --- */
@@ -313,12 +374,14 @@
             .dropdown.active .dropdown-content { display: block; }
             
             h1 { font-size: 1.2rem; }
-            .chat-input-area { flex-direction: column; gap: 10px; }
-            .chat-input-area button { margin-left: 0; padding: 15px; }
+            .chat-input-area { flex-direction: column; align-items: stretch; gap: 10px; }
+            .prompt-symbol { display: none; }
         }
     </style>
 </head>
 <body>
+    
+    <div class="scanlines"></div>
 
     <nav>
         <div class="logo">UNFILTERED</div>
@@ -431,22 +494,29 @@
 
     <section id="ai-chat" class="ai-chat-section">
         <div class="section-title">
-            <h2>Ask Eiji AI</h2>
-            <p>My personal AI representative. Ask it anything about my skills, projects, or just say hello!</p>
+            <h2><i class="fas fa-microchip"></i> NEURAL LINK</h2>
+            <p>Interface directly with Eiji AI. Ask about my skills, projects, or experience.</p>
         </div>
         
         <div class="chat-container">
             <div class="chat-header">
-                <i class="fas fa-robot"></i> EIJI-AI TERMINAL ONLINE
-            </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="message msg-ai">
-                    Hello! I am Eiji, Jon Lewyn's personal AI assistant. How can I help you today? You can ask me about his engineering projects, his web dev skills, or his work experience!
+                <div><i class="fas fa-satellite-dish"></i> EIJI_SYS_TERMINAL_v1.0</div>
+                <div class="sys-readout">MEM: OK | CPU: 12%</div>
+                <div class="dots">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
             </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="message msg-ai">
+                    Connection established. I am Eiji, Jon Lewyn's personal AI protocol. Accessing database arrays... ready for inquiry.
+                </div>
+            </div>
+            
             <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Type your message here..." autocomplete="off">
-                <button id="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                <span class="prompt-symbol">>&nbsp;</span>
+                <input type="text" id="chat-input" placeholder="Execute command..." autocomplete="off">
+                <button id="chat-send-btn">TRANSMIT</button>
             </div>
         </div>
     </section>
@@ -565,7 +635,6 @@
         createParticles();
 
         // --- 4. GROQ AI CHAT INTEGRATION ---
-        // Insert your API key here to test locally
         const GROQ_API_KEY = "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"; 
         
         const chatMessages = document.getElementById('chat-messages');
@@ -665,14 +734,14 @@
 
         // --- 5. SCROLL REVEAL ANIMATIONS FOR TECH STACK ---
         const observerOptions = {
-            threshold: 0.2 // Trigger animation when 20% of the card is visible
+            threshold: 0.2 
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('show');
-                    observer.unobserve(entry.target); // Stop observing once revealed
+                    observer.unobserve(entry.target); 
                 }
             });
         }, observerOptions);
