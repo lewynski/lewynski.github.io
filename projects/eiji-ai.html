@@ -3,254 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capy AI Terminal</title>
+    <title>Capy OS | AI Terminal</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            /* --- THE NEON PINK PALETTE --- */
-            --bg-color: #2b0a1a;        /* Deep dark magenta background */
-            --panel-bg: #4a152c;        /* Dark pink panel */
-            --text-main: #ffe6f2;       /* Very pale pink text */
-            --retro-light-pink: #ffb3d9;/* Soft pastel pink for Capy */
-            --retro-hot-pink: #ff007f;  /* Bright neon hot pink */
-            --retro-magenta: #d10056;   /* Deep magenta for Player 1 */
-            --border-dark: #240010;     /* Almost black-pink for borders */
+            --bg-color: #2b0a1a;        
+            --panel-bg: #4a152c;        
+            --text-main: #ffe6f2;       
+            --retro-light-pink: #ffb3d9;
+            --retro-hot-pink: #ff007f;  
+            --retro-magenta: #d10056;   
+            --border-dark: #240010;     
+            --retro-cyan: #00ffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'VT323', monospace;
             background-color: var(--bg-color);
             color: var(--text-main);
             height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            /* Subtle retro grid */
             background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
             linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
             background-size: 30px 30px;
             cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+            overflow: hidden;
         }
 
-        button, input { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+        a, button, select, input { cursor: pointer; }
 
-        /* BACK BUTTON */
+        /* --- TOP NAV --- */
+        .top-nav {
+            background: var(--panel-bg); border-bottom: 4px solid var(--border-dark);
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 0px var(--border-dark); z-index: 10;
+        }
+        .nav-brand { font-family: 'Press Start 2P', cursive; font-size: 1rem; color: var(--retro-hot-pink); text-shadow: 2px 2px 0 var(--border-dark);}
         .back-btn {
-            position: absolute; top: 20px; left: 20px;
-            background: var(--panel-bg); color: var(--text-main);
-            padding: 10px 15px; text-decoration: none; font-size: 0.6rem;
-            border: 4px solid var(--border-dark);
-            box-shadow: 4px 4px 0px var(--border-dark);
-            transition: all 0.1s;
+            background: var(--bg-color); color: var(--text-main); padding: 8px 12px; 
+            text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
+            border: 2px solid var(--border-dark); transition: all 0.1s;
         }
-        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .back-btn:active { transform: translate(2px, 2px); }
 
-        /* MAIN TERMINAL CONTAINER */
-        .terminal-container {
-            width: 100%; max-width: 800px; height: 85vh;
-            background: var(--panel-bg); border: 4px solid var(--border-dark);
-            box-shadow: 10px 10px 0px var(--border-dark);
-            display: flex; flex-direction: column;
+        /* --- OS LAYOUT --- */
+        .os-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* --- SIDEBAR TOOLS --- */
+        .sidebar {
+            width: 300px; background: rgba(0,0,0,0.4); border-right: 4px solid var(--border-dark);
+            padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+        }
+        
+        .tool-panel { background: var(--panel-bg); border: 4px solid var(--border-dark); padding: 15px; box-shadow: 4px 4px 0 var(--border-dark);}
+        .tool-panel h3 { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--retro-light-pink); margin-bottom: 15px; border-bottom: 2px dashed var(--retro-hot-pink); padding-bottom: 10px;}
+        
+        .tool-group { margin-bottom: 15px; }
+        .tool-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: var(--retro-cyan); margin-bottom: 5px; }
+        select {
+            width: 100%; padding: 8px; font-family: 'VT323', monospace; font-size: 1.1rem;
+            background: var(--bg-color); color: var(--text-main); border: 2px solid var(--border-dark); outline: none;
         }
 
-        /* TERMINAL HEADER */
+        .quick-note {
+            width: 100%; height: 100px; padding: 10px; font-family: 'VT323', monospace; font-size: 1.1rem;
+            background: var(--bg-color); color: var(--text-main); border: 2px solid var(--border-dark); resize: none; outline: none;
+        }
+
+        .btn-tool {
+            width: 100%; background: var(--retro-magenta); color: #fff; padding: 10px;
+            font-family: 'Press Start 2P', cursive; font-size: 0.6rem; border: 2px solid var(--border-dark);
+            margin-top: 5px; transition: 0.1s;
+        }
+        .btn-tool:active { transform: translateY(2px); }
+
+        /* --- MAIN TERMINAL --- */
+        .main-terminal { flex: 1; display: flex; flex-direction: column; position: relative; }
+        
         .terminal-header {
-            background: var(--retro-magenta); padding: 20px;
-            border-bottom: 4px solid var(--border-dark);
+            background: var(--retro-magenta); padding: 15px 20px; border-bottom: 4px solid var(--border-dark);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .terminal-header h1 { font-size: 1rem; color: #fff; text-shadow: 2px 2px 0px var(--border-dark); margin: 0; }
-        
-        /* NEON PINK STATUS BLINKER */
-        .status-light {
-            width: 15px; height: 15px; background: var(--retro-hot-pink);
-            border: 2px solid var(--border-dark); border-radius: 50%;
-            box-shadow: 0 0 10px var(--retro-hot-pink);
-            animation: blink 2s infinite;
-        }
+        .terminal-header h2 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: #fff; text-shadow: 2px 2px 0 var(--border-dark); margin: 0; }
+        .status-light { width: 12px; height: 12px; background: var(--retro-hot-pink); border: 2px solid var(--border-dark); border-radius: 50%; box-shadow: 0 0 10px var(--retro-hot-pink); animation: blink 2s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* CHAT BOX AREA */
-        .chat-box {
-            flex: 1; padding: 20px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 20px;
-        }
-        
-        /* Custom Pink Scrollbar */
-        .chat-box::-webkit-scrollbar { width: 12px; }
-        .chat-box::-webkit-scrollbar-track { background: var(--bg-color); border-left: 4px solid var(--border-dark); }
+        /* CHAT BOX */
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .chat-box::-webkit-scrollbar { width: 10px; }
+        .chat-box::-webkit-scrollbar-track { background: var(--bg-color); border-left: 2px solid var(--border-dark); }
         .chat-box::-webkit-scrollbar-thumb { background: var(--retro-hot-pink); border: 2px solid var(--border-dark); }
 
-        /* MESSAGES */
-        .message {
-            max-width: 80%; padding: 15px; font-size: 0.7rem; line-height: 1.6;
-            border: 4px solid var(--border-dark); position: relative;
-        }
+        .message { max-width: 85%; padding: 15px; font-size: 1.3rem; line-height: 1.5; border: 4px solid var(--border-dark); position: relative; }
         
-        .msg-capy {
-            background: var(--retro-light-pink); color: #000; align-self: flex-start;
-            box-shadow: 6px 6px 0px var(--retro-hot-pink);
-            border-bottom-left-radius: 0; 
-        }
-        .msg-capy::before { content: "CAPY"; display: block; font-size: 0.5rem; color: var(--retro-hot-pink); margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
+        .msg-capy { background: var(--retro-light-pink); color: #000; align-self: flex-start; box-shadow: 6px 6px 0px var(--retro-hot-pink); border-bottom-left-radius: 0; }
+        .msg-capy::before { content: "CAPY OS"; display: block; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: var(--retro-hot-pink); margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
 
-        .msg-user {
-            background: var(--retro-magenta); color: #fff; align-self: flex-end;
-            box-shadow: -6px 6px 0px var(--border-dark);
-            border-bottom-right-radius: 0;
-        }
-        .msg-user::before { content: "PLAYER 1"; display: block; font-size: 0.5rem; color: #fff; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
+        .msg-user { background: var(--retro-magenta); color: #fff; align-self: flex-end; box-shadow: -6px 6px 0px var(--border-dark); border-bottom-right-radius: 0; }
+        .msg-user::before { content: "PLAYER 1"; display: block; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: #fff; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
 
-        /* TYPING INDICATOR */
-        .typing-indicator { font-size: 0.6rem; color: var(--retro-light-pink); align-self: flex-start; display: none; margin-left: 10px; }
+        .typing-indicator { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--retro-light-pink); align-self: flex-start; display: none; margin-left: 10px; padding: 10px;}
+
+        /* SUGGESTIONS */
+        .suggestions-container { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px 20px; background: rgba(0,0,0,0.2); border-top: 2px dashed var(--border-dark);}
+        .sugg-pill {
+            background: var(--bg-color); border: 2px solid var(--retro-hot-pink); color: var(--retro-light-pink);
+            padding: 8px 12px; font-family: 'VT323', monospace; font-size: 1.1rem; transition: 0.2s;
+        }
+        .sugg-pill:hover { background: var(--retro-hot-pink); color: #fff; }
 
         /* INPUT AREA */
-        .input-area {
-            display: flex; padding: 20px; background: var(--bg-color);
-            border-top: 4px solid var(--border-dark); gap: 10px;
-        }
-        .input-area input {
-            flex: 1; padding: 15px; font-family: 'Press Start 2P', cursive;
-            font-size: 0.7rem; background: #fff; color: #000;
-            border: 4px solid var(--border-dark); outline: none;
-        }
-        .input-area input:focus { border-color: var(--retro-hot-pink); }
+        .input-area { display: flex; padding: 20px; background: var(--panel-bg); border-top: 4px solid var(--border-dark); gap: 10px; align-items: stretch;}
         
-        .input-area button {
-            background: var(--retro-hot-pink); color: #fff; padding: 0 20px;
-            font-family: 'Press Start 2P', cursive; font-size: 0.8rem;
-            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
-            transition: all 0.1s;
+        .input-wrapper { flex: 1; display: flex; flex-direction: column; position: relative;}
+        .input-area textarea {
+            width: 100%; height: 60px; padding: 15px; font-family: 'VT323', monospace; font-size: 1.4rem;
+            background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark); outline: none; resize: none;
         }
-        .input-area button:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .input-area textarea:focus { border-color: var(--retro-hot-pink); }
+        
+        /* Voice & Action Buttons */
+        .action-btns { display: flex; gap: 10px; }
+        .btn-action {
+            background: var(--retro-hot-pink); color: #fff; width: 60px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: 0.1s;
+        }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-action.mic-active { background: var(--retro-cyan); color: #000; animation: pulse 1s infinite;}
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        @media (max-width: 768px) {
-            .terminal-container { height: 90vh; border-width: 2px; }
-            .message { max-width: 95%; font-size: 0.6rem; }
+        /* DISCLAIMER */
+        .disclaimer { text-align: center; font-size: 0.9rem; color: var(--text-muted); padding: 5px; background: #000; }
+
+        @media (max-width: 900px) {
+            .os-container { flex-direction: column; }
+            .sidebar { width: 100%; height: 250px; border-right: none; border-bottom: 4px solid var(--border-dark); }
+            .message { max-width: 95%; }
+            .action-btns { flex-direction: column; }
+            .btn-action { width: 100%; height: 40px; }
             .input-area { flex-direction: column; }
-            .input-area button { padding: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <a href="../index.html" class="back-btn">◀ RETURN</a>
+    <nav class="top-nav">
+        <div class="nav-brand"><i class="fas fa-microchip"></i> CAPY OS v2.0</div>
+        <a href="../index.html" class="back-btn">EXIT SYSTEM</a>
+    </nav>
 
-    <div class="terminal-container">
-        <div class="terminal-header">
-            <h1><i class="fas fa-robot"></i> CAPY OS v1.0</h1>
-            <div class="status-light" title="System Online"></div>
-        </div>
-
-        <div class="chat-box" id="chatBox">
-            <div class="message msg-capy">Hello Player 1! I am Capy, Jon Lewyn's personal AI assistant. What would you like to know about his projects or skills?</div>
-        </div>
+    <div class="os-container">
         
-        <div class="typing-indicator" id="typingIndicator">Capy is typing...</div>
+        <aside class="sidebar">
+            <div class="tool-panel">
+                <h3><i class="fas fa-sliders-h"></i> SYSTEM PREFS</h3>
+                <div class="tool-group">
+                    <label>AI PERSONA MODE</label>
+                    <select id="persona-select">
+                        <option value="assistant">Standard Assistant</option>
+                        <option value="study">Study & Academic Mode</option>
+                        <option value="code">Code Debugger</option>
+                        <option value="creative">Creative Writer</option>
+                        <option value="professional">Professional / Formal</option>
+                    </select>
+                </div>
+                <div class="tool-group">
+                    <label>VOICE OUTPUT</label>
+                    <select id="voice-select">
+                        <option value="on">Text-to-Speech: ON</option>
+                        <option value="off">Text-to-Speech: OFF</option>
+                    </select>
+                </div>
+                <button class="btn-tool" id="btn-clear-chat"><i class="fas fa-trash"></i> WIPE MEMORY</button>
+            </div>
 
-        <div class="input-area">
-            <input type="text" id="userInput" placeholder="COMMAND HERE..." autocomplete="off">
-            <button id="sendBtn">SEND</button>
-        </div>
+            <div class="tool-panel">
+                <h3><i class="fas fa-sticky-note"></i> SCRATCHPAD</h3>
+                <textarea class="quick-note" id="scratchpad" placeholder="Paste data here or jot down ideas..."></textarea>
+                <button class="btn-tool" id="btn-save-note">SAVE TO LOCAL</button>
+            </div>
+        </aside>
+
+        <main class="main-terminal">
+            <div class="terminal-header">
+                <h2><i class="fas fa-terminal"></i> TERMINAL INTERFACE</h2>
+                <div class="status-light" title="Neural Link Active"></div>
+            </div>
+
+            <div class="chat-box" id="chatBox">
+                <div class="message msg-capy">System online. Memory protocols active. How can I assist you today, Player 1?</div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">Processing syntax...</div>
+
+            <div class="suggestions-container" id="suggestions">
+                <button class="sugg-pill" onclick="insertPrompt('Brainstorm features for my S.A.B.A. acoustic analysis capstone.')">S.A.B.A. Capstone Ideas</button>
+                <button class="sugg-pill" onclick="insertPrompt('Debug Kivy matrix logic for the Matematika app.')">Matematika App Debug</button>
+                <button class="sugg-pill" onclick="insertPrompt('Draft a formal email for deploying the Aegis Admin panel.')">Aegis Admin Email</button>
+                <button class="sugg-pill" onclick="insertPrompt('Summarize the text currently in my Scratchpad.')">Analyze Scratchpad</button>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="userInput" placeholder="Enter command or paste data block..." autocomplete="off"></textarea>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-action" id="micBtn" title="Voice Input"><i class="fas fa-microphone"></i></button>
+                    <button class="btn-action" id="sendBtn" title="Execute Command" style="background: var(--retro-cyan); color: #000;"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+            
+            <div class="disclaimer">⚠️ Capy OS AI can make mistakes. Verify critical code and academic data.</div>
+        </main>
     </div>
 
     <script>
+        // ⚠️ SECURE YOUR API KEY HERE ⚠️
+        const API_KEY = "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"; 
+
+        // DOM Elements
         const chatBox = document.getElementById('chatBox');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
+        const micBtn = document.getElementById('micBtn');
         const typingIndicator = document.getElementById('typingIndicator');
+        const personaSelect = document.getElementById('persona-select');
+        const voiceSelect = document.getElementById('voice-select');
+        const scratchpad = document.getElementById('scratchpad');
 
-        // Capy's Memory Array
-        let conversationHistory = [
-            { 
-                role: "system", 
-                content: "You are Capy, the helpful AI assistant of Jon Lewyn, an Electronics Engineering student. Keep your answers brief, retro, and arcade-themed." 
+        // Load Scratchpad
+        scratchpad.value = localStorage.getItem('capy-scratchpad') || '';
+        document.getElementById('btn-save-note').addEventListener('click', () => {
+            localStorage.setItem('capy-scratchpad', scratchpad.value);
+            alert('Scratchpad saved to local memory!');
+        });
+
+        // Personas Contexts
+        const personas = {
+            assistant: "You are Capy OS, Jon Lewyn's personal AI assistant. Keep answers brief, retro, and arcade-themed. No markdown.",
+            study: "You are Capy OS Academic Mode. You act as an engineering tutor. Break down complex electronics and programming concepts simply. No markdown.",
+            code: "You are Capy OS Dev Mode. You are an expert in Python, JS, Kivy, and Arduino. Provide clean, secure code snippets and explain bugs directly. Do not use markdown backticks.",
+            creative: "You are Capy OS Creative Mode. You are highly imaginative. Use cyberpunk slang, neon aesthetics, and vivid language. No markdown.",
+            professional: "You are Capy OS Formal Mode. You write highly professional, corporate-level emails, documentation, and resumes. No slang. No markdown."
+        };
+
+        // Chat History Memory (LocalStorage)
+        let conversationHistory = JSON.parse(localStorage.getItem('capy-chat-memory')) || [];
+        
+        // Initialize history if empty
+        if (conversationHistory.length === 0) {
+            conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
+        }
+
+        // Render past messages on load
+        function renderHistory() {
+            chatBox.innerHTML = '<div class="message msg-capy">System online. Memory protocols active. How can I assist you today, Player 1?</div>';
+            conversationHistory.forEach(msg => {
+                if (msg.role === 'user') addMessage(msg.content, 'user', false);
+                if (msg.role === 'assistant') addMessage(msg.content, 'capy', false);
+            });
+        }
+        renderHistory();
+
+        // Change Persona Warning
+        personaSelect.addEventListener('change', () => {
+            conversationHistory[0].content = personas[personaSelect.value];
+            localStorage.setItem('capy-chat-memory', JSON.stringify(conversationHistory));
+            addMessage(`SYSTEM OVERRIDE: Persona switched to ${personaSelect.options[personaSelect.selectedIndex].text}.`, 'capy');
+        });
+
+        // Clear Memory
+        document.getElementById('btn-clear-chat').addEventListener('click', () => {
+            if(confirm("WARNING: This will purge all conversation history. Proceed?")) {
+                conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
+                localStorage.setItem('capy-chat-memory', JSON.stringify(conversationHistory));
+                renderHistory();
             }
-        ];
+        });
 
-        // Function to create message bubbles
-        function addMessage(text, sender) {
+        // Insert prompt from suggestions
+        window.insertPrompt = function(text) {
+            userInput.value = text;
+            userInput.focus();
+        };
+
+        function addMessage(text, sender, save = true) {
             const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message');
-            msgDiv.classList.add(sender === 'user' ? 'msg-user' : 'msg-capy');
+            msgDiv.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-capy');
             msgDiv.innerText = text;
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
+
+            if(save) {
+                conversationHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: text });
+                localStorage.setItem('capy-chat-memory', JSON.stringify(conversationHistory));
+            }
+        }
+
+        // Text to Speech
+        function speak(text) {
+            if (voiceSelect.value === 'on' && 'speechSynthesis' in window) {
+                const synth = window.speechSynthesis;
+                const utterance = new SpeechSynthesisUtterance(text);
+                // Try to find a robotic or distinct voice
+                const voices = synth.getVoices();
+                utterance.voice = voices.find(v => v.name.includes('Google') || v.name.includes('Zira')) || voices[0];
+                utterance.rate = 1.1;
+                synth.speak(utterance);
+            }
         }
 
         // Main sending function
         async function handleSend() {
-            const text = userInput.value.trim();
+            let text = userInput.value.trim();
             if (!text) return;
 
-            addMessage(text, 'user');
+            // Handle Scratchpad injection
+            if (text.toLowerCase().includes("scratchpad")) {
+                const padContent = scratchpad.value.trim();
+                if (padContent) {
+                    text += `\n\n[ATTACHED DATA BLOCK]:\n"${padContent}"`;
+                }
+            }
+
+            addMessage(userInput.value.trim(), 'user'); // Show only user text, not appended pad data in UI
             userInput.value = ''; 
-            
-            // Save user message to memory
-            conversationHistory.push({ role: "user", content: text });
             
             typingIndicator.style.display = 'block';
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            // ==========================================
-            // PUT YOUR SECURE API KEY HERE
-            // ==========================================
-            const API_KEY = "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"; 
             
+            if (API_KEY === "YOUR_GROQ_API_KEY_HERE") {
+                setTimeout(() => {
+                    typingIndicator.style.display = 'none';
+                    addMessage("SYSTEM ERROR: Groq API Key missing. Neural link severed.", 'capy');
+                }, 1000);
+                return;
+            }
+
             try {
+                // Ensure system prompt is accurate before sending
+                conversationHistory[0].content = personas[personaSelect.value];
+                
+                // Add actual text sent to Groq
+                const tempHistory = [...conversationHistory, { role: "user", content: text }];
+
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        // Using the upgraded, highly capable Llama 3.3 model
                         model: "llama-3.3-70b-versatile", 
-                        messages: conversationHistory 
+                        messages: tempHistory
                     })
                 });
 
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
 
-                // Robust Error Check - Prints exact error to the chat screen
                 if (!response.ok) {
-                    console.error("Groq Error Details:", data);
-                    addMessage(`GROQ ERROR: ${data.error?.message || 'Unknown API issue'}`, 'capy');
-                    conversationHistory.pop(); // Remove the failed message so user can try again
+                    addMessage(`GROQ ERROR: ${data.error?.message || 'Unknown API issue'}`, 'capy', false);
                     return; 
                 }
 
-                // Show AI response
                 let capyResponse = data.choices[0].message.content;
-                addMessage(capyResponse, 'capy');
+                
+                // Remove Markdown asterisks for pure retro look
+                capyResponse = capyResponse.replace(/\*\*/g, '').replace(/\*/g, '');
 
-                // Save AI response to memory
-                conversationHistory.push({ role: "assistant", content: capyResponse });
+                addMessage(capyResponse, 'capy');
+                speak(capyResponse);
 
             } catch (error) {
                 typingIndicator.style.display = 'none';
-                addMessage("SYSTEM ERROR: Total network failure. Check console.", 'capy');
-                console.error("Network Error:", error);
+                addMessage("SYSTEM ERROR: Total network failure.", 'capy');
             }
         }
 
-        // Trigger send on "Enter" key
-        userInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') handleSend();
-        });
+        // Voice Input (Speech to Text)
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            
+            recognition.onstart = function() {
+                micBtn.classList.add('mic-active');
+                userInput.placeholder = "Listening...";
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                userInput.value = transcript;
+            };
+            
+            recognition.onend = function() {
+                micBtn.classList.remove('mic-active');
+                userInput.placeholder = "Enter command or paste data block...";
+            };
 
-        // Trigger send on button click
+            micBtn.addEventListener('click', () => {
+                if(micBtn.classList.contains('mic-active')) recognition.stop();
+                else recognition.start();
+            });
+        } else {
+            micBtn.style.display = 'none'; // Hide if browser doesn't support
+        }
+
+        // Listeners
+        userInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { // Allow Shift+Enter for new lines
+                e.preventDefault();
+                handleSend();
+            }
+        });
         sendBtn.addEventListener('click', handleSend);
     </script>
-
 </body>
 </html>
