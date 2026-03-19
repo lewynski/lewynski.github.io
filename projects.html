@@ -13,8 +13,8 @@
             --bg-color: #1e1e2f; --panel-bg: #2a2a40; --panel-bg-2: #343454;
             --text-main: #f8f8f2; --text-muted: #a8a8b2; --retro-green: #4ade80;
             --retro-blue: #3b82f6; --retro-purple: #bd93f9; --retro-pink: #ff79c6;
-            --retro-gold: #facc15; --retro-orange: #ffb86c; --border-dark: #000000; 
-            --grid-color: rgba(255, 255, 255, 0.03);
+            --retro-gold: #facc15; --retro-orange: #ffb86c; --retro-cyan: #8be9fd; 
+            --border-dark: #000000; --grid-color: rgba(255, 255, 255, 0.03);
         }
 
         [data-theme="light"] {
@@ -84,13 +84,14 @@
         .item-card:hover { transform: translateY(-5px); }
         .item-card.show { animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         
-        /* Animation Delays for all 6 cards */
+        /* Animation Delays for all 7 cards */
         .item-card:nth-child(1).show { animation-delay: 0.1s; } 
         .item-card:nth-child(2).show { animation-delay: 0.3s; } 
         .item-card:nth-child(3).show { animation-delay: 0.5s; }
         .item-card:nth-child(4).show { animation-delay: 0.7s; }
         .item-card:nth-child(5).show { animation-delay: 0.9s; }
         .item-card:nth-child(6).show { animation-delay: 1.1s; }
+        .item-card:nth-child(7).show { animation-delay: 1.3s; }
         
         @keyframes popInReveal { 0% { opacity: 0; transform: translateY(60px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
@@ -217,6 +218,15 @@
                 <h3 class="item-title">NetWatch PH Simulator</h3>
                 <p class="item-desc">An AI-driven ISP diagnostic simulator. Uses complex Groq AI prompting to generate realistic network status and latency reports for Philippine regions.</p>
                 <a href="projects/netwatch.html" class="btn-card" style="background: var(--retro-blue); color: #fff; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
+            </div>
+
+            <div class="item-card">
+                <div class="item-img-wrapper" style="color: var(--retro-cyan); box-shadow: inset 0 0 20px rgba(139, 233, 253, 0.2);">
+                    <i class="fas fa-fish"></i>
+                </div>
+                <h3 class="item-title">IsdaDex Marine AI</h3>
+                <p class="item-desc">A marine biology database specializing in local Philippine fishes. Uses API Chaining to fetch Groq AI analysis and Wikipedia imagery.</p>
+                <a href="projects/isdadex.html" class="btn-card" style="background: var(--retro-cyan); color: #000; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
 
         </div>
