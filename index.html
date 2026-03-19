@@ -74,9 +74,9 @@
         h3 { font-size: 0.8rem; margin-bottom: 10px; color: var(--retro-blue); }
         p { font-size: 0.65rem; color: var(--text-muted); line-height: 2; }
 
-        /* --- NEW FLOATING PIXEL NAV BAR --- */
+        /* --- NEW FLOATING PIXEL NAV BAR (SCROLLS AWAY) --- */
         nav {
-            position: fixed;
+            position: absolute; /* Changed from fixed so it scrolls away */
             top: 20px; left: 50%; transform: translateX(-50%);
             width: 95%; max-width: 1200px;
             background: rgba(42, 42, 64, 0.95);
@@ -176,7 +176,7 @@
         .stat-card span { font-size: 0.5rem; color: var(--text-muted); }
 
         .scroll-indicator { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 0.5rem; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; animation: bounceDown 2s infinite; }
-        .scroll-indicator i { color: var(--retro-pink); font-size: 1rem; }
+        .scroll-indicator i { color: var(--retro-pink); font-size: 1rem; text-shadow: 2px 2px 0 var(--border-dark); }
         @keyframes bounceDown { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
 
         .skills-section, .ai-chat-section, .contact-section { padding: 70px 20px; text-align: center; position: relative; z-index: 2; }
@@ -194,7 +194,7 @@
         .skill-card:hover { transform: translateY(-8px) rotate(-0.5deg); box-shadow: 10px 10px 0px var(--border-dark); }
         .icon-box { font-size: 2.5rem; color: var(--retro-pink); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
         .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid #555; transition: transform 0.2s; }
+        .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid var(--border-dark); transition: transform 0.2s; }
         .tags span:hover { transform: scale(1.06); }
 
         .ai-chat-section .section-title p { max-width: 760px; margin: 0 auto; }
@@ -207,7 +207,7 @@
         .ai-avatar { position: absolute; inset: 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top, #1f2937, #000); border: 3px solid var(--retro-green); color: var(--retro-green); font-size: 2rem; box-shadow: 0 0 20px rgba(74, 222, 128, 0.25); }
         @keyframes spinRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .ai-side-panel h3 { color: var(--retro-green); font-size: 0.9rem; margin-bottom: 10px; text-shadow: 2px 2px 0px var(--border-dark); }
-        .ai-side-text { font-size: 0.55rem; margin-bottom: 20px; }
+        .ai-side-text { font-size: 0.55rem; margin-bottom: 20px; color: var(--text-muted); }
         .ai-status-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
         .ai-status-item { display: flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.45); border: 2px solid var(--border-dark); padding: 10px; font-size: 0.5rem; color: var(--text-main); text-align: left; }
         .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
@@ -265,18 +265,31 @@
         .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
         .reveal.visible { opacity: 1; transform: translateY(0); }
 
-        /* --- MOBILE TWEAKS --- */
+        /* --- RESPONSIVE MOBILE FIX FOR NAV BAR --- */
         @media (max-width: 900px) {
-            nav { width: 100%; top: 0; border-left: none; border-right: none; border-top: none; padding: 15px 20px; }
-            .nav-brand-text { display: none; } /* Hide text on mobile, keep logo */
-            .nav-center { display: none; width: 100%; flex-direction: column; position: absolute; top: 100%; left: 0; background: var(--panel-bg); border-bottom: 4px solid var(--border-dark); padding: 10px 0; }
+            nav { 
+                position: absolute; /* Keeps it at the top of the page */
+                top: 0; left: 0; transform: none; 
+                width: 100%; max-width: 100%;
+                border-left: none; border-right: none; border-top: none; 
+                padding: 15px 20px; margin: 0; border-radius: 0;
+            }
+            .nav-brand-text { display: none; }
+            .nav-center { 
+                display: none; width: 100%; flex-direction: column; 
+                position: absolute; top: 100%; left: 0; 
+                background: var(--panel-bg); border-bottom: 4px solid var(--border-dark); 
+                padding: 0; margin: 0; box-shadow: 0px 8px 0px rgba(0,0,0,0.5); 
+            }
             .nav-center.show { display: flex; }
             .nav-center a, .dropbtn { width: 100%; padding: 15px; text-align: center; border-bottom: 2px solid var(--border-dark); }
+            .nav-center a:last-child { border-bottom: none; }
             .dropdown { width: 100%; flex-direction: column; }
-            .dropdown-content { position: relative; width: 100%; box-shadow: none; border: none; border-top: 2px dashed var(--border-dark); }
+            .dropdown-content { position: static; width: 100%; box-shadow: none; border: none; border-top: 2px dashed var(--border-dark); background: var(--bg-color); display: none; }
+            .dropdown.active .dropdown-content { display: block; }
             
             .mobile-menu-btn { display: flex; }
-            .btn-talk { display: none; } /* Hide large button on mobile header */
+            .btn-talk { display: none; } /* Hide TALK TO EIJI button to save space on mobile */
 
             .hero-container { padding: 120px 16px 100px; }
             .status-badge { min-width: 100%; max-width: 100%; font-size: 0.52rem; }
@@ -653,7 +666,6 @@
         });
 
         // --- AI CHAT LOGIC ---
-        // ⚠️ REMEMBER TO REPLACE THIS WITH YOUR REAL API KEY LATER ⚠️
         const GROQ_API_KEY = "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";
 
         const chatMessages = document.getElementById('chat-messages');
