@@ -37,7 +37,6 @@
 
         a, button { cursor: pointer; }
 
-        /* --- SYNCHRONIZED NAV BAR --- */
         nav {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 1200px;
             background: rgba(42, 42, 64, 0.95); border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark);
@@ -64,7 +63,6 @@
         .theme-toggle-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
         .mobile-menu-btn { display: none; background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1.2rem; color: var(--text-main); align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); }
 
-        /* --- ARCHIVE LAYOUT --- */
         .archive-container { padding: 150px 20px 80px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
         
         .back-btn-container { width: 100%; max-width: 1100px; text-align: left; margin-bottom: 30px; }
@@ -76,7 +74,6 @@
         .archive-header h1 { font-size: 1.5rem; color: var(--retro-gold); text-shadow: 4px 4px 0 var(--border-dark); margin-bottom: 15px; }
         .archive-header p { font-size: 0.65rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.8; }
 
-        /* --- THE CARD GRID --- */
         .card-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; max-width: 1150px; margin: 0 auto; }
         
         .item-card { background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 10px 10px 0px var(--border-dark); width: 340px; padding: 25px 20px 20px; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; opacity: 0; }
@@ -86,7 +83,6 @@
         
         @keyframes popInReveal { 0% { opacity: 0; transform: translateY(60px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* The Pink Pin */
         .item-card::before { content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; background: var(--retro-pink); border: 4px solid var(--border-dark); border-radius: 50%; z-index: 3; box-shadow: inset -2px -2px 0 rgba(0,0,0,0.3); }
         .item-card::after { content: ""; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 4px; height: 25px; background: var(--border-dark); z-index: 1; }
 
@@ -163,7 +159,7 @@
                 </div>
                 <h3 class="item-title">CapySave App</h3>
                 <p class="item-desc">A neural-linked virtual wealth terminal and budget tracker. Features real-time dashboard analytics and Groq AI financial diagnostics.</p>
-                <a href="projects/capysave.html" target="_blank" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
+                <a href="projects/capysave.html" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
 
             <div class="item-card">
@@ -172,7 +168,7 @@
                 </div>
                 <h3 class="item-title">Capy OS AI</h3>
                 <p class="item-desc">A customized cyberpunk AI assistant terminal. Features multi-mode personas, persistent memory, and scratchpad context injection.</p>
-                <a href="projects/eiji-ai.html" target="_blank" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
+                <a href="projects/eiji-ai.html" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
 
             <div class="item-card">
@@ -181,16 +177,7 @@
                 </div>
                 <h3 class="item-title">Cyber Retro Game</h3>
                 <p class="item-desc">An interactive pixelated browser game built entirely with JavaScript, HTML Canvas, and retro physics mechanics.</p>
-                <a href="projects/snake-game.html" target="_blank" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
-            </div>
-
-            <div class="item-card reveal">
-                <div class="item-img-wrapper" style="color: var(--retro-orange);">
-                    <i class="fas fa-barcode"></i>
-                </div>
-                <h3 class="item-title">PresyoDex Scanner</h3>
-                <p class="item-desc">An AI-powered pricing database for the Philippines. Queries Groq AI for standard retail SRP estimates on everyday items.</p>
-                <a href="projects/presyodex.html" target="_blank" class="btn-card" style="background: var(--retro-orange); color: #000;"><i class="fas fa-play"></i> LAUNCH APP</a>
+                <a href="projects/snake-game.html" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
 
         </div>
@@ -206,7 +193,6 @@
     </footer>
 
     <script>
-        // Only load pure UI logic. The AI chat script has been safely removed from this page.
         const themeBtn = document.getElementById('theme-btn');
         const themeIcon = themeBtn.querySelector('i');
         const body = document.documentElement;
