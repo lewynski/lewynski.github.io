@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PresyoDex | PH SRP Scanner</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #1e1e2f; --panel-bg: #2a2a40; --text-main: #f8f8f2;
+            --text-muted: #a8a8b2; --retro-green: #4ade80; --retro-blue: #3b82f6;
+            --retro-purple: #bd93f9; --retro-pink: #ff79c6; --retro-gold: #facc15;
+            --retro-orange: #ffb86c; --border-dark: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'VT323', monospace; background-color: var(--bg-color); color: var(--text-main);
+            font-size: 1.3rem; line-height: 1.6; padding: 20px;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
+            background-size: 30px 30px; min-height: 100vh;
+        }
+
+        a, button { cursor: pointer; }
+
+        .back-btn {
+            display: inline-block; margin-bottom: 20px; background: var(--panel-bg); color: var(--text-main);
+            padding: 10px 15px; text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
+            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
+        }
+        .back-btn:hover { background: var(--retro-orange); color: #000;}
+        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
+        .app-container {
+            max-width: 900px; margin: 0 auto; background: var(--panel-bg); border: 6px solid var(--border-dark);
+            box-shadow: 12px 12px 0px var(--border-dark); padding: 30px;
+        }
+
+        header { text-align: center; border-bottom: 4px dashed var(--border-dark); padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { font-family: 'Press Start 2P', cursive; font-size: 1.8rem; color: var(--retro-orange); text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 10px; }
+        .subtitle { color: var(--retro-green); font-size: 1.2rem; }
+
+        /* --- DASHBOARD DISPLAYS --- */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        @media (max-width: 600px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        .stat-card {
+            background: #1e1e2f; border: 4px solid var(--border-dark); padding: 20px;
+            text-align: center; box-shadow: 6px 6px 0px var(--border-dark); position: relative;
+        }
+        .stat-card.price-box { border-color: var(--retro-green); }
+        .stat-card.cat-box { border-color: var(--retro-purple); }
+        
+        .stat-card h3 { font-family: 'Press Start 2P', cursive; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 10px; }
+        .stat-card .val { font-size: 2.5rem; font-weight: bold; color: #fff; }
+
+        /* --- LAYOUT GRIDS --- */
+        .main-content { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; margin-bottom: 30px;}
+        @media (max-width: 850px) { .main-content { grid-template-columns: 1fr; } }
+
+        /* --- INPUT FORM --- */
+        .panel { background: rgba(0,0,0,0.2); border: 4px solid var(--border-dark); padding: 20px; display: flex; flex-direction: column;}
+        .panel h2 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--retro-orange); margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px;}
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: 0.55rem; color: var(--retro-gold); margin-bottom: 8px; }
+        .form-group input {
+            width: 100%; padding: 15px; font-family: 'VT323', monospace; font-size: 1.5rem; background: var(--bg-color);
+            color: var(--text-main); border: 4px solid var(--border-dark); outline: none; text-transform: capitalize;
+        }
+        .form-group input:focus { border-color: var(--retro-orange); }
+        
+        .btn-submit {
+            width: 100%; background: var(--retro-orange); color: #000; padding: 15px; border: 4px solid var(--border-dark); 
+            box-shadow: 4px 4px 0px var(--border-dark); font-family: 'Press Start 2P', cursive; font-size: 0.8rem; 
+            margin-top: 10px; transition: all 0.1s; cursor: pointer;
+        }
+        .btn-submit:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-submit:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+        /* --- AI TERMINAL --- */
+        .ai-terminal {
+            flex-grow: 1; background: #000; border: 4px solid var(--retro-blue); padding: 15px;
+            color: var(--retro-blue); font-size: 1.2rem; line-height: 1.5; text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+            min-height: 120px;
+        }
+        .cursor { display: inline-block; width: 10px; height: 15px; background: var(--retro-blue); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;}
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- HISTORY LOGS --- */
+        #history-list { list-style: none; height: 300px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px;}
+        #history-list::-webkit-scrollbar { width: 8px; }
+        #history-list::-webkit-scrollbar-thumb { background: var(--border-dark); }
+
+        .tx-item {
+            background: var(--panel-bg); border: 2px solid var(--border-dark); padding: 12px; margin-bottom: 10px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .tx-info h4 { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: #fff; margin-bottom: 5px; line-height: 1.4;}
+        .tx-info p { font-size: 0.85rem; color: var(--text-muted); }
+        .tx-amount { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--retro-green);}
+
+        .btn-reset {
+            width: 100%; background: transparent; color: var(--retro-pink); padding: 10px; border: 2px dashed var(--retro-pink);
+            font-family: 'Press Start 2P', cursive; font-size: 0.6rem; text-transform: uppercase; margin-top: auto; transition: all 0.2s; cursor: pointer;
+        }
+        .btn-reset:hover { background: var(--retro-pink); color: #fff; }
+        .empty-state { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.2rem;}
+        .disclaimer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 20px;}
+    </style>
+</head>
+<body>
+
+    <a href="../projects.html" class="back-btn">◀ RETURN TO ARCHIVE</a>
+
+    <div class="app-container">
+        <header>
+            <h1><i class="fas fa-barcode"></i> PRESYODEX</h1>
+            <div class="subtitle">Philippine Retail SRP Scanner</div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="stat-card price-box">
+                <h3>ESTIMATED SRP</h3>
+                <div class="val" id="display-price">₱0.00</div>
+            </div>
+            <div class="stat-card cat-box">
+                <h3>CATEGORY</h3>
+                <div class="val" id="display-cat" style="font-size: 1.8rem; margin-top: 10px;">---</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2><i class="fas fa-search"></i> ITEM SCANNER</h2>
+                <form id="scan-form">
+                    <div class="form-group">
+                        <label>ENTER SNACK / GROCERY / ITEM</label>
+                        <input type="text" id="item-input" placeholder="e.g. Piattos Cheese, C2 Apple, Milo..." required autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-scan">SCAN RETAIL DATABASE</button>
+                </form>
+
+                <h2 style="margin-top: 30px;"><i class="fas fa-robot"></i> AI ANALYSIS</h2>
+                <div class="ai-terminal">
+                    <span id="ai-output">> Awaiting item scan...</span><span class="cursor"></span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fas fa-history"></i> SCAN HISTORY</h2>
+                <ul id="history-list"></ul>
+                <button id="btn-reset" class="btn-reset"><i class="fas fa-trash-alt"></i> PURGE LOGS</button>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            *Prices generated by Groq AI. These are general Suggested Retail Prices (SRP) in the Philippines and may vary by supermarket, sari-sari store, or location.
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ INSERT YOUR API KEY HERE ⚠️
+        const GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE"; 
+
+        // State Management
+        let scanHistory = JSON.parse(localStorage.getItem('presyodex-history')) || [];
+        
+        // DOM Elements
+        const form = document.getElementById('scan-form');
+        const inputItem = document.getElementById('item-input');
+        const btnScan = document.getElementById('btn-scan');
+        const displayPrice = document.getElementById('display-price');
+        const displayCat = document.getElementById('display-cat');
+        const aiOutput = document.getElementById('ai-output');
+        const historyList = document.getElementById('history-list');
+        const btnReset = document.getElementById('btn-reset');
+        
+        let typeWriterTimeout;
+
+        // Render History List
+        function renderHistory() {
+            historyList.innerHTML = '';
+            if (scanHistory.length === 0) {
+                historyList.innerHTML = '<div class="empty-state">No items scanned yet.</div>';
+                return;
+            }
+
+            [...scanHistory].reverse().forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'tx-item';
+                li.innerHTML = `
+                    <div class="tx-info">
+                        <h4>${item.name}</h4>
+                        <p>${item.category} • ${item.date}</p>
+                    </div>
+                    <div class="tx-amount">${item.price}</div>
+                `;
+                historyList.appendChild(li);
+            });
+        }
+
+        // Typewriter Effect
+        function typeWriter(text) {
+            clearTimeout(typeWriterTimeout);
+            aiOutput.textContent = "";
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    aiOutput.textContent += text.charAt(i);
+                    i++;
+                    typeWriterTimeout = setTimeout(type, 20); 
+                }
+            }
+            type();
+        }
+
+        // AI Fetch Logic
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const itemName = inputItem.value.trim();
+            if(!itemName) return;
+
+            btnScan.disabled = true;
+            btnScan.textContent = "SCANNING DATABASE...";
+            displayPrice.textContent = "---";
+            displayCat.textContent = "---";
+            typeWriter(`> Searching Philippine retail databases for "${itemName}"...`);
+
+            if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
+                setTimeout(() => {
+                    typeWriter("> ERROR: Groq API Key missing. Database offline.");
+                    btnScan.disabled = false;
+                    btnScan.textContent = "SCAN RETAIL DATABASE";
+                }, 1000);
+                return;
+            }
+
+            // Upgraded Prompt: General Philippine Market SRP
+            const systemPrompt = `You are PresyoDex, an expert database for general supermarket and convenience store prices in the Philippines. 
+            The user will give you a snack, drink, grocery, or everyday item.
+            You must reply with the estimated general SRP (Suggested Retail Price) in Philippine Pesos.
+            You MUST format your reply exactly like this, on three separate lines:
+            PRICE: ₱[Amount]
+            CATEGORY: [Category Name]
+            ANALYSIS: [One short, analytical sentence about the item]`;
+
+            try {
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${GROQ_API_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.1-8b-instant", 
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: `What is the standard Philippine price of: ${itemName}?` }
+                        ],
+                        temperature: 0.3,
+                        max_tokens: 100 
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Connection Failed");
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                // Parse the response
+                let price = "₱0.00", cat = "Unknown", analysis = "Item found in database.";
+                
+                const lines = aiResponse.split('\n');
+                lines.forEach(line => {
+                    if(line.toUpperCase().includes('PRICE:')) price = line.split(':')[1].trim();
+                    if(line.toUpperCase().includes('CATEGORY:')) cat = line.split(':')[1].trim();
+                    if(line.toUpperCase().includes('ANALYSIS:')) analysis = line.split(':')[1].trim();
+                });
+
+                // Update UI Dashboard
+                displayPrice.textContent = price;
+                displayCat.textContent = cat;
+                typeWriter("> " + analysis);
+
+                // Save to History
+                const dateStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                scanHistory.push({ name: itemName, price: price, category: cat, date: dateStr });
+                localStorage.setItem('presyodex-history', JSON.stringify(scanHistory));
+                
+                renderHistory();
+                inputItem.value = '';
+
+            } catch (error) {
+                console.error(error);
+                typeWriter("> ERROR: Item not found or database link severed.");
+            }
+
+            btnScan.disabled = false;
+            btnScan.textContent = "SCAN RETAIL DATABASE";
+            inputItem.focus();
+        });
+
+        // Reset Logic
+        btnReset.addEventListener('click', () => {
+            if(confirm("Purge all scan logs?")) {
+                scanHistory = [];
+                localStorage.removeItem('presyodex-history');
+                renderHistory();
+                displayPrice.textContent = "₱0.00";
+                displayCat.textContent = "---";
+                typeWriter("> Memory wiped. Ready for new scans.");
+            }
+        });
+
+        // Init
+        renderHistory();
+    </script>
+</body>
+</html>
