@@ -228,17 +228,23 @@
             typeWriterHTML(html);
         }
 
-        // Fetch Image from Wikipedia Open API (No Key Needed!)
+        // --- UPDATED WIKIPEDIA FETCH LOGIC ---
+        // Uses Search (gsrsearch) instead of Exact Title to handle common names better
         async function fetchImage(query) {
             try {
-                const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(query)}&prop=pageimages&format=json&pithumbsize=600&origin=*`);
+                const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=600&origin=*`);
                 const data = await res.json();
-                const pages = data.query.pages;
-                const pageId = Object.keys(pages)[0];
-                if (pageId !== "-1" && pages[pageId].thumbnail) {
-                    return pages[pageId].thumbnail.source;
+                
+                if (data.query && data.query.pages) {
+                    const pages = data.query.pages;
+                    const pageId = Object.keys(pages)[0]; // Grab the top search result
+                    
+                    if (pages[pageId].thumbnail) {
+                        return pages[pageId].thumbnail.source;
+                    }
                 }
-                return 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=600&auto=format&fit=crop'; // Generic leaf fallback
+                // Fallback generic leaf image if search fails or has no image
+                return 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=600&auto=format&fit=crop'; 
             } catch (e) {
                 return 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=600&auto=format&fit=crop';
             }
@@ -247,7 +253,6 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             let itemName = inputItem.value.trim();
-            // Capitalize first letter
             itemName = itemName.charAt(0).toUpperCase() + itemName.slice(1).toLowerCase();
             if(!itemName) return;
 
@@ -275,7 +280,7 @@
             FACT: [One very interesting trivia fact]`;
 
             try {
-                // Fetch AI Data and Image simultaneously (Promise.all makes it faster!)
+                // Fetch AI Data and Image simultaneously
                 const [groqRes, imgUrl] = await Promise.all([
                     fetch("https://api.groq.com/openai/v1/chat/completions", {
                         method: "POST",
@@ -309,7 +314,6 @@
 
                 const newData = { id: Date.now(), name: itemName, sciName: sci, symbol: sym, care: care, fact: fact, imgUrl: imgUrl };
                 
-                // Add to history and local storage
                 scanHistory.push(newData);
                 localStorage.setItem('floradex-history', JSON.stringify(scanHistory));
                 
