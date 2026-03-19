@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PresyoDex | PH SRP Scanner</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
 
         body {
             font-family: 'VT323', monospace; background-color: var(--bg-color); color: var(--text-main);
-            font-size: 1.3rem; line-height: 1.6; padding: 20px;
+            font-size: clamp(1rem, 2vw, 1.3rem); line-height: 1.6; padding: 20px;
             background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
             background-size: 30px 30px; min-height: 100vh;
         }
@@ -29,24 +29,23 @@
 
         .back-btn {
             display: inline-block; margin-bottom: 20px; background: var(--panel-bg); color: var(--text-main);
-            padding: 10px 15px; text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
+            padding: 10px 15px; text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.6rem);
             border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
         }
         .back-btn:hover { background: var(--retro-orange); color: #000;}
         .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
 
         .app-container {
-            max-width: 900px; margin: 0 auto; background: var(--panel-bg); border: 6px solid var(--border-dark);
+            max-width: 950px; margin: 0 auto; background: var(--panel-bg); border: 6px solid var(--border-dark);
             box-shadow: 12px 12px 0px var(--border-dark); padding: 30px;
         }
 
         header { text-align: center; border-bottom: 4px dashed var(--border-dark); padding-bottom: 20px; margin-bottom: 30px; }
-        h1 { font-family: 'Press Start 2P', cursive; font-size: 1.8rem; color: var(--retro-orange); text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 10px; }
-        .subtitle { color: var(--retro-green); font-size: 1.2rem; }
+        h1 { font-family: 'Press Start 2P', cursive; font-size: clamp(1.2rem, 4vw, 1.8rem); color: var(--retro-orange); text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 10px; line-height: 1.4;}
+        .subtitle { color: var(--retro-green); font-size: clamp(0.9rem, 2vw, 1.2rem); }
 
         /* --- DASHBOARD DISPLAYS --- */
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-        @media (max-width: 600px) { .dashboard-grid { grid-template-columns: 1fr; } }
         
         .stat-card {
             background: #1e1e2f; border: 4px solid var(--border-dark); padding: 20px;
@@ -55,44 +54,56 @@
         .stat-card.price-box { border-color: var(--retro-green); }
         .stat-card.cat-box { border-color: var(--retro-purple); }
         
-        .stat-card h3 { font-family: 'Press Start 2P', cursive; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 10px; }
-        .stat-card .val { font-size: 2.5rem; font-weight: bold; color: #fff; }
+        .stat-card h3 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.65rem); color: var(--text-muted); margin-bottom: 10px; }
+        .stat-card .val { font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: bold; color: #fff; }
 
         /* --- LAYOUT GRIDS --- */
         .main-content { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; margin-bottom: 30px;}
-        @media (max-width: 850px) { .main-content { grid-template-columns: 1fr; } }
 
         /* --- INPUT FORM --- */
         .panel { background: rgba(0,0,0,0.2); border: 4px solid var(--border-dark); padding: 20px; display: flex; flex-direction: column;}
-        .panel h2 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--retro-orange); margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px;}
+        .panel h2 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.65rem, 2vw, 0.8rem); color: var(--retro-orange); margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px;}
         
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: 0.55rem; color: var(--retro-gold); margin-bottom: 8px; }
+        .form-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: clamp(0.45rem, 1.5vw, 0.55rem); color: var(--retro-gold); margin-bottom: 8px; line-height: 1.4;}
         .form-group input {
-            width: 100%; padding: 15px; font-family: 'VT323', monospace; font-size: 1.5rem; background: var(--bg-color);
+            width: 100%; padding: 15px; font-family: 'VT323', monospace; font-size: clamp(1.2rem, 3vw, 1.5rem); background: var(--bg-color);
             color: var(--text-main); border: 4px solid var(--border-dark); outline: none; text-transform: capitalize;
         }
         .form-group input:focus { border-color: var(--retro-orange); }
         
         .btn-submit {
             width: 100%; background: var(--retro-orange); color: #000; padding: 15px; border: 4px solid var(--border-dark); 
-            box-shadow: 4px 4px 0px var(--border-dark); font-family: 'Press Start 2P', cursive; font-size: 0.8rem; 
+            box-shadow: 4px 4px 0px var(--border-dark); font-family: 'Press Start 2P', cursive; font-size: clamp(0.6rem, 2vw, 0.8rem); 
             margin-top: 10px; transition: all 0.1s; cursor: pointer;
         }
         .btn-submit:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-        .btn-submit:disabled { background: #555; color: #888; cursor: not-allowed; }
+        .btn-submit:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: 0px 0px 0px var(--border-dark); transform: translate(4px, 4px);}
 
-        /* --- AI TERMINAL --- */
+        /* --- AI TERMINAL WITH LASER EFFECT --- */
+        .ai-terminal-wrapper {
+            position: relative; flex-grow: 1; min-height: 140px; border: 4px solid var(--retro-blue); 
+            background: #000; overflow: hidden;
+        }
         .ai-terminal {
-            flex-grow: 1; background: #000; border: 4px solid var(--retro-blue); padding: 15px;
-            color: var(--retro-blue); font-size: 1.2rem; line-height: 1.5; text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-            min-height: 120px;
+            padding: 15px; color: var(--retro-blue); font-size: clamp(1rem, 2.5vw, 1.2rem); 
+            line-height: 1.5; text-shadow: 0 0 5px rgba(59, 130, 246, 0.5); position: relative; z-index: 2;
         }
         .cursor { display: inline-block; width: 10px; height: 15px; background: var(--retro-blue); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;}
+        
+        /* The Scanning Laser */
+        .laser-scanner {
+            position: absolute; top: -10px; left: 0; width: 100%; height: 4px; 
+            background: var(--retro-green); box-shadow: 0 0 15px 5px rgba(74, 222, 128, 0.6);
+            z-index: 1; opacity: 0; pointer-events: none;
+        }
+        .laser-scanner.active { animation: scanLaser 1.5s ease-in-out infinite alternate; opacity: 1; }
+        
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes scanLaser { 0% { top: 0%; } 100% { top: 100%; } }
 
         /* --- HISTORY LOGS --- */
-        #history-list { list-style: none; height: 300px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px;}
+        #history-list { list-style: none; height: 300px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; -webkit-overflow-scrolling: touch;}
         #history-list::-webkit-scrollbar { width: 8px; }
         #history-list::-webkit-scrollbar-thumb { background: var(--border-dark); }
 
@@ -100,17 +111,43 @@
             background: var(--panel-bg); border: 2px solid var(--border-dark); padding: 12px; margin-bottom: 10px; 
             display: flex; justify-content: space-between; align-items: center;
         }
-        .tx-info h4 { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: #fff; margin-bottom: 5px; line-height: 1.4;}
-        .tx-info p { font-size: 0.85rem; color: var(--text-muted); }
-        .tx-amount { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--retro-green);}
+        .tx-info h4 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.6rem); color: #fff; margin-bottom: 5px; line-height: 1.4;}
+        .tx-info p { font-size: clamp(0.75rem, 2vw, 0.85rem); color: var(--text-muted); }
+        .tx-amount { font-family: 'Press Start 2P', cursive; font-size: clamp(0.6rem, 2vw, 0.7rem); color: var(--retro-green);}
 
         .btn-reset {
-            width: 100%; background: transparent; color: var(--retro-pink); padding: 10px; border: 2px dashed var(--retro-pink);
-            font-family: 'Press Start 2P', cursive; font-size: 0.6rem; text-transform: uppercase; margin-top: auto; transition: all 0.2s; cursor: pointer;
+            width: 100%; background: transparent; color: var(--retro-pink); padding: 12px; border: 2px dashed var(--retro-pink);
+            font-family: 'Press Start 2P', cursive; font-size: clamp(0.55rem, 1.5vw, 0.6rem); text-transform: uppercase; margin-top: auto; transition: all 0.2s; cursor: pointer;
         }
         .btn-reset:hover { background: var(--retro-pink); color: #fff; }
         .empty-state { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.2rem;}
-        .disclaimer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 20px;}
+        .disclaimer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 20px; padding: 0 10px;}
+
+        /* =========================================
+           MOBILE RESPONSIVE FIXES
+           ========================================= */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .app-container { padding: 15px; border-width: 4px; box-shadow: 6px 6px 0px var(--border-dark); }
+            
+            /* Stack columns into a single row vertically */
+            .dashboard-grid { grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+            .main-content { grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
+            
+            /* Make stat cards tighter on mobile */
+            .stat-card { padding: 15px; }
+            .stat-card .val { font-size: 2rem; }
+            .stat-card #display-cat { font-size: 1.4rem !important; }
+            
+            /* Make panels touch-friendly */
+            .panel { padding: 15px; border-width: 3px;}
+            .form-group input { padding: 12px; }
+            
+            /* Adjust History List for smaller screens */
+            .tx-item { flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px;}
+            .tx-amount { align-self: flex-start; border-top: 1px dashed var(--border-dark); padding-top: 5px; width: 100%;}
+            #history-list { height: 250px; }
+        }
     </style>
 </head>
 <body>
@@ -140,14 +177,17 @@
                 <form id="scan-form">
                     <div class="form-group">
                         <label>ENTER SNACK / GROCERY / ITEM</label>
-                        <input type="text" id="item-input" placeholder="e.g. Piattos Cheese, C2 Apple, Milo..." required autocomplete="off">
+                        <input type="text" id="item-input" placeholder="e.g. Piattos, C2, Milo..." required autocomplete="off">
                     </div>
-                    <button type="submit" class="btn-submit" id="btn-scan">SCAN RETAIL DATABASE</button>
+                    <button type="submit" class="btn-submit" id="btn-scan">SCAN DATABASE</button>
                 </form>
 
                 <h2 style="margin-top: 30px;"><i class="fas fa-robot"></i> AI ANALYSIS</h2>
-                <div class="ai-terminal">
-                    <span id="ai-output">> Awaiting item scan...</span><span class="cursor"></span>
+                <div class="ai-terminal-wrapper">
+                    <div class="laser-scanner" id="laser"></div>
+                    <div class="ai-terminal">
+                        <span id="ai-output">> Awaiting item scan...</span><span class="cursor"></span>
+                    </div>
                 </div>
             </div>
 
@@ -179,6 +219,7 @@
         const aiOutput = document.getElementById('ai-output');
         const historyList = document.getElementById('history-list');
         const btnReset = document.getElementById('btn-reset');
+        const laser = document.getElementById('laser');
         
         let typeWriterTimeout;
 
@@ -225,17 +266,20 @@
             const itemName = inputItem.value.trim();
             if(!itemName) return;
 
+            // UI Loading State
             btnScan.disabled = true;
-            btnScan.textContent = "SCANNING DATABASE...";
+            btnScan.textContent = "SCANNING...";
             displayPrice.textContent = "---";
             displayCat.textContent = "---";
-            typeWriter(`> Searching Philippine retail databases for "${itemName}"...`);
+            laser.classList.add('active'); // Turn on Laser!
+            typeWriter(`> Initiating database scan for "${itemName}"...`);
 
             if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
                 setTimeout(() => {
                     typeWriter("> ERROR: Groq API Key missing. Database offline.");
                     btnScan.disabled = false;
-                    btnScan.textContent = "SCAN RETAIL DATABASE";
+                    btnScan.textContent = "SCAN DATABASE";
+                    laser.classList.remove('active');
                 }, 1000);
                 return;
             }
@@ -272,7 +316,7 @@
                 const data = await response.json();
                 const aiResponse = data.choices[0].message.content;
 
-                // Parse the response
+                // Parse the response safely
                 let price = "₱0.00", cat = "Unknown", analysis = "Item found in database.";
                 
                 const lines = aiResponse.split('\n');
@@ -300,8 +344,10 @@
                 typeWriter("> ERROR: Item not found or database link severed.");
             }
 
+            // UI Reset State
             btnScan.disabled = false;
-            btnScan.textContent = "SCAN RETAIL DATABASE";
+            btnScan.textContent = "SCAN DATABASE";
+            laser.classList.remove('active'); // Turn off Laser!
             inputItem.focus();
         });
 
