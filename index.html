@@ -56,7 +56,10 @@
             overflow-x: hidden;
             transition: background-color 0.3s, color 0.3s;
             position: relative;
+            animation: scrollGrid 20s linear infinite;
         }
+
+        @keyframes scrollGrid { 0% { background-position: 0px 0px; } 100% { background-position: 60px 60px; } }
 
         body::before, body::after {
             content: ""; position: fixed; width: 500px; height: 500px; border-radius: 50%;
@@ -67,6 +70,8 @@
 
         @keyframes blobFloat { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px, 30px) scale(1.08); } }
 
+        .scanlines { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; z-index: 9999; pointer-events: none; }
+
         a, button, .dropbtn { cursor: pointer; }
 
         h1 { font-size: 1.6rem; line-height: 1.6; margin-bottom: 12px; }
@@ -76,7 +81,7 @@
 
         /* --- NEW FLOATING PIXEL NAV BAR (SCROLLS AWAY) --- */
         nav {
-            position: absolute; /* Changed from fixed so it scrolls away */
+            position: absolute; 
             top: 20px; left: 50%; transform: translateX(-50%);
             width: 95%; max-width: 1200px;
             background: rgba(42, 42, 64, 0.95);
@@ -88,43 +93,26 @@
         }
         [data-theme="light"] nav { background: rgba(255, 255, 255, 0.95); }
 
-        /* Nav Left: Brand */
         .nav-left { display: flex; align-items: center; gap: 15px; }
-        .jl-badge {
-            background: var(--retro-blue); color: #fff; width: 45px; height: 45px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; border: 3px solid var(--border-dark);
-            box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3); text-shadow: 2px 2px 0 #000;
-        }
+        .jl-badge { background: var(--retro-blue); color: #fff; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid var(--border-dark); box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3); text-shadow: 2px 2px 0 #000; }
         .nav-brand-text { display: flex; flex-direction: column; justify-content: center; }
         .nav-brand-text .name { color: var(--text-main); font-size: 0.8rem; text-shadow: 2px 2px 0 var(--border-dark); margin-bottom: 4px;}
         .nav-brand-text .title { font-family: 'VT323', monospace; color: var(--retro-green); font-size: 1rem; line-height: 1;}
 
-        /* Nav Center: Links */
+        /* Removed Eiji AI from center links */
         .nav-center { display: flex; align-items: center; gap: 5px; }
-        .nav-center a, .dropbtn {
-            color: var(--text-main); text-decoration: none; font-size: 0.6rem; padding: 10px 15px;
-            background: transparent; border: 2px solid transparent; font-family: inherit; text-transform: uppercase; transition: 0.2s;
-        }
+        .nav-center a, .dropbtn { color: var(--text-main); text-decoration: none; font-size: 0.6rem; padding: 10px 15px; background: transparent; border: 2px solid transparent; font-family: inherit; text-transform: uppercase; transition: 0.2s; }
         .nav-center a.active { background: var(--panel-bg-2); border-color: var(--border-dark); color: var(--retro-gold); box-shadow: 2px 2px 0 var(--border-dark); }
         .nav-center a:hover, .dropbtn:hover { color: var(--retro-pink); background: rgba(0,0,0,0.2);}
 
         .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
-        .dropdown-content {
-            display: none; position: absolute; left: 0; top: 100%; margin-top: 10px;
-            background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 6px 6px 0px var(--border-dark); min-width: 220px; z-index: 100;
-        }
+        .dropdown-content { display: none; position: absolute; left: 0; top: 100%; margin-top: 10px; background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 6px 6px 0px var(--border-dark); min-width: 220px; z-index: 100; }
         .dropdown-content a { display: block; padding: 15px; margin: 0; text-align: left; border-bottom: 2px solid var(--border-dark); border-left: none; border-right: none; border-top: none; width: 100%; box-shadow: none;}
         .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* Nav Right: Actions */
         .nav-right { display: flex; align-items: center; gap: 15px; }
-        .btn-talk {
-            background: var(--retro-blue); color: #fff; text-decoration: none; font-size: 0.6rem;
-            padding: 12px 18px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0 var(--border-dark);
-            transition: all 0.1s; text-transform: uppercase;
-        }
+        .btn-talk { background: var(--retro-blue); color: #fff; text-decoration: none; font-size: 0.6rem; padding: 12px 18px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0 var(--border-dark); transition: all 0.1s; text-transform: uppercase; }
         .btn-talk:hover { filter: brightness(1.1); }
         .btn-talk:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
 
@@ -133,9 +121,8 @@
 
         .mobile-menu-btn { display: none; background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1.2rem; color: var(--text-main); align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); }
 
-        /* Push body down to account for floating nav */
+        /* --- HERO SECTION --- */
         .hero-container { position: relative; text-align: center; padding: 140px 20px 120px; overflow: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-
         .hero-content { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; animation: heroFadeUp 1s ease forwards; }
         @keyframes heroFadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -179,7 +166,7 @@
         .scroll-indicator i { color: var(--retro-pink); font-size: 1rem; text-shadow: 2px 2px 0 var(--border-dark); }
         @keyframes bounceDown { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
 
-        .skills-section, .ai-chat-section, .contact-section { padding: 70px 20px; text-align: center; position: relative; z-index: 2; }
+        .skills-section, .ai-chat-section, .contact-section, .projects-section { padding: 70px 20px; text-align: center; position: relative; z-index: 2; }
         .section-title { margin-bottom: 40px; }
 
         .skills-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1250px; margin: 0 auto; }
@@ -194,8 +181,30 @@
         .skill-card:hover { transform: translateY(-8px) rotate(-0.5deg); box-shadow: 10px 10px 0px var(--border-dark); }
         .icon-box { font-size: 2.5rem; color: var(--retro-pink); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
         .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid var(--border-dark); transition: transform 0.2s; }
+        .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid #555; transition: transform 0.2s; }
         .tags span:hover { transform: scale(1.06); }
+
+        /* --- NEW PROJECT ARCHIVE GRID --- */
+        .projects-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; max-width: 1100px; margin: 0 auto; }
+        .project-card { background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark); width: 320px; padding: 20px; padding-top: 35px; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; opacity: 0; }
+        .project-card:hover { transform: translateY(-5px); }
+        .project-card.show { animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .project-card:nth-child(1).show { animation-delay: 0.1s; }
+        .project-card:nth-child(2).show { animation-delay: 0.3s; }
+        .project-card:nth-child(3).show { animation-delay: 0.5s; }
+        
+        /* The Top Pink Pin */
+        .project-card::before { content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 24px; height: 24px; background: var(--retro-pink); border: 4px solid var(--border-dark); border-radius: 50%; z-index: 2; }
+        .project-card::after { content: ""; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 4px; height: 25px; background: var(--border-dark); z-index: 1; }
+
+        .project-img-wrapper { border: 4px solid var(--border-dark); width: 100%; height: 160px; margin-bottom: 20px; background: #000; position: relative; z-index: 3; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--retro-purple); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        .project-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .project-title { color: var(--retro-green); font-size: 0.8rem; line-height: 1.4; margin-bottom: 10px; text-transform: uppercase; text-shadow: 2px 2px 0 var(--border-dark); }
+        .project-desc { color: var(--text-muted); font-size: 0.55rem; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
+        
+        .btn-project { display: block; width: 100%; background: var(--retro-blue); color: #fff; border: 4px solid var(--border-dark); padding: 12px; font-family: 'Press Start 2P', cursive; font-size: 0.6rem; text-decoration: none; text-transform: uppercase; box-shadow: 4px 4px 0 var(--border-dark); transition: transform 0.1s, box-shadow 0.1s; margin-top: auto; }
+        .btn-project:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
 
         .ai-chat-section .section-title p { max-width: 760px; margin: 0 auto; }
 
@@ -265,10 +274,10 @@
         .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
         .reveal.visible { opacity: 1; transform: translateY(0); }
 
-        /* --- RESPONSIVE MOBILE FIX FOR NAV BAR --- */
+        /* --- RESPONSIVE MOBILE FIX --- */
         @media (max-width: 900px) {
             nav { 
-                position: absolute; /* Keeps it at the top of the page */
+                position: absolute; 
                 top: 0; left: 0; transform: none; 
                 width: 100%; max-width: 100%;
                 border-left: none; border-right: none; border-top: none; 
@@ -289,7 +298,7 @@
             .dropdown.active .dropdown-content { display: block; }
             
             .mobile-menu-btn { display: flex; }
-            .btn-talk { display: none; } /* Hide TALK TO EIJI button to save space on mobile */
+            .btn-talk { display: none; } 
 
             .hero-container { padding: 120px 16px 100px; }
             .status-badge { min-width: 100%; max-width: 100%; font-size: 0.52rem; }
@@ -317,10 +326,11 @@
         <div class="nav-center" id="nav-center-menu">
             <a href="index.html" class="active">Home</a>
             <a href="#skills">Skills</a>
+            <a href="#projects">Projects</a>
             <a href="#contact">Contact</a>
 
             <div class="dropdown">
-                <button class="dropbtn">Projects ▼</button>
+                <button class="dropbtn">Apps ▼</button>
                 <div class="dropdown-content">
                     <a href="projects/capysave.html">CapySave App</a>
                     <a href="projects/eiji-ai.html">Capy OS AI</a>
@@ -441,6 +451,42 @@
                 <div class="tags">
                     <span>MS Word</span> <span>Excel</span> <span>PowerPoint</span> <span>Macro</span>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="projects-section reveal">
+        <div class="section-title">
+            <h2><i class="fas fa-folder-open"></i> PROJECT ARCHIVE</h2>
+            <p>A collection of deployed computational tools and interactive applications.</p>
+        </div>
+
+        <div class="projects-grid">
+            <div class="project-card reveal">
+                <div class="project-img-wrapper">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3 class="project-title">CapySave App</h3>
+                <p class="project-desc">A neural-linked virtual wealth terminal and budget tracker with Groq AI integration.</p>
+                <a href="projects/capysave.html" class="btn-project"><i class="fas fa-play"></i> LAUNCH APP</a>
+            </div>
+
+            <div class="project-card reveal">
+                <div class="project-img-wrapper">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="project-title">Capy OS AI</h3>
+                <p class="project-desc">A customized cyberpunk AI assistant terminal with multi-mode personas and scratchpad.</p>
+                <a href="projects/eiji-ai.html" class="btn-project"><i class="fas fa-play"></i> LAUNCH APP</a>
+            </div>
+
+            <div class="project-card reveal">
+                <div class="project-img-wrapper">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <h3 class="project-title">Cyber Retro Game</h3>
+                <p class="project-desc">An interactive pixelated browser game built entirely with JavaScript and HTML Canvas.</p>
+                <a href="projects/snake-game.html" class="btn-project"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
         </div>
     </section>
@@ -660,11 +706,13 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.skill-card, .reveal').forEach(el => {
+        // Include the new project cards in the observer
+        document.querySelectorAll('.skill-card, .project-card, .reveal').forEach(el => {
             observer.observe(el);
         });
 
         // --- AI CHAT LOGIC ---
+        // ⚠️ REMEMBER TO REPLACE THIS WITH YOUR REAL API KEY LATER ⚠️
         const GROQ_API_KEY = "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";
 
         const chatMessages = document.getElementById('chat-messages');
