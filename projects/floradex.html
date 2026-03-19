@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FloraDex | Botanical AI</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #1e1e2f; --panel-bg: #2a2a40; --text-main: #f8f8f2;
+            --text-muted: #a8a8b2; --retro-green: #4ade80; --retro-blue: #3b82f6;
+            --retro-purple: #bd93f9; --retro-pink: #ff79c6; --retro-gold: #facc15;
+            --border-dark: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'VT323', monospace; background-color: var(--bg-color); color: var(--text-main);
+            font-size: clamp(1rem, 2vw, 1.3rem); line-height: 1.6; padding: 20px;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
+            background-size: 30px 30px; min-height: 100vh;
+        }
+
+        a, button { cursor: pointer; }
+
+        .back-btn {
+            display: inline-block; margin-bottom: 20px; background: var(--panel-bg); color: var(--text-main);
+            padding: 10px 15px; text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.6rem);
+            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
+        }
+        .back-btn:hover { background: var(--retro-pink); color: #fff;}
+        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
+        .app-container {
+            max-width: 1000px; margin: 0 auto; background: var(--panel-bg); border: 6px solid var(--border-dark);
+            box-shadow: 12px 12px 0px var(--border-dark); padding: 30px;
+        }
+
+        header { text-align: center; border-bottom: 4px dashed var(--border-dark); padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { font-family: 'Press Start 2P', cursive; font-size: clamp(1.2rem, 4vw, 1.8rem); color: var(--retro-pink); text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 10px; line-height: 1.4;}
+        .subtitle { color: var(--retro-green); font-size: clamp(0.9rem, 2vw, 1.2rem); }
+
+        /* --- LAYOUT GRIDS --- */
+        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;}
+
+        /* --- INPUT FORM --- */
+        .panel { background: rgba(0,0,0,0.2); border: 4px solid var(--border-dark); padding: 20px; display: flex; flex-direction: column;}
+        .panel h2 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.65rem, 2vw, 0.8rem); color: var(--retro-pink); margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px;}
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: clamp(0.45rem, 1.5vw, 0.55rem); color: var(--retro-gold); margin-bottom: 8px; line-height: 1.4;}
+        .form-group input {
+            width: 100%; padding: 15px; font-family: 'VT323', monospace; font-size: clamp(1.2rem, 3vw, 1.5rem); background: var(--bg-color);
+            color: var(--text-main); border: 4px solid var(--border-dark); outline: none; text-transform: capitalize;
+        }
+        .form-group input:focus { border-color: var(--retro-pink); }
+        
+        .btn-submit {
+            width: 100%; background: var(--retro-green); color: #000; padding: 15px; border: 4px solid var(--border-dark); 
+            box-shadow: 4px 4px 0px var(--border-dark); font-family: 'Press Start 2P', cursive; font-size: clamp(0.6rem, 2vw, 0.8rem); 
+            margin-top: 10px; transition: all 0.1s; cursor: pointer;
+        }
+        .btn-submit:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-submit:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: 0px 0px 0px var(--border-dark); transform: translate(4px, 4px);}
+
+        /* --- FLOWER DISPLAY --- */
+        .flower-display { display: flex; flex-direction: column; gap: 15px; }
+        .img-box {
+            width: 100%; height: 250px; border: 4px solid var(--border-dark); background: #000;
+            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+            box-shadow: 6px 6px 0px var(--border-dark);
+        }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .img-box i { font-size: 4rem; color: var(--retro-purple); opacity: 0.5; }
+        
+        .data-box {
+            background: #000; border: 4px solid var(--retro-green); padding: 15px;
+            color: var(--retro-green); font-size: 1.1rem; line-height: 1.5; min-height: 200px;
+        }
+        .data-row { margin-bottom: 10px; border-bottom: 1px dashed rgba(74, 222, 128, 0.3); padding-bottom: 10px;}
+        .data-label { font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: var(--retro-pink); display: block; margin-bottom: 4px;}
+        
+        .cursor { display: inline-block; width: 10px; height: 15px; background: var(--retro-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;}
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- HISTORY LOGS --- */
+        #history-list { list-style: none; height: 250px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; -webkit-overflow-scrolling: touch;}
+        #history-list::-webkit-scrollbar { width: 8px; }
+        #history-list::-webkit-scrollbar-thumb { background: var(--border-dark); }
+
+        .tx-item { background: var(--panel-bg); border: 2px solid var(--border-dark); padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s;}
+        .tx-item:hover { border-color: var(--retro-pink); }
+        .tx-info h4 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.6rem); color: #fff; margin-bottom: 5px; line-height: 1.4;}
+        .tx-info p { font-size: clamp(0.75rem, 2vw, 0.85rem); color: var(--text-muted); }
+
+        .btn-reset { width: 100%; background: transparent; color: var(--retro-pink); padding: 12px; border: 2px dashed var(--retro-pink); font-family: 'Press Start 2P', cursive; font-size: clamp(0.55rem, 1.5vw, 0.6rem); text-transform: uppercase; margin-top: auto; transition: all 0.2s; cursor: pointer; }
+        .btn-reset:hover { background: var(--retro-pink); color: #fff; }
+        .empty-state { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.2rem;}
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .app-container { padding: 15px; border-width: 4px; }
+            .main-content { grid-template-columns: 1fr; gap: 20px; }
+            .img-box { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="../projects.html" class="back-btn">◀ RETURN TO ARCHIVE</a>
+
+    <div class="app-container">
+        <header>
+            <h1><i class="fas fa-leaf"></i> FLORADEX</h1>
+            <div class="subtitle">Neural Botanical Database v1.0</div>
+        </header>
+
+        <div class="main-content">
+            
+            <div class="flower-display">
+                <div class="img-box" id="image-container">
+                    <i class="fas fa-seedling" id="fallback-icon"></i>
+                    <img id="flower-img" src="" alt="Flower Image">
+                </div>
+                
+                <div class="data-box" id="data-output">
+                    > Enter a plant designation to initiate scan...<span class="cursor"></span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="panel">
+                    <h2><i class="fas fa-search"></i> SCAN TARGET</h2>
+                    <form id="scan-form">
+                        <div class="form-group">
+                            <label>FLOWER / PLANT NAME</label>
+                            <input type="text" id="item-input" placeholder="e.g. Sunflower, Cherry Blossom..." required autocomplete="off">
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-scan">ANALYZE SPECIMEN</button>
+                    </form>
+                </div>
+
+                <div class="panel" style="flex-grow: 1;">
+                    <h2><i class="fas fa-book-open"></i> FIELD LOGS</h2>
+                    <ul id="history-list"></ul>
+                    <button id="btn-reset" class="btn-reset"><i class="fas fa-trash-alt"></i> PURGE LOGS</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ INSERT YOUR API KEY HERE ⚠️
+        const GROQ_API_KEY = "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"; 
+
+        let scanHistory = JSON.parse(localStorage.getItem('floradex-history')) || [];
+        
+        const form = document.getElementById('scan-form');
+        const inputItem = document.getElementById('item-input');
+        const btnScan = document.getElementById('btn-scan');
+        const dataOutput = document.getElementById('data-output');
+        const historyList = document.getElementById('history-list');
+        const btnReset = document.getElementById('btn-reset');
+        const flowerImg = document.getElementById('flower-img');
+        const fallbackIcon = document.getElementById('fallback-icon');
+        
+        let typeWriterTimeout;
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            if (scanHistory.length === 0) {
+                historyList.innerHTML = '<div class="empty-state">No specimens scanned.</div>';
+                return;
+            }
+
+            [...scanHistory].reverse().forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'tx-item';
+                li.innerHTML = `
+                    <div class="tx-info">
+                        <h4>${item.name}</h4>
+                        <p>${item.sciName}</p>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--retro-pink); font-size: 0.8rem;"></i>
+                `;
+                // Allow clicking history to view it again
+                li.addEventListener('click', () => displayData(item));
+                historyList.appendChild(li);
+            });
+        }
+
+        function typeWriterHTML(htmlContent) {
+            clearTimeout(typeWriterTimeout);
+            dataOutput.innerHTML = "";
+            let i = 0;
+            // Simple trick to bypass typing HTML tags char by char
+            dataOutput.innerHTML = htmlContent; 
+        }
+
+        function displayData(data) {
+            flowerImg.style.display = 'block';
+            fallbackIcon.style.display = 'none';
+            flowerImg.src = data.imgUrl;
+
+            const html = `
+                <div class="data-row">
+                    <span class="data-label">SCIENTIFIC DESIGNATION</span>
+                    ${data.sciName}
+                </div>
+                <div class="data-row">
+                    <span class="data-label">SYMBOLISM</span>
+                    ${data.symbol}
+                </div>
+                <div class="data-row">
+                    <span class="data-label">CARE PROTOCOL</span>
+                    ${data.care}
+                </div>
+                <div class="data-row" style="border-bottom: none;">
+                    <span class="data-label">DATABASE FACT</span>
+                    ${data.fact}
+                </div>
+            `;
+            typeWriterHTML(html);
+        }
+
+        // Fetch Image from Wikipedia Open API (No Key Needed!)
+        async function fetchImage(query) {
+            try {
+                const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(query)}&prop=pageimages&format=json&pithumbsize=600&origin=*`);
+                const data = await res.json();
+                const pages = data.query.pages;
+                const pageId = Object.keys(pages)[0];
+                if (pageId !== "-1" && pages[pageId].thumbnail) {
+                    return pages[pageId].thumbnail.source;
+                }
+                return 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=600&auto=format&fit=crop'; // Generic leaf fallback
+            } catch (e) {
+                return 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=600&auto=format&fit=crop';
+            }
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            let itemName = inputItem.value.trim();
+            // Capitalize first letter
+            itemName = itemName.charAt(0).toUpperCase() + itemName.slice(1).toLowerCase();
+            if(!itemName) return;
+
+            btnScan.disabled = true;
+            btnScan.textContent = "SCANNING...";
+            dataOutput.innerHTML = "> Querying botanical networks...<span class='cursor'></span>";
+            flowerImg.style.display = 'none';
+            fallbackIcon.style.display = 'block';
+
+            if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
+                setTimeout(() => {
+                    dataOutput.innerHTML = "> ERROR: Groq API Key missing. Neural link severed.";
+                    btnScan.disabled = false;
+                    btnScan.textContent = "ANALYZE SPECIMEN";
+                }, 1000);
+                return;
+            }
+
+            const systemPrompt = `You are FloraDex, an expert botanical database. 
+            The user will give you a flower or plant name.
+            You MUST format your reply exactly like this on four lines:
+            SCI: [Scientific Name]
+            SYM: [What the flower symbolizes or means]
+            CARE: [Very short sun/water instructions]
+            FACT: [One very interesting trivia fact]`;
+
+            try {
+                // Fetch AI Data and Image simultaneously (Promise.all makes it faster!)
+                const [groqRes, imgUrl] = await Promise.all([
+                    fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            model: "llama-3.1-8b-instant", 
+                            messages: [
+                                { role: "system", content: systemPrompt },
+                                { role: "user", content: `Analyze: ${itemName}` }
+                            ],
+                            temperature: 0.4,
+                            max_tokens: 150 
+                        })
+                    }),
+                    fetchImage(itemName)
+                ]);
+
+                if (!groqRes.ok) throw new Error("API Connection Failed");
+
+                const groqData = await groqRes.json();
+                const aiResponse = groqData.choices[0].message.content;
+
+                let sci = "Unknown", sym = "N/A", care = "N/A", fact = "N/A";
+                const lines = aiResponse.split('\n');
+                lines.forEach(line => {
+                    if(line.startsWith('SCI:')) sci = line.replace('SCI:', '').trim();
+                    if(line.startsWith('SYM:')) sym = line.replace('SYM:', '').trim();
+                    if(line.startsWith('CARE:')) care = line.replace('CARE:', '').trim();
+                    if(line.startsWith('FACT:')) fact = line.replace('FACT:', '').trim();
+                });
+
+                const newData = { id: Date.now(), name: itemName, sciName: sci, symbol: sym, care: care, fact: fact, imgUrl: imgUrl };
+                
+                // Add to history and local storage
+                scanHistory.push(newData);
+                localStorage.setItem('floradex-history', JSON.stringify(scanHistory));
+                
+                displayData(newData);
+                renderHistory();
+                inputItem.value = '';
+
+            } catch (error) {
+                console.error(error);
+                dataOutput.innerHTML = "> ERROR: Specimen not found in database.";
+            }
+
+            btnScan.disabled = false;
+            btnScan.textContent = "ANALYZE SPECIMEN";
+            inputItem.focus();
+        });
+
+        btnReset.addEventListener('click', () => {
+            if(confirm("Purge all field logs?")) {
+                scanHistory = [];
+                localStorage.removeItem('floradex-history');
+                renderHistory();
+                dataOutput.innerHTML = "> Memory wiped. Ready for new scans.<span class='cursor'></span>";
+                flowerImg.style.display = 'none';
+                fallbackIcon.style.display = 'block';
+            }
+        });
+
+        renderHistory();
+    </script>
+</body>
+</html>
