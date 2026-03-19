@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jon Lewyn | Unfiltered Website</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --bg-color: #1e1e2f;
@@ -289,20 +289,8 @@
             margin-bottom: 25px;
             display: inline-block;
             position: relative;
-        }
-
-        .profile-frame::before {
-            content: "";
-            position: absolute;
-            inset: -10px;
-            border: 2px dashed var(--retro-purple);
-            animation: spinBorder 10s linear infinite;
-            opacity: 0.7;
-        }
-
-        @keyframes spinBorder {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            padding: 10px;
+            background: transparent;
         }
 
         .profile-pic {
@@ -310,11 +298,14 @@
             height: 170px;
             object-fit: cover;
             border: 4px solid var(--border-dark);
-            box-shadow: 8px 8px 0px var(--retro-blue);
-            image-rendering: pixelated;
+            box-shadow:
+                10px 10px 0px var(--retro-blue),
+                0 0 0 4px rgba(255,255,255,0.04);
+            image-rendering: auto;
             position: relative;
             z-index: 2;
             animation: profileFloat 3s ease-in-out infinite;
+            background: #fff;
         }
 
         @keyframes profileFloat {
@@ -576,9 +567,140 @@
             margin: 0 auto;
         }
 
+        .ai-shell {
+            max-width: 1150px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .ai-side-panel {
+            background: linear-gradient(180deg, #111827, #1b1b2f);
+            border: 4px solid var(--border-dark);
+            box-shadow: 8px 8px 0px var(--border-dark);
+            padding: 24px 18px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-side-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, rgba(74, 222, 128, 0.08), transparent 40%),
+                linear-gradient(315deg, rgba(59, 130, 246, 0.08), transparent 40%);
+            pointer-events: none;
+        }
+
+        .ai-avatar-wrap {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 20px;
+        }
+
+        .ai-avatar-ring {
+            position: absolute;
+            inset: 0;
+            border: 3px dashed var(--retro-blue);
+            border-radius: 50%;
+            animation: spinRing 8s linear infinite;
+        }
+
+        .ai-avatar {
+            position: absolute;
+            inset: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top, #1f2937, #000);
+            border: 3px solid var(--retro-green);
+            color: var(--retro-green);
+            font-size: 2rem;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.25);
+        }
+
+        @keyframes spinRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .ai-side-panel h3 {
+            color: var(--retro-green);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px var(--border-dark);
+        }
+
+        .ai-side-text {
+            font-size: 0.55rem;
+            margin-bottom: 20px;
+        }
+
+        .ai-status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .ai-status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 2px solid var(--border-dark);
+            padding: 10px;
+            font-size: 0.5rem;
+            color: var(--text-main);
+            text-align: left;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot.online {
+            background: var(--retro-green);
+            box-shadow: 0 0 12px var(--retro-green);
+        }
+
+        .dot.thinking {
+            background: var(--retro-gold);
+            box-shadow: 0 0 12px var(--retro-gold);
+        }
+
+        .dot.secure {
+            background: var(--retro-blue);
+            box-shadow: 0 0 12px var(--retro-blue);
+        }
+
+        .ai-mini-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ai-mini-tags span {
+            font-size: 0.45rem;
+            padding: 6px 8px;
+            border: 2px solid var(--border-dark);
+            background: #000;
+            color: var(--retro-pink);
+        }
+
         .chat-container {
             background: var(--panel-bg);
-            max-width: 820px;
+            max-width: 100%;
             margin: 0 auto;
             border: 4px solid var(--border-dark);
             box-shadow: 8px 8px 0px var(--border-dark);
@@ -586,6 +708,10 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+        }
+
+        .cool-chat {
+            background: linear-gradient(180deg, var(--panel-bg), #1d2038);
         }
 
         .chat-container::before {
@@ -611,12 +737,35 @@
             border-bottom: 4px solid var(--border-dark);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
             font-size: 0.8rem;
             text-align: left;
             position: relative;
             z-index: 2;
         }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-header-right span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .chat-header-right span:nth-child(1) { background: #ff5f56; }
+        .chat-header-right span:nth-child(2) { background: #ffbd2e; }
+        .chat-header-right span:nth-child(3) { background: #27c93f; }
 
         .chat-messages {
             height: 320px;
@@ -662,6 +811,33 @@
             color: #fff;
             align-self: flex-end;
             box-shadow: -3px 3px 0px var(--border-dark);
+        }
+
+        .quick-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 15px 15px;
+            background: var(--panel-bg);
+            border-top: 2px solid rgba(255,255,255,0.06);
+            position: relative;
+            z-index: 2;
+        }
+
+        .prompt-chip {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            padding: 10px 12px;
+            border: 3px solid var(--border-dark);
+            background: #000;
+            color: var(--retro-green);
+            box-shadow: 4px 4px 0px var(--border-dark);
+            transition: transform 0.15s, color 0.2s;
+        }
+
+        .prompt-chip:hover {
+            transform: translateY(-2px);
+            color: var(--retro-pink);
         }
 
         .typing {
@@ -877,6 +1053,10 @@
                 max-width: 350px;
             }
 
+            .ai-shell {
+                grid-template-columns: 1fr;
+            }
+
             .chat-input-area {
                 flex-direction: column;
                 gap: 10px;
@@ -1026,22 +1206,72 @@
 
     <section id="ai-chat" class="ai-chat-section reveal">
         <div class="section-title">
-            <h2>Ask Eiji AI</h2>
-            <p>My personal AI representative. Ask it anything about my skills, projects, or just say hello.</p>
+            <h2>Eiji AI Console</h2>
+            <p>Talk to my AI assistant about my projects, skills, and developer journey.</p>
         </div>
 
-        <div class="chat-container">
-            <div class="chat-header">
-                <i class="fas fa-robot"></i> EIJI-AI TERMINAL ONLINE
-            </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="message msg-ai">
-                    Hello! I am Eiji, Jon Lewyn's personal AI assistant. How can I help you today? You can ask me about his engineering projects, his web dev skills, or his work experience!
+        <div class="ai-shell">
+            <div class="ai-side-panel">
+                <div class="ai-avatar-wrap">
+                    <div class="ai-avatar-ring"></div>
+                    <div class="ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                </div>
+
+                <h3>EIJI AI</h3>
+                <p class="ai-side-text">Cyber assistant online and ready to respond.</p>
+
+                <div class="ai-status-list">
+                    <div class="ai-status-item">
+                        <span class="dot online"></span>
+                        <span>STATUS: ONLINE</span>
+                    </div>
+                    <div class="ai-status-item">
+                        <span class="dot thinking"></span>
+                        <span>MODE: ASSIST</span>
+                    </div>
+                    <div class="ai-status-item">
+                        <span class="dot secure"></span>
+                        <span>LINK: STABLE</span>
+                    </div>
+                </div>
+
+                <div class="ai-mini-tags">
+                    <span>Projects</span>
+                    <span>Skills</span>
+                    <span>Portfolio</span>
+                    <span>ECE</span>
                 </div>
             </div>
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Type your message here..." autocomplete="off">
-                <button id="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+
+            <div class="chat-container cool-chat">
+                <div class="chat-header">
+                    <div class="chat-header-left">
+                        <i class="fas fa-terminal"></i>
+                        <span>EIJI-AI NEURAL TERMINAL</span>
+                    </div>
+                    <div class="chat-header-right">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message msg-ai">
+                        Yo, I’m Eiji AI. Ask me about Jon Lewyn’s projects, skills, tech stack, or experience.
+                    </div>
+                </div>
+
+                <div class="quick-prompts">
+                    <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's projects">Projects</button>
+                    <button class="prompt-chip" data-prompt="What are Jon Lewyn's technical skills?">Skills</button>
+                    <button class="prompt-chip" data-prompt="What makes Jon Lewyn different as a developer?">Why him?</button>
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Ask Eiji AI something..." autocomplete="off">
+                    <button id="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
     </section>
@@ -1295,6 +1525,13 @@ If the user asks a question about Jon, answer accurately based on this data. If 
         chatSendBtn.addEventListener('click', handleSend);
         chatInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') handleSend();
+        });
+
+        document.querySelectorAll('.prompt-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chatInput.value = chip.dataset.prompt;
+                handleSend();
+            });
         });
     </script>
 </body>
