@@ -4,41 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jon Lewyn | Unfiltered Website</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
-            --bg-color: #1e1e2f; --panel-bg: #2a2a40; --panel-bg-2: #343454;
-            --text-main: #f8f8f2; --text-muted: #a8a8b2; --retro-green: #4ade80;
-            --retro-blue: #3b82f6; --retro-purple: #bd93f9; --retro-pink: #ff79c6;
-            --retro-gold: #facc15; --border-dark: #000000; --grid-color: rgba(255, 255, 255, 0.03);
-            --hero-glow-1: rgba(74, 222, 128, 0.10); --hero-glow-2: rgba(59, 130, 246, 0.10);
+            --bg-color: #1e1e2f;
+            --panel-bg: #2a2a40;
+            --panel-bg-2: #343454;
+            --text-main: #f8f8f2;
+            --text-muted: #a8a8b2;
+            --retro-green: #4ade80;
+            --retro-blue: #3b82f6;
+            --retro-purple: #bd93f9;
+            --retro-pink: #ff79c6;
+            --retro-gold: #facc15;
+            --retro-red: #ff5555;
+            --border-dark: #000000;
+            --grid-color: rgba(255, 255, 255, 0.03);
+            --hero-glow-1: rgba(74, 222, 128, 0.10);
+            --hero-glow-2: rgba(59, 130, 246, 0.10);
+            --hero-glow-3: rgba(255, 121, 198, 0.08);
         }
 
         [data-theme="light"] {
-            --bg-color: #f0f0f5; --panel-bg: #ffffff; --panel-bg-2: #ededf6;
-            --text-main: #1a1a2e; --text-muted: #4a4a6a; --border-dark: #111111;
-            --grid-color: rgba(0, 0, 0, 0.05); --hero-glow-1: rgba(74, 222, 128, 0.12);
+            --bg-color: #f0f0f5;
+            --panel-bg: #ffffff;
+            --panel-bg-2: #ededf6;
+            --text-main: #1a1a2e;
+            --text-muted: #4a4a6a;
+            --border-dark: #111111;
+            --grid-color: rgba(0, 0, 0, 0.05);
+            --hero-glow-1: rgba(74, 222, 128, 0.12);
             --hero-glow-2: rgba(59, 130, 246, 0.12);
+            --hero-glow-3: rgba(255, 121, 198, 0.09);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
-        
+
         body {
-            font-family: 'Press Start 2P', cursive; background-color: var(--bg-color); color: var(--text-main);
-            line-height: 1.8; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; position: relative;
-            background-image: linear-gradient(var(--grid-color) 2px, transparent 2px), linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
-            background-size: 30px 30px; animation: scrollGrid 20s linear infinite;
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.8;
+            background-image:
+                linear-gradient(var(--grid-color) 2px, transparent 2px),
+                linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
+            background-size: 30px 30px;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
         }
 
-        @keyframes scrollGrid { 0% { background-position: 0px 0px; } 100% { background-position: 60px 60px; } }
-
-        body::before, body::after {
-            content: ""; position: fixed; width: 500px; height: 500px; border-radius: 50%;
-            filter: blur(90px); z-index: -1; animation: blobFloat 12s ease-in-out infinite; pointer-events: none;
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: -1;
+            animation: blobFloat 12s ease-in-out infinite;
+            pointer-events: none;
         }
+
         body::before { top: -120px; left: -100px; background: var(--hero-glow-1); }
         body::after { bottom: -140px; right: -120px; background: var(--hero-glow-2); animation-delay: 3s; }
 
@@ -47,39 +78,67 @@
         .scanlines { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; z-index: 9999; pointer-events: none; }
 
         a, button { cursor: pointer; }
+
         h1 { font-size: 1.6rem; line-height: 1.6; margin-bottom: 12px; }
         h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--retro-pink); text-shadow: 2px 2px 0px var(--border-dark); }
         h3 { font-size: 0.8rem; margin-bottom: 10px; color: var(--retro-blue); }
         p { font-size: 0.65rem; color: var(--text-muted); line-height: 2; }
 
         nav {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 1200px;
-            background: rgba(42, 42, 64, 0.95); border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark);
-            display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; z-index: 1000; backdrop-filter: blur(4px);
+            position: absolute;
+            top: 20px; left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 1200px;
+            background: rgba(42, 42, 64, 0.95);
+            border: 4px solid var(--border-dark);
+            box-shadow: 8px 8px 0px var(--border-dark);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 20px; z-index: 1000;
+            backdrop-filter: blur(4px);
         }
+
         [data-theme="light"] nav { background: rgba(255, 255, 255, 0.95); }
 
         .nav-left { display: flex; align-items: center; gap: 15px; }
-        .jl-badge { background: var(--retro-blue); color: #fff; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid var(--border-dark); box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3); text-shadow: 2px 2px 0 #000; }
+        
+        /* --- NEW: Interactive JL Badge --- */
+        .jl-badge {
+            background: var(--retro-blue); color: #fff; width: 45px; height: 45px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; border: 3px solid var(--border-dark);
+            box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3); text-shadow: 2px 2px 0 #000;
+            cursor: pointer; transition: transform 0.1s, filter 0.2s;
+        }
+        .jl-badge:hover { filter: brightness(1.2); transform: scale(1.05); }
+        .jl-badge:active { transform: scale(0.95); }
+
         .nav-brand-text { display: flex; flex-direction: column; justify-content: center; }
         .nav-brand-text .name { color: var(--text-main); font-size: 0.8rem; text-shadow: 2px 2px 0 var(--border-dark); margin-bottom: 4px;}
         .nav-brand-text .title { font-family: 'VT323', monospace; color: var(--retro-green); font-size: 1rem; line-height: 1;}
 
         .nav-center { display: flex; align-items: center; gap: 5px; }
-        .nav-center a { color: var(--text-main); text-decoration: none; font-size: 0.6rem; padding: 10px 15px; background: transparent; border: 2px solid transparent; font-family: inherit; text-transform: uppercase; transition: 0.2s; }
+        .nav-center a {
+            color: var(--text-main); text-decoration: none; font-size: 0.6rem; padding: 10px 15px;
+            background: transparent; border: 2px solid transparent; font-family: inherit; text-transform: uppercase; transition: 0.2s;
+        }
         .nav-center a.active { background: var(--panel-bg-2); border-color: var(--border-dark); color: var(--retro-gold); box-shadow: 2px 2px 0 var(--border-dark); }
         .nav-center a:hover { color: var(--retro-pink); background: rgba(0,0,0,0.2);}
 
         .nav-right { display: flex; align-items: center; gap: 15px; }
-        .btn-talk { background: var(--retro-blue); color: #fff; text-decoration: none; font-size: 0.6rem; padding: 12px 18px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0 var(--border-dark); transition: all 0.1s; text-transform: uppercase; }
+        .btn-talk {
+            background: var(--retro-blue); color: #fff; text-decoration: none; font-size: 0.6rem;
+            padding: 12px 18px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0 var(--border-dark);
+            transition: all 0.1s; text-transform: uppercase;
+        }
         .btn-talk:hover { filter: brightness(1.1); }
         .btn-talk:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
+
         .theme-toggle-btn { background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1rem; color: var(--retro-gold); display: flex; align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); transition: 0.1s;}
         .theme-toggle-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
-        .mobile-menu-btn { display: none; background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1.2rem; color: var(--text-main); align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); }
+        .mobile-menu-btn { display: none; background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1.2rem; color: var(--text-main); display: none; align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); }
 
         .hero-container { position: relative; text-align: center; padding: 140px 20px 120px; overflow: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .hero-content { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; animation: heroFadeUp 1s ease forwards; }
+
         @keyframes heroFadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         #particle-canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
@@ -114,7 +173,7 @@
         .stat-card span { font-size: 0.5rem; color: var(--text-muted); }
 
         .scroll-indicator { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 0.5rem; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; animation: bounceDown 2s infinite; }
-        .scroll-indicator i { color: var(--retro-pink); font-size: 1rem; text-shadow: 2px 2px 0 var(--border-dark); }
+        .scroll-indicator i { color: var(--retro-pink); font-size: 1rem; }
         @keyframes bounceDown { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
 
         .skills-section, .ai-chat-section, .contact-section { padding: 70px 20px; text-align: center; position: relative; z-index: 2; }
@@ -131,8 +190,8 @@
         .skill-card:hover { transform: translateY(-8px) rotate(-0.5deg); box-shadow: 10px 10px 0px var(--border-dark); }
         .icon-box { font-size: 2.5rem; color: var(--retro-pink); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
         .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid var(--border-dark); transition: transform 0.2s; }
-        .tags span:hover { transform: scale(1.06); background: var(--retro-green); color: #000;}
+        .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid #555; transition: transform 0.2s; }
+        .tags span:hover { transform: scale(1.06); }
 
         .ai-chat-section .section-title p { max-width: 760px; margin: 0 auto; }
         .ai-shell { max-width: 1150px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: stretch; }
@@ -143,7 +202,7 @@
         .ai-avatar { position: absolute; inset: 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top, #1f2937, #000); border: 3px solid var(--retro-green); color: var(--retro-green); font-size: 2rem; box-shadow: 0 0 20px rgba(74, 222, 128, 0.25); }
         @keyframes spinRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .ai-side-panel h3 { color: var(--retro-green); font-size: 0.9rem; margin-bottom: 10px; text-shadow: 2px 2px 0px var(--border-dark); }
-        .ai-side-text { font-size: 0.55rem; margin-bottom: 20px; color: var(--text-muted); }
+        .ai-side-text { font-size: 0.55rem; margin-bottom: 20px; }
         .ai-status-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
         .ai-status-item { display: flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.45); border: 2px solid var(--border-dark); padding: 10px; font-size: 0.5rem; color: var(--text-main); text-align: left; }
         .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
@@ -178,7 +237,8 @@
 
         .typing { display: inline-flex; gap: 5px; align-items: center; }
         .typing span { width: 7px; height: 7px; background: var(--retro-green); display: inline-block; animation: typingBlink 1s infinite ease-in-out; }
-        .typing span:nth-child(2) { animation-delay: 0.15s; } .typing span:nth-child(3) { animation-delay: 0.3s; }
+        .typing span:nth-child(2) { animation-delay: 0.15s; }
+        .typing span:nth-child(3) { animation-delay: 0.3s; }
         @keyframes typingBlink { 0%, 100% { opacity: 0.3; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
 
         .chat-input-area { display: flex; padding: 15px; background: var(--panel-bg); border-top: 4px solid var(--border-dark); position: relative; z-index: 2; }
@@ -201,14 +261,63 @@
         .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
         .reveal.visible { opacity: 1; transform: translateY(0); }
 
+        /* --- ANDROID EMULATOR MODAL --- */
+        .emulator-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .emulator-modal.show { display: flex; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .emulator-window {
+            background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 12px 12px 0px rgba(0,0,0,0.8);
+            width: 90%; max-width: 450px; height: 90vh; display: flex; flex-direction: column;
+        }
+
+        .emulator-header {
+            background: #1e1e1e; border-bottom: 4px solid var(--border-dark); padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center; color: var(--text-muted);
+        }
+        .emulator-title { font-size: 0.6rem; font-family: 'Press Start 2P', cursive; color: var(--retro-green); display: flex; align-items: center; gap: 8px;}
+        .emulator-close { background: var(--retro-red); border: 2px solid var(--border-dark); color: #fff; width: 25px; height: 25px; font-size: 0.8rem; cursor: pointer; transition: 0.1s;}
+        .emulator-close:active { transform: translate(2px, 2px); }
+
+        .emulator-body {
+            flex: 1; display: flex; align-items: center; justify-content: center; background: #2b2b2b;
+            background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px);
+            background-size: 20px 20px; padding: 20px; overflow: hidden;
+        }
+
+        .phone-mockup {
+            width: 320px; height: 600px; background: #111; border: 4px solid #444; border-radius: 30px;
+            position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); padding: 15px 10px;
+        }
+        
+        .phone-camera { width: 40px; height: 6px; background: #222; border-radius: 10px; position: absolute; top: 15px; }
+
+        .phone-screen { width: 100%; height: 100%; background: #fff; border: 2px solid #000; overflow: hidden; }
+        .phone-screen iframe { width: 100%; height: 100%; border: none; }
+
+        .emulator-console {
+            height: 100px; background: #000; border-top: 4px solid var(--border-dark); padding: 10px;
+            font-family: 'VT323', monospace; font-size: 0.9rem; color: #aaa; display: flex; flex-direction: column; gap: 4px;
+        }
+
         @media (max-width: 900px) {
-            nav { position: absolute; top: 0; left: 0; transform: none; width: 100%; max-width: 100%; border-left: none; border-right: none; border-top: none; padding: 15px 20px; margin: 0; border-radius: 0; }
+            nav {
+                position: absolute; top: 0; left: 0; transform: none; width: 100%; max-width: 100%;
+                border-left: none; border-right: none; border-top: none; padding: 15px 20px; margin: 0; border-radius: 0;
+            }
             .nav-brand-text { display: none; }
-            .nav-center { display: none; width: 100%; flex-direction: column; position: absolute; top: 100%; left: 0; background: var(--panel-bg); border-bottom: 4px solid var(--border-dark); padding: 0; margin: 0; box-shadow: 0px 8px 0px rgba(0,0,0,0.5); }
+            .nav-center {
+                display: none; width: 100%; flex-direction: column; position: absolute; top: 100%; left: 0;
+                background: var(--panel-bg); border-bottom: 4px solid var(--border-dark); padding: 0; margin: 0; box-shadow: 0px 8px 0px rgba(0,0,0,0.5);
+            }
             .nav-center.show { display: flex; }
             .nav-center a { width: 100%; padding: 18px; text-align: center; border-bottom: 2px solid var(--border-dark); font-size: 0.7rem; }
             .nav-center a:last-child { border-bottom: none; }
-
             .mobile-menu-btn { display: flex; }
             .btn-talk { display: none; }
 
@@ -219,6 +328,9 @@
             .ai-shell { grid-template-columns: 1fr; }
             .chat-input-area { flex-direction: column; gap: 10px; }
             .chat-input-area button { margin-left: 0; padding: 15px; }
+
+            /* Hide emulator button entirely on actual mobile devices */
+            .jl-badge { pointer-events: none; } 
         }
     </style>
 </head>
@@ -228,7 +340,7 @@
 
     <nav>
         <div class="nav-left">
-            <div class="jl-badge">JL</div>
+            <div class="jl-badge" id="emulator-toggle" title="Launch Mobile Emulator">JL</div>
             <div class="nav-brand-text">
                 <div class="name">Jon Lewyn</div>
                 <div class="title">Electronics + Software Builder</div>
@@ -244,13 +356,8 @@
 
         <div class="nav-right">
             <a href="#ai-chat" class="btn-talk"><i class="fas fa-comment-dots"></i> TALK TO EIJI</a>
-            
-            <button id="theme-btn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
-                <i class="fas fa-sun"></i>
-            </button>
-            <button id="mobile-menu-btn" class="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
+            <button id="theme-btn" class="theme-toggle-btn"><i class="fas fa-sun"></i></button>
+            <button id="mobile-menu-btn" class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
@@ -454,6 +561,28 @@
         </div>
     </footer>
 
+    <div id="emulator-modal" class="emulator-modal">
+        <div class="emulator-window">
+            <div class="emulator-header">
+                <div class="emulator-title"><i class="fas fa-mobile-alt"></i> Android Emulator - Nexus_Retro</div>
+                <button id="close-emulator" class="emulator-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="emulator-body">
+                <div class="phone-mockup">
+                    <div class="phone-camera"></div>
+                    <div class="phone-screen">
+                        <iframe src="index.html" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="emulator-console">
+                <span>> adb connect localhost:5555</span>
+                <span>> deploying unfiltered-portfolio.apk</span>
+                <span style="color: var(--retro-green);">> App launched successfully. Mobile view active.</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         const themeBtn = document.getElementById('theme-btn');
         const themeIcon = themeBtn.querySelector('i');
@@ -562,6 +691,30 @@
 
         document.querySelectorAll('.skill-card, .reveal').forEach(el => {
             observer.observe(el);
+        });
+
+        // --- NEW: EMULATOR LOGIC ---
+        const emulatorToggle = document.getElementById('emulator-toggle');
+        const emulatorModal = document.getElementById('emulator-modal');
+        const closeEmulator = document.getElementById('close-emulator');
+
+        // Check if we are inside an iframe so we don't open infinite emulators
+        if (window.self !== window.top) {
+            emulatorToggle.style.pointerEvents = 'none';
+        } else {
+            emulatorToggle.addEventListener('click', () => {
+                emulatorModal.classList.add('show');
+            });
+        }
+
+        closeEmulator.addEventListener('click', () => {
+            emulatorModal.classList.remove('show');
+        });
+
+        emulatorModal.addEventListener('click', (e) => {
+            if (e.target === emulatorModal) {
+                emulatorModal.classList.remove('show');
+            }
         });
 
         // --- AI CHAT LOGIC ---
