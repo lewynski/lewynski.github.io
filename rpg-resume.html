@@ -6,198 +6,714 @@
     <title>Lewyn's Journey - GBA Edition</title>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --gba-frame: #283593; /* Gameboy Advance Indigo */
-            --gba-screen: #98c870; /* Route Grass Green */
+            --body-bg-1: #5068d9;
+            --body-bg-2: #2e3d99;
+            --gba-shell: #7d89d9;
+            --gba-shell-dark: #5f6cc4;
+            --gba-shell-light: #9ea8f4;
+            --screen-frame: #1a1a1a;
+            --screen-inner: #98c870;
+            --screen-shadow: #0a0a0a;
             --poke-red: #e53935;
-            --text-dark: #1a1a1a;
-            --border-dark: #2a2a2a;
+            --poke-blue: #3c5aa6;
+            --poke-yellow: #ffcb05;
+            --text-dark: #1b1b1b;
+            --panel-bg: #f2f2f2;
+            --panel-border: #5e5e5e;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            background-color: var(--gba-frame);
-            background-image: linear-gradient(rgba(255,255,255,0.05) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(255,255,255,0.05) 2px, transparent 2px);
-            background-size: 30px 30px;
-            font-family: 'Press Start 2P', cursive;
-            color: #ffffff;
-            padding: 40px;
             min-height: 100vh;
+            padding: 28px;
+            font-family: 'Press Start 2P', cursive;
+            color: #fff;
+            background:
+                radial-gradient(circle at top left, rgba(255,255,255,0.10), transparent 30%),
+                linear-gradient(180deg, var(--body-bg-1), var(--body-bg-2));
+            overflow-x: hidden;
             cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
         }
 
-        .page-header { margin-bottom: 30px; text-align: center; }
-        .page-header h1 { font-size: 1.5rem; color: #ffcb05; text-shadow: 4px 4px 0px #3c5aa6; margin-bottom: 12px; line-height: 1.5; }
-        .page-header p { color: #e0e0e0; font-size: 0.6rem; line-height: 1.8; }
-        
+        .page-wrap {
+            max-width: 1450px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
         .back-btn {
-            display: inline-block; margin-bottom: 20px;
-            color: #ffffff; text-decoration: none; font-size: 0.6rem;
-            background: var(--poke-red); padding: 12px 16px; 
-            border: 4px solid var(--border-dark);
-            box-shadow: 4px 4px 0px var(--border-dark);
-            transition: transform 0.1s;
+            display: inline-block;
+            text-decoration: none;
+            color: #fff;
+            font-size: 0.65rem;
+            background: linear-gradient(180deg, #ff5f57, #d92d2d);
+            padding: 14px 18px;
+            border: 4px solid #311616;
+            box-shadow: 5px 5px 0 #251010;
+            transition: 0.12s ease;
         }
-        .back-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--border-dark); }
-        .back-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--border-dark); }
 
-        .layout-container { display: flex; gap: 30px; max-width: 1300px; margin: 0 auto; }
-        .left-column { width: 350px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
+        .back-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #251010;
+        }
 
-        /* UI Panels styled like an in-game menu/Pokédex */
+        .page-header {
+            text-align: center;
+            flex: 1;
+        }
+
+        .page-header h1 {
+            font-size: 1.45rem;
+            color: var(--poke-yellow);
+            text-shadow:
+                3px 3px 0 var(--poke-blue),
+                6px 6px 0 rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .page-header p {
+            font-size: 0.60rem;
+            color: #eef2ff;
+            letter-spacing: 1px;
+        }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
         .panel {
-            background: #f8f8f8; color: var(--text-dark);
-            border: 6px solid #505050; border-radius: 8px; padding: 24px;
-            box-shadow: inset 0 0 0 2px #d0d0d0, 8px 8px 0px rgba(0,0,0,0.3);
+            background: linear-gradient(180deg, #fcfcfc, #ececec);
+            color: var(--text-dark);
+            border: 6px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow:
+                inset 0 0 0 3px #d8d8d8,
+                8px 8px 0 rgba(0,0,0,0.25);
+            position: relative;
+            overflow: hidden;
         }
 
-        .panel h3 { font-size: 0.8rem; color: var(--poke-red); margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px dashed #a0a0a0; padding-bottom: 10px; }
+        .panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--poke-red), var(--poke-yellow), var(--poke-blue));
+        }
+
+        .panel h3 {
+            margin-top: 8px;
+            margin-bottom: 16px;
+            font-size: 0.8rem;
+            color: var(--poke-red);
+            border-bottom: 2px dashed #aaaaaa;
+            padding-bottom: 10px;
+        }
 
         .chat-msg {
-            background: #ffffff; border: 2px solid #a0a0a0; border-radius: 4px; 
-            padding: 12px; font-family: 'VT323', monospace; font-size: 1.2rem; color: #333; margin-bottom: 12px;
+            background: #fff;
+            border: 3px solid #b0b0b0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-family: 'VT323', monospace;
+            font-size: 1.25rem;
+            line-height: 1.2;
         }
 
-        .keyboard-layout { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 16px; }
-        .key-row { display: flex; gap: 6px; }
+        .chat-msg.tip {
+            border-color: #4a79ff;
+            background: #f5f8ff;
+        }
+
+        .keyboard-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .key-row {
+            display: flex;
+            gap: 6px;
+        }
+
         .key {
-            width: 40px; height: 40px; background: #e0e0e0; border: 4px solid #808080;
-            border-radius: 4px; display: flex; justify-content: center; align-items: center;
-            font-size: 0.8rem; color: #333; box-shadow: inset -2px -2px 0px #a0a0a0;
+            width: 42px;
+            height: 42px;
+            border-radius: 6px;
+            background: linear-gradient(180deg, #f2f2f2, #d9d9d9);
+            border: 4px solid #8b8b8b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 0.75rem;
+            box-shadow: inset -2px -2px 0 #bfbfbf;
         }
-        .instruction-text { text-align: center; color: #555; font-family: 'VT323', monospace; font-size: 1.2rem; line-height: 1.2; }
 
-        .right-column { flex: 1; position: relative; }
+        .instruction-text {
+            text-align: center;
+            font-family: 'VT323', monospace;
+            font-size: 1.25rem;
+            color: #444;
+            line-height: 1.25;
+        }
 
-        /* The Gameboy Screen */
-        #game-wrapper {
-            width: 100%; height: 650px; background: #000;
-            border: 12px solid #111; border-radius: 16px 16px 40px 16px; /* GBA asymmetrical curve */
-            overflow: hidden; box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+        .right-column {
+            display: flex;
+            justify-content: center;
+        }
+
+        .gba-console {
+            width: 100%;
+            max-width: 980px;
+            background: linear-gradient(180deg, var(--gba-shell-light), var(--gba-shell));
+            border: 8px solid var(--gba-shell-dark);
+            border-radius: 34px 34px 90px 34px;
+            padding: 28px 28px 26px;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.4),
+                0 18px 35px rgba(0,0,0,0.35);
             position: relative;
         }
 
-        /* Classic Pokémon Text Box */
-        #dialogue-overlay {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 600px; 
-            background: #f8f8f8;
-            border: 6px solid #484848; border-radius: 8px;
-            box-shadow: inset 0 0 0 4px #b0b0b0, 0 8px 0px rgba(0,0,0,0.4);
-            padding: 20px; display: none; z-index: 10;
+        .gba-top-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding: 0 8px;
+            color: #eef0ff;
+            font-size: 0.52rem;
+            opacity: 0.95;
         }
-        
-        #dialogue-title { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--poke-red); margin-bottom: 12px; text-transform: uppercase; }
-        #dialogue-text { font-family: 'VT323', monospace; font-size: 1.6rem; line-height: 1.4; color: var(--text-dark); }
-        #dialogue-text strong { color: #0050b0; } /* Highlighted text color */
+
+        .power-led-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.45rem;
+        }
+
+        .power-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff3d3d;
+            box-shadow: 0 0 8px #ff3d3d;
+            animation: ledPulse 1.2s infinite;
+        }
+
+        @keyframes ledPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .55; transform: scale(.92); }
+        }
+
+        .screen-shell {
+            background: linear-gradient(180deg, #2a2a2a, #111);
+            border-radius: 22px 22px 46px 22px;
+            padding: 22px 22px 28px;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.08),
+                inset 0 -3px 0 rgba(0,0,0,0.45);
+            position: relative;
+        }
+
+        .screen-top-deco {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            color: #d9d9d9;
+            font-size: 0.48rem;
+            padding: 0 6px;
+        }
+
+        .screen-top-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .screen-led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff3d3d;
+            box-shadow: 0 0 6px #ff3d3d;
+        }
+
+        #game-wrapper {
+            width: 100%;
+            height: 650px;
+            background: #000;
+            border: 10px solid #050505;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow:
+                inset 0 0 0 4px #1d1d1d,
+                0 6px 0 rgba(0,0,0,0.35);
+        }
+
+        .screen-bottom-logo {
+            text-align: center;
+            font-size: 0.5rem;
+            color: #cfcfcf;
+            margin-top: 14px;
+            letter-spacing: 2px;
+            opacity: 0.75;
+        }
+
+        .gba-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 26px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .dpad-shell {
+            width: 170px;
+            height: 170px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .dpad-piece {
+            position: absolute;
+            background: linear-gradient(180deg, #383838, #171717);
+            border: 3px solid #0b0b0b;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+
+        .dpad-v {
+            width: 54px;
+            height: 170px;
+            left: 58px;
+            top: 0;
+            border-radius: 10px;
+        }
+
+        .dpad-h {
+            width: 170px;
+            height: 54px;
+            left: 0;
+            top: 58px;
+            border-radius: 10px;
+        }
+
+        .dpad-center-dot {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #101010;
+            border: 2px solid #000;
+            left: 72px;
+            top: 72px;
+            z-index: 2;
+        }
+
+        .controls-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .select-start {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .oval-btn {
+            width: 58px;
+            height: 16px;
+            border-radius: 20px;
+            background: linear-gradient(180deg, #5d5d5d, #373737);
+            border: 2px solid #1e1e1e;
+            transform: rotate(-18deg);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+        }
+
+        .oval-labels {
+            display: flex;
+            gap: 26px;
+            font-size: 0.42rem;
+            color: #ecf0ff;
+            opacity: 0.9;
+        }
+
+        .speaker {
+            display: grid;
+            grid-template-columns: repeat(5, 8px);
+            gap: 8px 10px;
+            transform: rotate(-18deg);
+        }
+
+        .speaker span {
+            width: 4px;
+            height: 18px;
+            border-radius: 5px;
+            background: rgba(36,36,36,0.9);
+            display: block;
+        }
+
+        .ab-shell {
+            width: 200px;
+            height: 140px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .ab-btn {
+            position: absolute;
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #6a4e8f, #3b2755);
+            border: 4px solid #231732;
+            color: #fff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                inset 0 3px 0 rgba(255,255,255,0.18),
+                0 6px 0 rgba(0,0,0,0.22);
+        }
+
+        .ab-btn.a { right: 10px; top: 20px; }
+        .ab-btn.b { left: 25px; top: 52px; }
+
+        .ab-label {
+            position: absolute;
+            color: #f3f4ff;
+            font-size: 0.55rem;
+            opacity: 0.9;
+        }
+
+        .ab-label.a { right: 34px; top: 102px; }
+        .ab-label.b { left: 54px; top: 132px; }
+
+        #dialogue-overlay {
+            position: absolute;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            width: calc(100% - 26px);
+            max-width: 720px;
+            background: #f8f8f8;
+            border: 6px solid #3f3f3f;
+            border-radius: 12px;
+            box-shadow:
+                inset 0 0 0 4px #b9b9b9,
+                0 8px 0 rgba(0,0,0,0.42);
+            padding: 18px 20px 34px;
+            display: none;
+            z-index: 10;
+        }
+
+        #dialogue-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.65rem;
+            color: var(--poke-red);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        #dialogue-text {
+            font-family: 'VT323', monospace;
+            font-size: 1.65rem;
+            line-height: 1.22;
+            color: #1b1b1b;
+        }
+
+        #dialogue-text strong {
+            color: var(--poke-blue);
+        }
 
         #close-dialogue {
-            position: absolute; bottom: 15px; right: 20px;
-            background: none; border: none; color: var(--poke-red);
-            font-family: 'Press Start 2P', cursive; font-size: 0.8rem; cursor: pointer;
+            position: absolute;
+            right: 16px;
+            bottom: 8px;
+            background: none;
+            border: none;
+            color: var(--poke-red);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            cursor: pointer;
             animation: blink 1s infinite;
         }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* Retro Nintendo D-Pad */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.15; }
+        }
+
         #mobile-controls {
-            position: absolute; bottom: 20px; left: 20px; display: none; z-index: 5;
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            display: none;
+            z-index: 12;
         }
-        .d-pad { 
-            display: grid; grid-template-columns: repeat(3, 45px); grid-template-rows: repeat(3, 45px); 
-            background: #333; padding: 5px; border-radius: 50%; border: 4px solid #111;
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 45px);
+            grid-template-rows: repeat(3, 45px);
+            background: rgba(30,30,30,0.95);
+            padding: 5px;
+            border-radius: 50%;
+            border: 4px solid #111;
         }
+
         .ctrl-btn {
-            background: #555; border: 2px solid #222;
-            color: #111; font-size: 20px; display: flex; justify-content: center; align-items: center; user-select: none;
+            background: #555;
+            border: 2px solid #222;
+            color: #111;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
         }
-        .ctrl-btn:active { background: #333; }
+
+        .ctrl-btn:active {
+            background: #333;
+        }
+
         #btn-up { grid-column: 2; grid-row: 1; border-radius: 8px 8px 0 0; border-bottom: none; }
         #btn-left { grid-column: 1; grid-row: 2; border-radius: 8px 0 0 8px; border-right: none; }
         #btn-right { grid-column: 3; grid-row: 2; border-radius: 0 8px 8px 0; border-left: none; }
         #btn-down { grid-column: 2; grid-row: 3; border-radius: 0 0 8px 8px; border-top: none; }
-        .d-pad-center { grid-column: 2; grid-row: 2; background: #555; } /* Center of the cross */
+        .d-pad-center { grid-column: 2; grid-row: 2; background: #555; }
+
+        @media (max-width: 1100px) {
+            .layout-container {
+                grid-template-columns: 1fr;
+            }
+
+            .right-column {
+                justify-content: stretch;
+            }
+
+            .gba-console {
+                max-width: 100%;
+            }
+        }
 
         @media (max-width: 900px) {
-            .layout-container { flex-direction: column; }
-            .left-column { width: 100%; }
-            body { padding: 20px; }
+            body {
+                padding: 18px;
+            }
+
+            .page-header h1 {
+                font-size: 1rem;
+            }
+
+            .page-header p {
+                font-size: 0.5rem;
+            }
+
+            #game-wrapper {
+                height: 520px;
+            }
+
+            .gba-controls {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #game-wrapper {
+                height: 420px;
+            }
+
+            .top-bar {
+                justify-content: center;
+            }
+
+            .back-btn {
+                font-size: 0.55rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="page-wrap">
+        <div class="top-bar">
+            <a href="index.html" class="back-btn">◀ EXIT SIMULATION</a>
 
-    <a href="index.html" class="back-btn">◀ EXIT SIMULATION</a>
-
-    <div class="page-header">
-        <h1>JON'S JOURNEY</h1>
-        <p>A 16-bit interactive space to explore my background.</p>
-    </div>
-
-    <div class="layout-container">
-        <div class="left-column">
-            <div class="panel">
-                <h3>SYSTEM LOG</h3>
-                <div class="chat-msg">
-                    <span style="color: var(--poke-red); font-weight: bold;">OAK:</span> Welcome to the world of Engineering! The simulation is active.
-                </div>
-                <div class="chat-msg" style="border-color: #3b82f6;">
-                    <span style="color: #3b82f6; font-weight: bold;">TIP:</span> Use WASD to explore the tall grass and read the signposts.
-                </div>
-            </div>
-
-            <div class="panel" id="pc-instructions">
-                <h3>CONTROLS</h3>
-                <div class="keyboard-layout">
-                    <div class="key-row"><div class="key">W</div></div>
-                    <div class="key-row"><div class="key">A</div><div class="key">S</div><div class="key">D</div></div>
-                </div>
-                <p class="instruction-text">Hold WASD or Arrow keys to walk.<br><br>Step up to signposts to interact.</p>
+            <div class="page-header">
+                <h1>JON'S JOURNEY</h1>
+                <p>A 16-bit interactive space to explore my background.</p>
             </div>
         </div>
 
-        <div class="right-column">
-            <div id="game-wrapper">
-                
-                <div id="dialogue-overlay">
-                    <div id="dialogue-title">Signpost</div>
-                    <div id="dialogue-text">Details go here...</div>
-                    <button id="close-dialogue">▼</button>
-                </div>
-
-                <div id="mobile-controls">
-                    <div class="d-pad">
-                        <div class="ctrl-btn" id="btn-up"><i class="fas fa-caret-up"></i></div>
-                        <div class="ctrl-btn" id="btn-left"><i class="fas fa-caret-left"></i></div>
-                        <div class="d-pad-center"></div>
-                        <div class="ctrl-btn" id="btn-right"><i class="fas fa-caret-right"></i></div>
-                        <div class="ctrl-btn" id="btn-down"><i class="fas fa-caret-down"></i></div>
+        <div class="layout-container">
+            <div class="left-column">
+                <div class="panel">
+                    <h3>SYSTEM LOG</h3>
+                    <div class="chat-msg">
+                        <span style="color: var(--poke-red); font-weight: bold;">OAK:</span>
+                        Welcome to the world of Engineering! The simulation is active.
+                    </div>
+                    <div class="chat-msg tip">
+                        <span style="color: #3b82f6; font-weight: bold;">TIP:</span>
+                        Use WASD to explore the route and step near signposts to interact.
                     </div>
                 </div>
 
+                <div class="panel" id="pc-instructions">
+                    <h3>CONTROLS</h3>
+                    <div class="keyboard-layout">
+                        <div class="key-row"><div class="key">W</div></div>
+                        <div class="key-row">
+                            <div class="key">A</div>
+                            <div class="key">S</div>
+                            <div class="key">D</div>
+                        </div>
+                    </div>
+                    <p class="instruction-text">
+                        Hold WASD or Arrow keys to walk.<br><br>
+                        Step near signs or buildings to inspect them.
+                    </p>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="gba-console">
+                    <div class="gba-top-label">
+                        <div>LEWYN ADVANCE</div>
+                        <div class="power-led-wrap">
+                            <div class="power-led"></div>
+                            <span>POWER</span>
+                        </div>
+                    </div>
+
+                    <div class="screen-shell">
+                        <div class="screen-top-deco">
+                            <div class="screen-top-left">
+                                <div class="screen-led"></div>
+                                <span>BATTERY</span>
+                            </div>
+                            <span>DOT MATRIX TFT COLOR LCD</span>
+                        </div>
+
+                        <div id="game-wrapper">
+                            <div id="dialogue-overlay">
+                                <div id="dialogue-title">Signpost</div>
+                                <div id="dialogue-text">Details go here...</div>
+                                <button id="close-dialogue">▼</button>
+                            </div>
+
+                            <div id="mobile-controls">
+                                <div class="d-pad">
+                                    <div class="ctrl-btn" id="btn-up"><i class="fas fa-caret-up"></i></div>
+                                    <div class="ctrl-btn" id="btn-left"><i class="fas fa-caret-left"></i></div>
+                                    <div class="d-pad-center"></div>
+                                    <div class="ctrl-btn" id="btn-right"><i class="fas fa-caret-right"></i></div>
+                                    <div class="ctrl-btn" id="btn-down"><i class="fas fa-caret-down"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="screen-bottom-logo">TRAINER PROFILE SIMULATION</div>
+                    </div>
+
+                    <div class="gba-controls">
+                        <div class="dpad-shell">
+                            <div class="dpad-piece dpad-v"></div>
+                            <div class="dpad-piece dpad-h"></div>
+                            <div class="dpad-center-dot"></div>
+                        </div>
+
+                        <div class="controls-center">
+                            <div class="select-start">
+                                <div class="oval-btn"></div>
+                                <div class="oval-btn"></div>
+                            </div>
+                            <div class="oval-labels">
+                                <span>SELECT</span>
+                                <span>START</span>
+                            </div>
+
+                            <div class="speaker" aria-hidden="true">
+                                <span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span><span></span>
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <div class="ab-shell">
+                            <div class="ab-btn b">B</div>
+                            <div class="ab-btn a">A</div>
+                            <div class="ab-label b">B</div>
+                            <div class="ab-label a">A</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- NATIVE KEYBOARD OVERRIDE ---
         let activeKeys = { up: false, down: false, left: false, right: false, space: false };
-        
+
         window.addEventListener('keydown', (e) => {
             if (!e.key) return;
             const k = e.key.toLowerCase();
-            if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.code) > -1) { e.preventDefault(); }
-            
-            if (k === 'w' || e.code === 'ArrowUp')    activeKeys.up    = true;
-            if (k === 'a' || e.code === 'ArrowLeft')  activeKeys.left  = true;
-            if (k === 's' || e.code === 'ArrowDown')  activeKeys.down  = true;
+
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) {
+                e.preventDefault();
+            }
+
+            if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = true;
+            if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = true;
+            if (k === 's' || e.code === 'ArrowDown') activeKeys.down = true;
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = true;
             if (e.code === 'Space') activeKeys.space = true;
         }, { passive: false });
@@ -205,92 +721,132 @@
         window.addEventListener('keyup', (e) => {
             if (!e.key) return;
             const k = e.key.toLowerCase();
-            if (k === 'w' || e.code === 'ArrowUp')    activeKeys.up    = false;
-            if (k === 'a' || e.code === 'ArrowLeft')  activeKeys.left  = false;
-            if (k === 's' || e.code === 'ArrowDown')  activeKeys.down  = false;
+
+            if (k === 'w' || e.code === 'ArrowUp') activeKeys.up = false;
+            if (k === 'a' || e.code === 'ArrowLeft') activeKeys.left = false;
+            if (k === 's' || e.code === 'ArrowDown') activeKeys.down = false;
             if (k === 'd' || e.code === 'ArrowRight') activeKeys.right = false;
+
             if (e.code === 'Space') {
                 activeKeys.space = false;
-                // Allow spacebar to close dialogue
                 if (isDialogueOpen) closeDialogue();
             }
         });
 
-        // --- GAME CONSTANTS ---
-        const WORLD_WIDTH  = 1600;
+        const WORLD_WIDTH = 1600;
         const WORLD_HEIGHT = 1200;
-        const MOVE_SPEED   = 200;
-        const DIAG_SPEED   = MOVE_SPEED / Math.SQRT2; 
+        const MOVE_SPEED = 170;
+        const DIAG_SPEED = MOVE_SPEED / Math.SQRT2;
 
         const resumeData = [
-            { id: 'elem',      x: 300,  y: 1000, title: "Primary Education",  text: "<strong>Jose G. Peralta Memorial School</strong><br>Valedictorian (2011-2017)" },
-            { id: 'jhs',       x: 300,  y: 800,  title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>With Honor (2017-2021)" },
-            { id: 'shs',       x: 300,  y: 600,  title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>With High Honor (2021-2023)" },
-            { id: 'college',   x: 300,  y: 400,  title: "PUP College",        text: "<strong>B.S. Electronics Engineering</strong><br>Affiliations: OECES, IECEP Batangas." },
-            { id: 'work',      x: 800,  y: 600,  title: "Work Experience",    text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." },
-            { id: 'skill_prog',x: 1300, y: 1000, title: "Programming",        text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack apps.</em>" },
-            { id: 'skill_hw',  x: 1300, y: 800,  title: "Embedded Sys",       text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and circuits.</em>" },
-            { id: 'skill_sim', x: 1300, y: 600,  title: "Simulation",         text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex blueprints.</em>" },
-            { id: 'proj_calc', x: 900,  y: 200,  title: "Eng. Tools",         text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built for math.</em>" },
-            { id: 'proj_game', x: 1100, y: 200,  title: "Games",              text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048.<br><em>Game development testing complex logic.</em>" },
-            { id: 'proj_ai',   x: 1300, y: 200,  title: "Eiji AI",            text: "<strong>Project:</strong> Eiji / D Dwarf Mini.<br><em>A sleek conversational assistant powered by Groq LPUs.</em>" }
+            { id: 'elem',       x: 300,  y: 1000, title: "Primary Education",  text: "<strong>Jose G. Peralta Memorial School</strong><br>Valedictorian (2011-2017)" },
+            { id: 'jhs',        x: 300,  y: 800,  title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>With Honor (2017-2021)" },
+            { id: 'shs',        x: 300,  y: 600,  title: "Senior High (STEM)", text: "<strong>Fellowship Baptist College</strong><br>With High Honor (2021-2023)" },
+            { id: 'college',    x: 300,  y: 400,  title: "PUP College",        text: "<strong>B.S. Electronics Engineering</strong><br>Affiliations: OECES, IECEP Batangas." },
+            { id: 'work',       x: 800,  y: 600,  title: "Work Experience",    text: "<strong>Bandai Wireharness (2025):</strong> Developed automated macro systems.<br><br><strong>NOCECO (2023):</strong> Assisted in daily technical operations." },
+            { id: 'skill_prog', x: 1300, y: 1000, title: "Programming",        text: "<strong>Languages:</strong> Python, JavaScript, HTML/CSS, Java, C++<br><em>Building robust logic and full-stack apps.</em>" },
+            { id: 'skill_hw',   x: 1300, y: 800,  title: "Embedded Sys",       text: "<strong>Hardware:</strong> Arduino, FPGA, TinkerCAD, Proto Boarding<br><em>Bridging the gap between software and circuits.</em>" },
+            { id: 'skill_sim',  x: 1300, y: 600,  title: "Simulation",         text: "<strong>Software:</strong> AutoCAD, MATLAB, Multisim, Proteus<br><em>Modeling complex blueprints.</em>" },
+            { id: 'proj_calc',  x: 900,  y: 200,  title: "Eng. Tools",         text: "<strong>Projects:</strong> Calc Splainer, Determinant Calculator, Matrix Operations.<br><em>Custom software built for math.</em>" },
+            { id: 'proj_game',  x: 1100, y: 200,  title: "Games",              text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048.<br><em>Game development testing complex logic.</em>" },
+            { id: 'proj_ai',    x: 1300, y: 200,  title: "Eiji AI",            text: "<strong>Project:</strong> Eiji / D Dwarf Mini.<br><em>A sleek conversational assistant powered by Groq LPUs.</em>" }
         ];
 
         const config = {
             type: Phaser.AUTO,
-            scale: { mode: Phaser.Scale.FIT, parent: 'game-wrapper', width: 800, height: 600 },
-            backgroundColor: '#98c870', 
-            pixelArt: true, 
-            physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
-            scene: { create: create, update: update }
+            scale: {
+                mode: Phaser.Scale.FIT,
+                parent: 'game-wrapper',
+                width: 800,
+                height: 600
+            },
+            backgroundColor: '#98c870',
+            pixelArt: true,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                create: create,
+                update: update
+            }
         };
 
         const game = new Phaser.Game(config);
 
-        let player, playerShadow;
-        
-        // BUG FIX: Two separate flags for the UI and the Trigger Pads
+        let player;
+        let playerShadow;
         let isDialogueOpen = false;
-        let triggerCooldown = false; 
+        let triggerCooldown = false;
 
         function create() {
             this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-            let graphics = this.add.graphics();
-            graphics.fillStyle(0x78a850, 1); 
+            const graphics = this.add.graphics();
+
+            graphics.fillStyle(0x98c870, 1);
+            graphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+            graphics.fillStyle(0x7fb35a, 1);
             for (let i = 0; i < WORLD_WIDTH; i += 60) {
                 for (let j = 0; j < WORLD_HEIGHT; j += 60) {
-                    graphics.fillRect(i, j, 8, 8);
-                    graphics.fillRect(i + 8, j + 8, 8, 8);
+                    graphics.fillRect(i, j + 12, 6, 14);
+                    graphics.fillRect(i + 8, j + 18, 6, 10);
                 }
             }
 
-            graphics.fillStyle(0xdfc898, 1); 
-            graphics.fillRect(250, 350, 100, 700); 
-            graphics.fillRect(1250, 150, 100, 900); 
-            graphics.fillRect(250, 600, 1100, 100); 
-            graphics.fillRect(800, 150, 500, 100); 
+            graphics.fillStyle(0xdfc898, 1);
+            graphics.fillRect(250, 350, 100, 700);
+            graphics.fillRect(1250, 150, 100, 900);
+            graphics.fillRect(250, 600, 1100, 100);
+            graphics.fillRect(800, 150, 500, 100);
+
+            graphics.lineStyle(4, 0xc1a66c, 1);
+            graphics.strokeRect(250, 350, 100, 700);
+            graphics.strokeRect(1250, 150, 100, 900);
+            graphics.strokeRect(250, 600, 1100, 100);
+            graphics.strokeRect(800, 150, 500, 100);
 
             const createSignpost = (scene, x, y, title) => {
-                scene.add.ellipse(x, y + 25, 40, 15, 0x000000, 0.2);
-                scene.add.rectangle(x, y + 15, 10, 20, 0x5c4033);
-                let board = scene.add.rectangle(x, y, 50, 35, 0x8b5a2b);
-                board.setStrokeStyle(4, 0x5c4033);
-                scene.add.text(x, y - 35, title, {
-                    fontFamily: '"Press Start 2P"', fontSize: '10px', fill: '#ffffff', 
-                    stroke: '#000000', strokeThickness: 4
+                scene.add.ellipse(x, y + 25, 34, 12, 0x000000, 0.22);
+                scene.add.rectangle(x, y + 16, 8, 20, 0x6b4b2a);
+
+                const board = scene.add.rectangle(x, y, 54, 34, 0xc18545);
+                board.setStrokeStyle(4, 0x70411c);
+
+                scene.add.rectangle(x, y - 6, 42, 4, 0xe9d3aa);
+                scene.add.rectangle(x, y + 3, 42, 4, 0xe9d3aa);
+
+                scene.add.text(x, y - 34, title, {
+                    fontFamily: '"Press Start 2P"',
+                    fontSize: '10px',
+                    fill: '#ffffff',
+                    stroke: '#000000',
+                    strokeThickness: 4
                 }).setOrigin(0.5);
             };
 
             const createGymZone = (scene, x, y, width, height, title) => {
-                scene.add.rectangle(x, y + height/2, width + 20, 20, 0x000000, 0.2); 
-                let building = scene.add.rectangle(x, y, width, height, 0xd0d0d0);
-                building.setStrokeStyle(6, 0x505050);
-                scene.add.rectangle(x, y - height/2 + 15, width + 10, 30, 0x3c5aa6); 
-                scene.add.rectangle(x, y + height/2 - 20, 40, 40, 0x5c4033); 
-                scene.add.text(x, y - height/2 - 20, "GYM: " + title, {
-                    fontFamily: '"Press Start 2P"', fontSize: '14px', fill: '#ffcb05', 
-                    stroke: '#3c5aa6', strokeThickness: 6
+                scene.add.rectangle(x, y + height / 2, width + 20, 20, 0x000000, 0.2);
+
+                const building = scene.add.rectangle(x, y, width, height, 0xd7d7d7);
+                building.setStrokeStyle(6, 0x565656);
+
+                scene.add.rectangle(x, y - height / 2 + 15, width + 14, 30, 0xb71c1c);
+                scene.add.rectangle(x, y + height / 2 - 20, 44, 40, 0x70411c);
+                scene.add.rectangle(x, y - 8, 66, 30, 0x9dc7ff);
+                scene.add.rectangle(x - 60, y - 8, 38, 26, 0x9dc7ff);
+                scene.add.rectangle(x + 60, y - 8, 38, 26, 0x9dc7ff);
+
+                scene.add.text(x, y - height / 2 - 24, "GYM: " + title, {
+                    fontFamily: '"Press Start 2P"',
+                    fontSize: '14px',
+                    fill: '#ffcb05',
+                    stroke: '#3c5aa6',
+                    strokeThickness: 6
                 }).setOrigin(0.5);
             };
 
@@ -302,11 +858,14 @@
                 }
             });
 
-            playerShadow = this.add.ellipse(800, 1065, 30, 15, 0x000000, 0.3);
-            player = this.add.rectangle(800, 1050, 28, 36, 0xe53935);
-            player.setStrokeStyle(4, 0x8e0000);
+            playerShadow = this.add.ellipse(800, 1068, 26, 12, 0x000000, 0.28);
+
+            player = createTrainer(this, 800, 1050);
+
             this.physics.add.existing(player);
             player.body.setCollideWorldBounds(true);
+            player.body.setSize(18, 24);
+            player.body.setOffset(-9, -12);
 
             resumeData.forEach(data => {
                 const w = data.id === 'work' ? 240 : 60;
@@ -322,45 +881,183 @@
             document.getElementById('dialogue-overlay').addEventListener('click', closeDialogue);
         }
 
-        function update() {
-            if (!player || !playerShadow) return;
+        function createTrainer(scene, x, y) {
+            const trainer = scene.add.container(x, y);
+            trainer.setSize(24, 32);
 
-            playerShadow.x = player.x;
-            playerShadow.y = player.y + 15;
+            const shadowOutline = 0x1a1a1a;
+            const skin = 0xf2c49b;
+            const hair = 0x2f2f2f;
+            const shirt = 0xd83434;
+            const shirtDark = 0xa81e1e;
+            const pants = 0x2d4ea2;
+            const pantsDark = 0x1d3470;
+            const shoes = 0x2b2b2b;
+            const bag = 0xf4c542;
 
-            // If the text box is open, lock player movement
-            if (isDialogueOpen) {
-                player.body.setVelocity(0, 0);
+            const px = (x, y, w, h, color) => {
+                const r = scene.add.rectangle(x, y, w, h, color).setOrigin(0.5);
+                trainer.add(r);
+                return r;
+            };
+
+            trainer.parts = {};
+
+            trainer.parts.shadowHair = px(0, -11, 16, 6, shadowOutline);
+
+            trainer.parts.head = px(0, -8, 14, 12, skin);
+            trainer.parts.hairTop = px(0, -13, 16, 6, hair);
+            trainer.parts.hairLeft = px(-6, -9, 4, 8, hair);
+            trainer.parts.hairRight = px(6, -9, 4, 8, hair);
+
+            trainer.parts.body = px(0, 3, 16, 12, shirt);
+            trainer.parts.bodyShade = px(0, 6, 16, 4, shirtDark);
+
+            trainer.parts.armLeft = px(-9, 2, 4, 10, skin);
+            trainer.parts.armRight = px(9, 2, 4, 10, skin);
+
+            trainer.parts.bag = px(7, 1, 4, 8, bag);
+
+            trainer.parts.legLeft = px(-4, 14, 6, 10, pants);
+            trainer.parts.legRight = px(4, 14, 6, 10, pants);
+            trainer.parts.legLeftShade = px(-4, 17, 6, 4, pantsDark);
+            trainer.parts.legRightShade = px(4, 17, 6, 4, pantsDark);
+
+            trainer.parts.shoeLeft = px(-4, 22, 6, 4, shoes);
+            trainer.parts.shoeRight = px(4, 22, 6, 4, shoes);
+
+            trainer.facing = 'down';
+            trainer.walkCycle = 0;
+            trainer.isMoving = false;
+
+            return trainer;
+        }
+
+        function setTrainerFacing(direction) {
+            if (!player || !player.parts) return;
+
+            player.facing = direction;
+
+            const p = player.parts;
+
+            if (direction === 'left') {
+                p.bag.x = -8;
+                p.armLeft.visible = true;
+                p.armRight.visible = true;
+                p.hairLeft.visible = true;
+                p.hairRight.visible = false;
+            } else if (direction === 'right') {
+                p.bag.x = 8;
+                p.armLeft.visible = true;
+                p.armRight.visible = true;
+                p.hairLeft.visible = false;
+                p.hairRight.visible = true;
+            } else {
+                p.bag.x = 7;
+                p.hairLeft.visible = true;
+                p.hairRight.visible = true;
+            }
+
+            if (direction === 'up') {
+                p.head.y = -8;
+                p.hairTop.y = -11;
+                p.shadowHair.visible = true;
+            } else {
+                p.head.y = -8;
+                p.hairTop.y = -13;
+                p.shadowHair.visible = true;
+            }
+        }
+
+        function animateTrainerWalk(time, moving) {
+            if (!player || !player.parts) return;
+
+            const p = player.parts;
+
+            if (!moving) {
+                p.legLeft.y = 14;
+                p.legRight.y = 14;
+                p.legLeftShade.y = 17;
+                p.legRightShade.y = 17;
+                p.shoeLeft.y = 22;
+                p.shoeRight.y = 22;
+                p.armLeft.y = 2;
+                p.armRight.y = 2;
+                player.yBaseOffset = 0;
                 return;
             }
 
-            const goLeft  = activeKeys.left;
+            const swing = Math.sin(time / 110);
+            const bounce = Math.abs(Math.sin(time / 110)) * 1.4;
+
+            p.legLeft.y = 14 + swing * 2;
+            p.legRight.y = 14 - swing * 2;
+            p.legLeftShade.y = 17 + swing * 2;
+            p.legRightShade.y = 17 - swing * 2;
+            p.shoeLeft.y = 22 + swing * 1.5;
+            p.shoeRight.y = 22 - swing * 1.5;
+
+            p.armLeft.y = 2 - swing * 1.2;
+            p.armRight.y = 2 + swing * 1.2;
+
+            player.yBaseOffset = -bounce;
+        }
+
+        function update() {
+            if (!player || !playerShadow) return;
+
+            if (isDialogueOpen) {
+                player.body.setVelocity(0, 0);
+                animateTrainerWalk(this.time.now, false);
+                playerShadow.x = player.x;
+                playerShadow.y = player.y + 18;
+                return;
+            }
+
+            const goLeft = activeKeys.left;
             const goRight = activeKeys.right;
-            const goUp    = activeKeys.up;
-            const goDown  = activeKeys.down;
+            const goUp = activeKeys.up;
+            const goDown = activeKeys.down;
 
             const diagonal = (goLeft || goRight) && (goUp || goDown);
-            const speed    = diagonal ? DIAG_SPEED : MOVE_SPEED;
+            const speed = diagonal ? DIAG_SPEED : MOVE_SPEED;
 
-            let velX = 0, velY = 0;
-            if (goLeft)  velX = -speed;
-            if (goRight) velX =  speed;
-            if (goUp)    velY = -speed;
-            if (goDown)  velY =  speed;
+            let velX = 0;
+            let velY = 0;
+
+            if (goLeft) velX = -speed;
+            if (goRight) velX = speed;
+            if (goUp) velY = -speed;
+            if (goDown) velY = speed;
 
             player.body.setVelocity(velX, velY);
-            
-            if (velX !== 0 || velY !== 0) {
-                player.y += Math.sin(this.time.now / 50) * 1.5;
+
+            if (velX < 0) setTrainerFacing('left');
+            else if (velX > 0) setTrainerFacing('right');
+            else if (velY < 0) setTrainerFacing('up');
+            else if (velY > 0) setTrainerFacing('down');
+
+            const moving = velX !== 0 || velY !== 0;
+            animateTrainerWalk(this.time.now, moving);
+
+            playerShadow.x = player.x;
+            playerShadow.y = player.y + 18;
+
+            if (player.yBaseOffset) {
+                player.list.forEach(part => {
+                    if (!part.baseYStored) {
+                        part.baseY = part.y;
+                        part.baseYStored = true;
+                    }
+                });
             }
         }
 
         function createTrigger(scene, x, y, width, height, data) {
-            let pad = scene.add.rectangle(x, y, width, height, 0x000000, 0);
+            const pad = scene.add.rectangle(x, y, width, height, 0x000000, 0);
             scene.physics.add.existing(pad, true);
 
             scene.physics.add.overlap(player, pad, () => {
-                // BUG FIX: Check both flags before opening
                 if (!isDialogueOpen && !triggerCooldown) {
                     showDialogue(data.title, data.text);
                 }
@@ -369,23 +1066,24 @@
 
         function showDialogue(title, text) {
             isDialogueOpen = true;
-            activeKeys.up = false; activeKeys.down = false;
-            activeKeys.left = false; activeKeys.right = false;
+            activeKeys.up = false;
+            activeKeys.down = false;
+            activeKeys.left = false;
+            activeKeys.right = false;
 
             document.getElementById('dialogue-title').innerHTML = title;
-            document.getElementById('dialogue-text').innerHTML  = text;
+            document.getElementById('dialogue-text').innerHTML = text;
             document.getElementById('dialogue-overlay').style.display = 'block';
         }
 
         function closeDialogue() {
             document.getElementById('dialogue-overlay').style.display = 'none';
-            
-            // 1. Instantly unfreeze the player so they can walk away
-            isDialogueOpen = false; 
-            
-            // 2. Start a 1-second cooldown so the sign doesn't instantly re-trigger
+            isDialogueOpen = false;
+
             triggerCooldown = true;
-            setTimeout(() => { triggerCooldown = false; }, 1000);
+            setTimeout(() => {
+                triggerCooldown = false;
+            }, 1000);
         }
 
         function setupMobileControls() {
@@ -397,18 +1095,27 @@
             const setupBtn = (id, direction) => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
-                const press   = (e) => { e.preventDefault(); activeKeys[direction] = true;  };
-                const release = (e) => { e.preventDefault(); activeKeys[direction] = false; };
-                btn.addEventListener('touchstart', press,   { passive: false });
-                btn.addEventListener('mousedown',  press,   { passive: false });
-                btn.addEventListener('touchend',   release, { passive: false });
-                btn.addEventListener('mouseup',    release, { passive: false });
+
+                const press = (e) => {
+                    e.preventDefault();
+                    activeKeys[direction] = true;
+                };
+
+                const release = (e) => {
+                    e.preventDefault();
+                    activeKeys[direction] = false;
+                };
+
+                btn.addEventListener('touchstart', press, { passive: false });
+                btn.addEventListener('mousedown', press, { passive: false });
+                btn.addEventListener('touchend', release, { passive: false });
+                btn.addEventListener('mouseup', release, { passive: false });
                 btn.addEventListener('mouseleave', release, { passive: false });
             };
 
-            setupBtn('btn-up',    'up');
-            setupBtn('btn-down',  'down');
-            setupBtn('btn-left',  'left');
+            setupBtn('btn-up', 'up');
+            setupBtn('btn-down', 'down');
+            setupBtn('btn-left', 'left');
             setupBtn('btn-right', 'right');
         }
     </script>
