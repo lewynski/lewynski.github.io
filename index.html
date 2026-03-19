@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jon Lewyn | Unfiltered Website</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <style>
         :root {
+            /* DARK MODE (DEFAULT) */
             --bg-color: #1e1e2f;
             --panel-bg: #2a2a40;
-            --panel-bg-2: #343454;
             --text-main: #f8f8f2;
             --text-muted: #a8a8b2;
             --retro-green: #4ade80;
@@ -22,1044 +22,306 @@
             --retro-gold: #facc15;
             --border-dark: #000000;
             --grid-color: rgba(255, 255, 255, 0.03);
-            --hero-glow-1: rgba(74, 222, 128, 0.10);
-            --hero-glow-2: rgba(59, 130, 246, 0.10);
-            --hero-glow-3: rgba(255, 121, 198, 0.08);
         }
 
+        /* LIGHT MODE OVERRIDES */
         [data-theme="light"] {
             --bg-color: #f0f0f5;
             --panel-bg: #ffffff;
-            --panel-bg-2: #ededf6;
             --text-main: #1a1a2e;
             --text-muted: #4a4a6a;
             --border-dark: #111111;
             --grid-color: rgba(0, 0, 0, 0.05);
-            --hero-glow-1: rgba(74, 222, 128, 0.12);
-            --hero-glow-2: rgba(59, 130, 246, 0.12);
-            --hero-glow-3: rgba(255, 121, 198, 0.09);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
-
+        /* --- GLOBAL, CURSORS & ALIVE ANIMATIONS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth;}
+        
         body {
             font-family: 'Press Start 2P', cursive;
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.8;
-            background-image:
-                linear-gradient(var(--grid-color) 2px, transparent 2px),
-                linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
+            background-image: linear-gradient(var(--grid-color) 2px, transparent 2px),
+            linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
             background-size: 30px 30px;
             overflow-x: hidden;
             transition: background-color 0.3s, color 0.3s;
-            position: relative;
+            animation: scrollGrid 20s linear infinite;
         }
 
-        body::before,
-        body::after {
-            content: "";
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            filter: blur(90px);
-            z-index: -1;
-            animation: blobFloat 12s ease-in-out infinite;
-            pointer-events: none;
+        @keyframes scrollGrid {
+            0% { background-position: 0px 0px; }
+            100% { background-position: 60px 60px; }
         }
 
-        body::before {
-            top: -120px;
-            left: -100px;
-            background: var(--hero-glow-1);
-        }
-
-        body::after {
-            bottom: -140px;
-            right: -120px;
-            background: var(--hero-glow-2);
-            animation-delay: 3s;
-        }
-
-        @keyframes blobFloat {
-            0%, 100% { transform: translate(0,0) scale(1); }
-            50% { transform: translate(40px, 30px) scale(1.08); }
+        /* Global CRT Scanline Overlay */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px; z-index: 9999; pointer-events: none;
         }
 
         a, button, .dropbtn { cursor: pointer; }
 
-        h1 { font-size: 1.6rem; line-height: 1.6; margin-bottom: 12px; }
-        h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--retro-pink); text-shadow: 2px 2px 0px var(--border-dark); }
+        h1 { font-size: 1.5rem; line-height: 1.5; margin-bottom: 10px; }
+        h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--retro-pink); text-shadow: 2px 2px 0px var(--border-dark);}
         h3 { font-size: 0.8rem; margin-bottom: 10px; color: var(--retro-blue); }
         p { font-size: 0.65rem; color: var(--text-muted); line-height: 2; }
 
+        /* --- NAVIGATION --- */
         nav {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            padding: 20px 40px;
-            background: rgba(42, 42, 64, 0.88);
-            backdrop-filter: blur(8px);
+            display: flex; align-items: center; flex-wrap: wrap;
+            padding: 20px 40px; background: var(--panel-bg);
             border-bottom: 4px solid var(--border-dark);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: background-color 0.3s, box-shadow 0.3s;
+            position: relative; z-index: 10;
+            transition: background-color 0.3s;
         }
-
-        [data-theme="light"] nav {
-            background: rgba(255, 255, 255, 0.88);
-        }
-
-        .logo {
-            color: var(--retro-green);
-            font-size: 1rem;
-            text-shadow: 3px 3px 0px var(--border-dark);
-            animation: logoPulse 2.4s infinite ease-in-out;
-        }
-
-        @keyframes logoPulse {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            margin-left: auto;
-        }
-
+        .logo { color: var(--retro-green); font-size: 1rem; text-shadow: 3px 3px 0px var(--border-dark); }
+        
+        .nav-links { display: flex; align-items: center; gap: 25px; margin-left: auto; }
+        
         .nav-links a, .dropbtn {
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 0.6rem;
-            background: none;
-            border: none;
-            font-family: inherit;
-            text-transform: uppercase;
-            transition: color 0.3s, transform 0.2s;
-            display: inline-flex;
-            align-items: center;
-            height: 100%;
+            color: var(--text-main); text-decoration: none; font-size: 0.6rem; background: none; border: none; 
+            font-family: inherit; text-transform: uppercase; transition: color 0.3s; display: inline-flex; align-items: center; height: 100%;
         }
-
-        .nav-links a:hover, .dropbtn:hover {
-            color: var(--retro-pink);
-            transform: translateY(-2px);
-        }
+        .nav-links a:hover, .dropbtn:hover { color: var(--retro-pink); }
 
         .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
-
         .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: var(--panel-bg);
-            border: 4px solid var(--border-dark);
-            box-shadow: 6px 6px 0px var(--border-dark);
-            min-width: 250px;
-            z-index: 100;
+            display: none; position: absolute; right: 0; top: 100%; background: var(--panel-bg); 
+            border: 4px solid var(--border-dark); box-shadow: 6px 6px 0px var(--border-dark); min-width: 250px; z-index: 100;
         }
-
-        .dropdown-content a {
-            display: block;
-            padding: 15px;
-            margin: 0;
-            text-align: left;
-            border-bottom: 2px solid var(--border-dark);
-            width: 100%;
-        }
-
-        .dropdown-content a:hover {
-            background: var(--retro-blue);
-            color: #fff;
-        }
-
+        .dropdown-content a { display: block; padding: 15px; margin: 0; text-align: left; border-bottom: 2px solid var(--border-dark); width: 100%; }
+        .dropdown-content a:hover { background: var(--retro-blue); color: #fff; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        .theme-toggle-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--retro-gold);
-            margin-left: 30px;
-            transition: transform 0.2s ease;
-            display: flex;
-            align-items: center;
-        }
+        .theme-toggle-btn { background: none; border: none; font-size: 1.2rem; color: var(--retro-gold); margin-left: 30px; transition: transform 0.2s ease; display: flex; align-items: center; }
+        .theme-toggle-btn:hover { transform: scale(1.2) rotate(15deg); color: var(--retro-pink); }
 
-        .theme-toggle-btn:hover {
-            transform: scale(1.2) rotate(15deg);
-            color: var(--retro-pink);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-main);
-            margin-left: 20px;
-            transition: color 0.2s;
-        }
-
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; margin-left: 20px; transition: color 0.2s; }
         .mobile-menu-btn:hover { color: var(--retro-pink); }
 
-        .hero-container {
-            position: relative;
-            text-align: center;
-            padding: 90px 20px 120px;
-            overflow: hidden;
-            min-height: 92vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 1100px;
-            margin: 0 auto;
-            animation: heroFadeUp 1s ease forwards;
-        }
-
-        @keyframes heroFadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #particle-canvas {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .hero-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(30px);
-            opacity: 0.5;
-            z-index: 1;
-            animation: orbMove 10s ease-in-out infinite;
-        }
-
-        .orb1 {
-            width: 140px;
-            height: 140px;
-            background: var(--hero-glow-1);
-            top: 15%;
-            left: 12%;
-        }
-
-        .orb2 {
-            width: 180px;
-            height: 180px;
-            background: var(--hero-glow-3);
-            bottom: 12%;
-            right: 12%;
-            animation-delay: 2s;
-        }
-
-        @keyframes orbMove {
-            0%, 100% { transform: translateY(0) translateX(0); }
-            50% { transform: translateY(-20px) translateX(20px); }
-        }
-
-        .pixel-particle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            opacity: 0.6;
-            animation: floatUp linear infinite;
-        }
+        /* --- HERO SECTION --- */
+        .hero-container { position: relative; text-align: center; padding: 80px 20px 100px 20px; overflow: hidden; min-height: 90vh; display: flex; align-items: center; justify-content: center; flex-direction: column;}
+        .hero-content { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto;}
+        
+        #particle-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .pixel-particle { position: absolute; width: 6px; height: 6px; opacity: 0.6; animation: floatUp linear infinite; }
 
         @keyframes floatUp {
             0% { transform: translateY(0); opacity: 0; }
-            10% { opacity: 0.85; }
-            90% { opacity: 0.1; }
-            100% { transform: translateY(-180px); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0; }
+            100% { transform: translateY(-150px); opacity: 0; }
         }
 
-        .profile-frame {
-            margin-bottom: 25px;
-            display: inline-block;
-            position: relative;
-            padding: 10px;
-            background: transparent;
-        }
-
+        .profile-frame { margin-bottom: 20px; display: inline-block; }
+        
+        /* Glitch Hover on Profile Pic */
         .profile-pic {
-            width: 170px;
-            height: 170px;
-            object-fit: cover;
-            border: 4px solid var(--border-dark);
-            box-shadow:
-                10px 10px 0px var(--retro-blue),
-                0 0 0 4px rgba(255,255,255,0.04);
-            image-rendering: auto;
-            position: relative;
-            z-index: 2;
-            animation: profileFloat 3s ease-in-out infinite;
-            background: #fff;
+            width: 160px; height: 160px; object-fit: cover; border: 4px solid var(--border-dark);
+            box-shadow: 8px 8px 0px var(--retro-blue); image-rendering: pixelated; transition: all 0.1s;
         }
-
-        @keyframes profileFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+        .profile-frame:hover .profile-pic {
+            animation: glitch-anim 0.3s infinite; border-color: var(--retro-pink); box-shadow: 8px 8px 0px var(--retro-green);
         }
-
+        @keyframes glitch-anim {
+            0% { transform: translate(0) } 20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) } 60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) } 100% { transform: translate(0) }
+        }
+        
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: flex-start;
-            background: #000;
-            color: var(--retro-green);
-            padding: 10px 15px;
-            border: 2px solid var(--retro-green);
-            font-size: 0.6rem;
-            margin: 0 auto 22px auto;
-            box-shadow: 4px 4px 0px var(--border-dark);
-            min-width: 300px;
-            height: 40px;
-            text-align: left;
+            display: inline-flex; align-items: center; justify-content: flex-start; background: #000; color: var(--retro-green);
+            padding: 10px 15px; border: 2px solid var(--retro-green); font-size: 0.6rem; margin: 0 auto 20px auto; 
+            box-shadow: 4px 4px 0px var(--border-dark); min-width: 280px; height: 38px; text-align: left;
         }
-
-        .blinking-cursor {
-            display: inline-block;
-            width: 8px;
-            height: 10px;
-            background-color: var(--retro-green);
-            margin-left: 5px;
-            animation: blink 1s step-end infinite;
-            vertical-align: middle;
-        }
-
+        .blinking-cursor { display: inline-block; width: 8px; height: 10px; background-color: var(--retro-green); margin-left: 5px; animation: blink 1s step-end infinite; vertical-align: middle; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        .gradient-text {
-            color: var(--retro-purple);
-            text-shadow: 3px 3px 0px var(--border-dark);
-        
-        }
+        .gradient-text { color: var(--retro-purple); text-shadow: 3px 3px 0px var(--border-dark); }
+        .bio-text { max-width: 700px; margin: 0 auto 30px auto; }
 
-        .bio-text {
-            max-width: 760px;
-            margin: 0 auto 30px auto;
-        }
-
-        .cta-buttons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 35px;
-        }
-
+        .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 40px;}
         .btn-primary, .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            font-size: 0.6rem;
-            text-decoration: none;
-            text-transform: uppercase;
-            border: 4px solid var(--border-dark);
-            box-shadow: 6px 6px 0px var(--border-dark);
-            transition: transform 0.15s, box-shadow 0.15s, filter 0.2s;
-            color: #fff;
-            position: relative;
-            overflow: hidden;
+            display: inline-block; padding: 12px 16px; font-size: 0.6rem; text-decoration: none; text-transform: uppercase;
+            border: 4px solid var(--border-dark); box-shadow: 6px 6px 0px var(--border-dark); transition: all 0.1s; color: #fff;
         }
-
-        .btn-primary::before,
-        .btn-secondary::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -120%;
-            width: 70%;
-            height: 100%;
-            background: rgba(255,255,255,0.18);
-            transform: skewX(-25deg);
-            transition: left 0.45s ease;
-        }
-
-        .btn-primary:hover::before,
-        .btn-secondary:hover::before {
-            left: 140%;
-        }
-
-        .btn-primary:hover, .btn-secondary:hover {
-            transform: translate(-2px, -2px);
-            filter: brightness(1.05);
-        }
-
         .btn-primary { background: var(--retro-blue); }
         .btn-secondary { background: var(--panel-bg); color: var(--text-main); }
         .cta-buttons a[href="rpg-resume.html"] { background: var(--retro-green); color: #000; }
+        .btn-primary:active, .btn-secondary:active, .cta-buttons a[href="rpg-resume.html"]:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
 
-        .btn-primary:active, .btn-secondary:active, .cta-buttons a[href="rpg-resume.html"]:active {
-            transform: translate(4px, 4px);
-            box-shadow: 2px 2px 0px var(--border-dark);
+        /* --- HERO STATS (PIXEL STYLE) --- */
+        .hero-stats { display: grid; grid-template-columns: repeat(3, minmax(150px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; }
+        .stat-card-top {
+            background: rgba(0,0,0,0.4); border: 4px solid var(--border-dark); box-shadow: 6px 6px 0 var(--border-dark);
+            padding: 15px; transition: transform 0.1s;
         }
+        .stat-card-top:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--border-dark); }
+        .stat-card-top strong { display: block; font-size: 1rem; color: var(--retro-green); text-shadow: 2px 2px 0 var(--border-dark); margin-bottom: 5px; }
+        .stat-card-top span { font-size: 0.55rem; color: var(--text-main); }
 
-        .hero-stats {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(150px, 1fr));
-            gap: 16px;
-            max-width: 760px;
-            margin: 0 auto;
-        }
-
-        .stat-card {
-            background: var(--panel-bg);
-            border: 4px solid var(--border-dark);
-            box-shadow: 6px 6px 0px var(--border-dark);
-            padding: 18px 14px;
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover { transform: translateY(-4px); }
-
-        .stat-card strong {
-            display: block;
-            font-size: 1rem;
-            color: var(--retro-green);
-            margin-bottom: 6px;
-            text-shadow: 2px 2px 0px var(--border-dark);
-        }
-
-        .stat-card span {
-            font-size: 0.5rem;
-            color: var(--text-muted);
-        }
-
+        /* --- SCROLL INDICATOR --- */
         .scroll-indicator {
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--text-muted);
-            font-size: 0.5rem;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            animation: bounceDown 2s infinite;
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: var(--retro-pink);
+            font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; gap: 10px; animation: bounceDown 1.5s infinite; z-index: 2;
         }
+        .scroll-indicator i { font-size: 1.2rem; text-shadow: 2px 2px 0 var(--border-dark);}
+        @keyframes bounceDown { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
 
-        .scroll-indicator i {
-            color: var(--retro-pink);
-            font-size: 1rem;
-        }
-
-        @keyframes bounceDown {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(6px); }
-        }
-
-        .skills-section, .ai-chat-section, .contact-section {
-            padding: 70px 20px;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
+        /* --- SKILLS GRID WITH SCROLL ANIMATION --- */
+        .skills-section { padding: 50px 20px; text-align: center; position: relative; z-index: 2; overflow: hidden; }
         .section-title { margin-bottom: 40px; }
-
-        .skills-grid {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
-            max-width: 1250px;
-            margin: 0 auto;
-        }
-
-        @keyframes popInReveal {
-            0% { opacity: 0; transform: translateY(60px) scale(0.9); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        
+        .skills-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1250px; margin: 0 auto; }
+        
+        @keyframes popInReveal { 0% { opacity: 0; transform: translateY(60px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
         .skill-card {
-            background: linear-gradient(180deg, var(--panel-bg), var(--panel-bg-2));
-            width: 280px;
-            padding: 25px;
-            border: 4px solid var(--border-dark);
-            box-shadow: 8px 8px 0px var(--border-dark);
-            transition: transform 0.2s, background-color 0.3s, box-shadow 0.2s;
-            opacity: 0;
-            position: relative;
-            overflow: hidden;
+            background: var(--panel-bg); width: 280px; padding: 25px; border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark);
+            transition: transform 0.2s, background-color 0.3s; opacity: 0; 
         }
+        .skill-card.show { animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .skill-card:nth-child(1).show { animation-delay: 0.1s; } .skill-card:nth-child(2).show { animation-delay: 0.3s; }
+        .skill-card:nth-child(3).show { animation-delay: 0.5s; } .skill-card:nth-child(4).show { animation-delay: 0.7s; }
+        .skill-card:hover { transform: translateY(-5px); }
+        .icon-box { font-size: 2.5rem; color: var(--retro-pink); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
+        
+        .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .tags span { background: #000; color: var(--retro-green); padding: 6px 8px; font-size: 0.5rem; border: 2px solid var(--border-dark); }
 
-        .skill-card::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
-            transform: translateX(-120%);
-            transition: transform 0.5s ease;
-        }
-
-        .skill-card:hover::after {
-            transform: translateX(120%);
-        }
-
-        .skill-card.show {
-            animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .skill-card:nth-child(1).show { animation-delay: 0.1s; }
-        .skill-card:nth-child(2).show { animation-delay: 0.25s; }
-        .skill-card:nth-child(3).show { animation-delay: 0.4s; }
-        .skill-card:nth-child(4).show { animation-delay: 0.55s; }
-
-        .skill-card:hover {
-            transform: translateY(-8px) rotate(-0.5deg);
-            box-shadow: 10px 10px 0px var(--border-dark);
-        }
-
-        .icon-box {
-            font-size: 2.5rem;
-            color: var(--retro-pink);
-            margin-bottom: 15px;
-            text-shadow: 3px 3px 0px var(--border-dark);
-        }
-
-        .tags {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .tags span {
-            background: #000;
-            color: var(--retro-green);
-            padding: 6px 8px;
-            font-size: 0.5rem;
-            border: 2px solid #555;
-            transition: transform 0.2s;
-        }
-
-        .tags span:hover { transform: scale(1.06); }
-
-        .ai-chat-section .section-title p {
-            max-width: 760px;
-            margin: 0 auto;
-        }
-
-        .ai-shell {
-            max-width: 1150px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 24px;
-            align-items: stretch;
-        }
-
+        /* --- PIXEL AI TERMINAL HUD REDESIGN --- */
+        .ai-chat-section { padding: 80px 20px; text-align: center; }
+        .ai-shell { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 30px; align-items: stretch; text-align: left;}
+        
+        /* Left Panel */
         .ai-side-panel {
-            background: linear-gradient(180deg, #111827, #1b1b2f);
-            border: 4px solid var(--border-dark);
-            box-shadow: 8px 8px 0px var(--border-dark);
-            padding: 24px 18px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 8px 8px 0 var(--border-dark);
+            padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-
-        .ai-side-panel::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(135deg, rgba(74, 222, 128, 0.08), transparent 40%),
-                linear-gradient(315deg, rgba(59, 130, 246, 0.08), transparent 40%);
-            pointer-events: none;
-        }
-
         .ai-avatar-wrap {
-            position: relative;
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 20px;
+            width: 100px; height: 100px; background: #000; border: 4px solid var(--retro-green); box-shadow: inset 0 0 15px var(--retro-green);
+            display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--retro-green); margin-bottom: 15px;
         }
+        .ai-side-panel h3 { color: var(--retro-green); font-size: 0.8rem; margin-bottom: 5px; text-shadow: 2px 2px 0 var(--border-dark);}
+        .ai-side-text { font-size: 0.55rem; color: var(--text-muted); margin-bottom: 20px;}
+        
+        .ai-status-list { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;}
+        .ai-status-item { background: rgba(0,0,0,0.4); border: 2px solid var(--border-dark); padding: 10px; font-size: 0.5rem; display: flex; align-items: center; gap: 10px;}
+        .square-dot { width: 12px; height: 12px; border: 2px solid var(--border-dark); }
+        .dot-online { background: var(--retro-green); animation: blink 2s infinite; }
+        .dot-mode { background: var(--retro-gold); }
+        .dot-link { background: var(--retro-blue); }
 
-        .ai-avatar-ring {
-            position: absolute;
-            inset: 0;
-            border: 3px dashed var(--retro-blue);
-            border-radius: 50%;
-            animation: spinRing 8s linear infinite;
-        }
+        .ai-mini-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;}
+        .ai-mini-tags span { background: #000; border: 2px solid var(--border-dark); padding: 6px 8px; font-size: 0.45rem; color: var(--retro-pink);}
 
-        .ai-avatar {
-            position: absolute;
-            inset: 12px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at top, #1f2937, #000);
-            border: 3px solid var(--retro-green);
-            color: var(--retro-green);
-            font-size: 2rem;
-            box-shadow: 0 0 20px rgba(74, 222, 128, 0.25);
-        }
-
-        @keyframes spinRing {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .ai-side-panel h3 {
-            color: var(--retro-green);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 0px var(--border-dark);
-        }
-
-        .ai-side-text {
-            font-size: 0.55rem;
-            margin-bottom: 20px;
-        }
-
-        .ai-status-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .ai-status-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.45);
-            border: 2px solid var(--border-dark);
-            padding: 10px;
-            font-size: 0.5rem;
-            color: var(--text-main);
-            text-align: left;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .dot.online {
-            background: var(--retro-green);
-            box-shadow: 0 0 12px var(--retro-green);
-        }
-
-        .dot.thinking {
-            background: var(--retro-gold);
-            box-shadow: 0 0 12px var(--retro-gold);
-        }
-
-        .dot.secure {
-            background: var(--retro-blue);
-            box-shadow: 0 0 12px var(--retro-blue);
-        }
-
-        .ai-mini-tags {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .ai-mini-tags span {
-            font-size: 0.45rem;
-            padding: 6px 8px;
-            border: 2px solid var(--border-dark);
-            background: #000;
-            color: var(--retro-pink);
-        }
-
+        /* Right Panel (Chat) */
         .chat-container {
-            background: var(--panel-bg);
-            max-width: 100%;
-            margin: 0 auto;
-            border: 4px solid var(--border-dark);
-            box-shadow: 8px 8px 0px var(--border-dark);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
+            background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 8px 8px 0 var(--border-dark);
+            display: flex; flex-direction: column; overflow: hidden;
         }
-
-        .cool-chat {
-            background: linear-gradient(180deg, var(--panel-bg), #1d2038);
-        }
-
-        .chat-container::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                repeating-linear-gradient(
-                    to bottom,
-                    rgba(255,255,255,0.03),
-                    rgba(255,255,255,0.03) 2px,
-                    transparent 2px,
-                    transparent 4px
-                );
-            pointer-events: none;
-            opacity: 0.22;
-        }
-
         .chat-header {
-            background: #000;
-            padding: 15px;
-            color: var(--retro-green);
-            border-bottom: 4px solid var(--border-dark);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 0.8rem;
-            text-align: left;
-            position: relative;
-            z-index: 2;
+            background: #000; padding: 15px; color: var(--retro-green); border-bottom: 4px solid var(--border-dark);
+            display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem;
         }
-
-        .chat-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .chat-header-right {
-            display: flex;
-            gap: 8px;
-        }
-
-        .chat-header-right span {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: block;
-        }
-
-        .chat-header-right span:nth-child(1) { background: #ff5f56; }
-        .chat-header-right span:nth-child(2) { background: #ffbd2e; }
-        .chat-header-right span:nth-child(3) { background: #27c93f; }
+        .chat-header-right { display: flex; gap: 6px; }
+        .chat-header-right span { width: 12px; height: 12px; border: 2px solid var(--border-dark); }
+        .chat-header-right span:nth-child(1) { background: var(--retro-red); }
+        .chat-header-right span:nth-child(2) { background: var(--retro-gold); }
+        .chat-header-right span:nth-child(3) { background: var(--retro-green); }
 
         .chat-messages {
-            height: 320px;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background: var(--bg-color);
-            font-family: Arial, sans-serif;
-            font-size: 0.9rem;
-            text-align: left;
-            position: relative;
-            z-index: 2;
+            height: 300px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
+            background: var(--bg-color); font-family: 'VT323', monospace; font-size: 1.3rem; text-align: left;
         }
+        .chat-messages::-webkit-scrollbar { width: 10px; }
+        .chat-messages::-webkit-scrollbar-track { background: var(--bg-color); border-left: 4px solid var(--border-dark); }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--retro-green); border: 2px solid var(--border-dark); }
 
-        .chat-messages::-webkit-scrollbar { width: 8px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: var(--border-dark); }
-
-        .message {
-            padding: 12px 15px;
-            border-radius: 8px;
-            max-width: 80%;
-            line-height: 1.5;
-            border: 2px solid var(--border-dark);
-            animation: messageIn 0.25s ease;
-        }
-
-        @keyframes messageIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .msg-ai {
-            background: var(--panel-bg);
-            color: var(--text-main);
-            align-self: flex-start;
-            box-shadow: 3px 3px 0px var(--border-dark);
-        }
-
-        .msg-user {
-            background: var(--retro-blue);
-            color: #fff;
-            align-self: flex-end;
-            box-shadow: -3px 3px 0px var(--border-dark);
-        }
-
-        .quick-prompts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 0 15px 15px;
-            background: var(--panel-bg);
-            border-top: 2px solid rgba(255,255,255,0.06);
-            position: relative;
-            z-index: 2;
-        }
-
+        .message { padding: 12px 15px; max-width: 85%; line-height: 1.5; border: 4px solid var(--border-dark); }
+        .msg-ai { background: var(--panel-bg); color: var(--text-main); align-self: flex-start; box-shadow: 4px 4px 0px var(--border-dark); }
+        .msg-user { background: var(--retro-blue); color: #fff; align-self: flex-end; box-shadow: -4px 4px 0px var(--border-dark); }
+        
+        .quick-prompts { background: rgba(0,0,0,0.3); padding: 15px; display: flex; flex-wrap: wrap; gap: 10px; border-bottom: 4px solid var(--border-dark); border-top: 4px solid var(--border-dark);}
         .prompt-chip {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.5rem;
-            padding: 10px 12px;
-            border: 3px solid var(--border-dark);
-            background: #000;
-            color: var(--retro-green);
-            box-shadow: 4px 4px 0px var(--border-dark);
-            transition: transform 0.15s, color 0.2s;
+            background: var(--bg-color); color: var(--retro-light-pink); font-family: 'Press Start 2P', cursive; font-size: 0.5rem;
+            padding: 10px 12px; border: 2px solid var(--retro-pink); box-shadow: 4px 4px 0 var(--border-dark); transition: 0.1s;
         }
+        .prompt-chip:hover { background: var(--retro-pink); color: #000; }
+        .prompt-chip:active { transform: translate(4px, 4px); box-shadow: 0 0 0 transparent; }
 
-        .prompt-chip:hover {
-            transform: translateY(-2px);
-            color: var(--retro-pink);
-        }
-
-        .typing {
-            display: inline-flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .typing span {
-            width: 7px;
-            height: 7px;
-            background: var(--retro-green);
-            display: inline-block;
-            animation: typingBlink 1s infinite ease-in-out;
-        }
-
-        .typing span:nth-child(2) { animation-delay: 0.15s; }
-        .typing span:nth-child(3) { animation-delay: 0.3s; }
-
-        @keyframes typingBlink {
-            0%, 100% { opacity: 0.3; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-3px); }
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 15px;
-            background: var(--panel-bg);
-            border-top: 4px solid var(--border-dark);
-            position: relative;
-            z-index: 2;
-        }
-
+        .chat-input-area { display: flex; padding: 15px; background: var(--panel-bg); align-items: stretch; gap: 10px;}
         .chat-input-area input {
-            flex: 1;
-            padding: 12px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.6rem;
-            background: var(--bg-color);
-            color: var(--text-main);
-            border: 4px solid var(--border-dark);
-            outline: none;
+            flex: 1; padding: 12px; font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
+            background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark); outline: none;
         }
-
+        .chat-input-area input:focus { border-color: var(--retro-green); }
         .chat-input-area button {
-            background: var(--retro-green);
-            color: #000;
-            border: 4px solid var(--border-dark);
-            padding: 0 20px;
-            margin-left: 10px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.8rem;
-            transition: transform 0.1s;
+            background: var(--retro-green); color: #000; border: 4px solid var(--border-dark); padding: 0 20px;
+            font-family: 'Press Start 2P', cursive; font-size: 0.8rem; transition: 0.1s; box-shadow: 4px 4px 0 var(--border-dark);
         }
+        .chat-input-area button:active { transform: translate(4px, 4px); box-shadow: 0 0 0 transparent;}
 
-        .chat-input-area button:active { transform: translateY(2px); }
-
+        /* --- CONTACT FORM --- */
+        .contact-section { padding: 50px 20px; text-align: center; }
         .contact-form {
-            background: var(--panel-bg);
-            max-width: 650px;
-            margin: 0 auto;
-            padding: 30px;
-            border: 4px solid var(--border-dark);
-            box-shadow: 8px 8px 0px var(--border-dark);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            transition: background-color 0.3s;
+            background: var(--panel-bg); max-width: 600px; margin: 0 auto; padding: 30px; border: 4px solid var(--border-dark);
+            box-shadow: 8px 8px 0px var(--border-dark); display: flex; flex-direction: column; gap: 20px; transition: background-color 0.3s;
         }
-
         .contact-form input, .contact-form textarea {
-            font-family: 'Press Start 2P', cursive;
-            background: var(--bg-color);
-            color: var(--text-main);
-            border: 4px solid var(--border-dark);
-            padding: 15px;
-            font-size: 0.6rem;
-            outline: none;
-            width: 100%;
-            transition: background-color 0.3s, color 0.3s, transform 0.2s;
+            font-family: 'Press Start 2P', cursive; background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark); 
+            padding: 15px; font-size: 0.6rem; outline: none; width: 100%; transition: background-color 0.3s, color 0.3s;
         }
-
-        .contact-form input:focus, .contact-form textarea:focus {
-            border-color: var(--retro-pink);
-            transform: translateY(-2px);
-        }
-
-        .contact-form textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
-
+        .contact-form input:focus, .contact-form textarea:focus { border-color: var(--retro-pink); }
+        .contact-form textarea { resize: vertical; min-height: 150px; }
         .contact-form button {
-            background: var(--retro-pink);
-            color: #fff;
-            border: 4px solid var(--border-dark);
-            padding: 15px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            box-shadow: 6px 6px 0px var(--border-dark);
-            transition: all 0.1s;
+            background: var(--retro-pink); color: #fff; border: 4px solid var(--border-dark); padding: 15px; font-family: 'Press Start 2P', cursive; 
+            font-size: 0.7rem; text-transform: uppercase; box-shadow: 6px 6px 0px var(--border-dark); transition: all 0.1s; cursor: pointer;
         }
+        .contact-form button:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
 
-        .contact-form button:active {
-            transform: translate(4px, 4px);
-            box-shadow: 2px 2px 0px var(--border-dark);
-        }
+        /* --- FOOTER --- */
+        footer { background: var(--panel-bg); border-top: 4px solid var(--border-dark); padding: 30px; text-align: center; margin-top: 50px; transition: background-color 0.3s; }
+        .social-links { margin-top: 15px; display: flex; justify-content: center; gap: 20px; }
+        .social-links a { color: var(--text-main); font-size: 1.2rem; text-shadow: 2px 2px 0px var(--border-dark); transition: color 0.2s; }
+        .social-links a:hover { color: var(--retro-blue); }
 
-        footer {
-            background: var(--panel-bg);
-            border-top: 4px solid var(--border-dark);
-            padding: 30px;
-            text-align: center;
-            margin-top: 50px;
-            transition: background-color 0.3s;
-        }
-
-        .social-links {
-            margin-top: 15px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .social-links a {
-            color: var(--text-main);
-            font-size: 1.2rem;
-            text-shadow: 2px 2px 0px var(--border-dark);
-            transition: color 0.2s, transform 0.2s;
-        }
-
-        .social-links a:hover {
-            color: var(--retro-blue);
-            transform: translateY(-3px);
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        /* --- RESPONSIVE MOBILE FIX --- */
         @media (max-width: 900px) {
             nav { padding: 15px 20px; }
-            .logo { font-size: 1.1rem; order: 1; margin-right: auto; }
-            .theme-toggle-btn { margin-left: 0; order: 2; font-size: 1.5rem; }
+            .logo { font-size: 1.2rem; order: 1; margin-right: auto; }
+            .theme-toggle-btn { margin-left: 0; order: 2; font-size: 1.5rem; } 
             .mobile-menu-btn { display: block; order: 3; }
-
-            .nav-links {
-                display: none;
-                width: 100%;
-                flex-direction: column;
-                gap: 0;
-                align-items: stretch;
-                margin-top: 20px;
-                border: 4px solid var(--border-dark);
-                background: var(--panel-bg);
-                box-shadow: 6px 6px 0px var(--border-dark);
-                margin-left: 0;
-                order: 4;
-                border-radius: 8px;
-                overflow: hidden;
+            
+            .nav-links { 
+                display: none; width: 100%; flex-direction: column; gap: 0; align-items: stretch;
+                margin-top: 20px; border: 4px solid var(--border-dark); background: var(--panel-bg); box-shadow: 6px 6px 0px var(--border-dark);
+                margin-left: 0; order: 4; border-radius: 8px; overflow: hidden;
             }
-
-            .nav-links.show { display: flex; }
-
-            .nav-links a, .dropbtn {
-                width: 100%;
-                padding: 18px;
-                justify-content: center;
-                border-bottom: 2px solid var(--border-dark);
-                font-size: 0.7rem;
-            }
-
+            .nav-links.show { display: flex; } 
+            .nav-links a, .dropbtn { width: 100%; padding: 18px; justify-content: center; border-bottom: 2px solid var(--border-dark); font-size: 0.7rem; }
             .nav-links > *:last-child, .nav-links > *:last-child .dropbtn { border-bottom: none; }
-
             .dropdown { width: 100%; flex-direction: column; align-items: stretch; }
             .dropbtn { width: 100%; justify-content: center; }
-
-            .dropdown-content {
-                position: static;
-                width: 100%;
-                border: none;
-                box-shadow: none;
-                border-top: 2px dashed var(--border-dark);
-                background: var(--bg-color);
-                display: none;
-            }
-
+            .dropdown-content { position: static; width: 100%; border: none; box-shadow: none; border-top: 2px dashed var(--border-dark); background: var(--bg-color); display: none; }
             .dropdown.active .dropdown-content { display: block; }
-
-            .hero-container {
-                min-height: auto;
-                padding: 70px 16px 100px;
-            }
-
-            .status-badge {
-                min-width: 100%;
-                max-width: 100%;
-                font-size: 0.52rem;
-            }
-
-            h1 { font-size: 1.15rem; }
-
-            .hero-stats {
-                grid-template-columns: 1fr;
-                max-width: 350px;
-            }
-
-            .ai-shell {
-                grid-template-columns: 1fr;
-            }
-
-            .chat-input-area {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .chat-input-area button {
-                margin-left: 0;
-                padding: 15px;
-            }
+            
+            h1 { font-size: 1.2rem; }
+            
+            /* Mobile Adjustments for new elements */
+            .hero-stats { grid-template-columns: 1fr; }
+            .ai-shell { grid-template-columns: 1fr; }
+            .chat-input-area { flex-direction: column; }
+            .chat-input-area button { margin-left: 0; padding: 15px; }
         }
     </style>
 </head>
 <body>
+    
+    <div class="scanlines"></div>
 
     <nav>
         <div class="logo">UNFILTERED</div>
@@ -1069,12 +331,12 @@
             <a href="https://github.com/lewynski" target="_blank">GitHub</a>
             <a href="#ai-chat">Eiji AI</a>
             <a href="#contact">Contact</a>
-
+            
             <div class="dropdown">
                 <button class="dropbtn">Projects ▼</button>
                 <div class="dropdown-content">
                     <a href="projects/capysave.html">CapySave App</a>
-                    <a href="projects/eiji-ai.html">Capy OS AI</a>
+                    <a href="projects/eiji-ai.html">Capy os AI</a>
                     <a href="projects/anime-quiz.html">Guess the Anime</a>
                     <a href="projects/mlbb-quiz.html">MLBB Quiz</a>
                     <a href="projects/snake-game.html">Cyber Retro Game</a>
@@ -1092,27 +354,24 @@
 
     <header class="hero-container">
         <div id="particle-canvas"></div>
-        <div class="hero-orb orb1"></div>
-        <div class="hero-orb orb2"></div>
 
         <div class="hero-content">
             <div class="profile-frame">
                 <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
             </div>
-
+            
             <div class="status-badge-container">
                 <div class="status-badge">
                     > <span id="typewriter-text"></span><span class="blinking-cursor"></span>
                 </div>
             </div>
 
-
             <h1>Hello, I'm <br><span class="gradient-text">Jon Lewyn</span></h1>
             <p class="bio-text">
-                An Electronics Engineering student at Polytechnic University of the Philippines Santo Tomas Campus with a passion for bridging the gap between hardware and software.
+                An Electronics Engineering student at Polytechnic University of the Philippines Santo Tomas Campus with a passion for bridging the gap between hardware and software. 
                 I specialize in building computational tools, embedded systems, and full-stack web development applications.
             </p>
-
+            
             <div class="cta-buttons">
                 <a href="#skills" class="btn-primary">Tech Stack</a>
                 <a href="https://github.com/lewynski" target="_blank" class="btn-secondary">
@@ -1129,20 +388,21 @@
                 </a>
             </div>
 
-            <div class="hero-stats reveal">
-                <div class="stat-card">
+            <div class="hero-stats reveal show">
+                <div class="stat-card-top">
                     <strong>5+</strong>
                     <span>Core Languages</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card-top">
                     <strong>Hardware</strong>
-                    <span>Embedded + Circuit Focus</span>
+                    <span>Embedded & Circuits</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card-top">
                     <strong>Full Stack</strong>
                     <span>From UI to Logic</span>
                 </div>
             </div>
+
         </div>
 
         <div class="scroll-indicator">
@@ -1151,7 +411,7 @@
         </div>
     </header>
 
-    <section id="skills" class="skills-section reveal">
+    <section id="skills" class="skills-section">
         <div class="section-title">
             <h2>Technical Arsenal</h2>
             <p>My toolkit for solving engineering problems.</p>
@@ -1171,7 +431,7 @@
                 <h3>Hardware</h3>
                 <p>Bringing code to the physical world.</p>
                 <div class="tags">
-                    <span>Arduino</span> <span>FPGA</span> <span>TinkerCAD</span> <span>Proto Board</span>
+                    <span>Arduino</span> <span>FPGA</span> <span>TinkerCAD</span> <span>Proto Boarding</span>
                 </div>
             </div>
             <div class="skill-card">
@@ -1202,10 +462,7 @@
         <div class="ai-shell">
             <div class="ai-side-panel">
                 <div class="ai-avatar-wrap">
-                    <div class="ai-avatar-ring"></div>
-                    <div class="ai-avatar">
-                        <i class="fas fa-robot"></i>
-                    </div>
+                    <i class="fas fa-robot"></i>
                 </div>
 
                 <h3>EIJI AI</h3>
@@ -1213,15 +470,15 @@
 
                 <div class="ai-status-list">
                     <div class="ai-status-item">
-                        <span class="dot online"></span>
+                        <span class="square-dot dot-online"></span>
                         <span>STATUS: ONLINE</span>
                     </div>
                     <div class="ai-status-item">
-                        <span class="dot thinking"></span>
+                        <span class="square-dot dot-mode"></span>
                         <span>MODE: ASSIST</span>
                     </div>
                     <div class="ai-status-item">
-                        <span class="dot secure"></span>
+                        <span class="square-dot dot-link"></span>
                         <span>LINK: STABLE</span>
                     </div>
                 </div>
@@ -1234,11 +491,10 @@
                 </div>
             </div>
 
-            <div class="chat-container cool-chat">
+            <div class="chat-container">
                 <div class="chat-header">
-                    <div class="chat-header-left">
-                        <i class="fas fa-terminal"></i>
-                        <span>EIJI-AI NEURAL TERMINAL</span>
+                    <div>
+                        <i class="fas fa-terminal"></i> EIJI-AI NEURAL TERMINAL
                     </div>
                     <div class="chat-header-right">
                         <span></span><span></span><span></span>
@@ -1247,7 +503,7 @@
 
                 <div class="chat-messages" id="chat-messages">
                     <div class="message msg-ai">
-                        Yo, I’m Eiji AI. Ask me about Jon Lewyn’s projects, skills, tech stack, or experience.
+                        Yo, I'm Eiji AI. Ask me about Jon Lewyn's projects, skills, tech stack, or experience.
                     </div>
                 </div>
 
@@ -1270,7 +526,7 @@
             <h2>Email Me</h2>
             <p>Send a transmission directly to my inbox.</p>
         </div>
-
+        
         <form action="https://formsubmit.co/lewynvllram@gmail.com" method="POST" class="contact-form">
             <input type="hidden" name="_subject" value="New Message from Unfiltered Portfolio!">
             <input type="hidden" name="_captcha" value="false">
@@ -1279,7 +535,7 @@
             <input type="text" name="name" placeholder="NAME" required>
             <input type="email" name="email" placeholder="EMAIL ADDRESS" required>
             <textarea name="message" placeholder="ENTER YOUR MESSAGE..." required></textarea>
-
+            
             <button type="submit">SEND MESSAGE ▶</button>
         </form>
     </section>
@@ -1294,6 +550,7 @@
     </footer>
 
     <script>
+        // --- 0. LIGHT/DARK MODE TOGGLE ---
         const themeBtn = document.getElementById('theme-btn');
         const themeIcon = themeBtn.querySelector('i');
         const body = document.documentElement;
@@ -1319,13 +576,14 @@
             }
         });
 
+        // --- 1. MOBILE HAMBURGER MENU ---
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const navMenu = document.querySelector('.nav-links');
-
+        
         mobileBtn.addEventListener('click', () => {
             navMenu.classList.toggle('show');
             const icon = mobileBtn.querySelector('i');
-            if (navMenu.classList.contains('show')) {
+            if(navMenu.classList.contains('show')) {
                 icon.classList.replace('fa-bars', 'fa-times');
             } else {
                 icon.classList.replace('fa-times', 'fa-bars');
@@ -1335,102 +593,66 @@
         const dropBtn = document.querySelector('.dropbtn');
         const dropdown = document.querySelector('.dropdown');
         dropBtn.addEventListener('click', (e) => {
-            if (window.innerWidth <= 900) {
+            if(window.innerWidth <= 900) {
                 e.preventDefault();
                 dropdown.classList.toggle('active');
             }
         });
 
-        const statuses = [
-            "STATUS: AVAILABLE",
-            "BUILDING NEW PROJECTS",
-            "ECE STUDENT MODE: ACTIVE",
-            "READY FOR COLLABS",
-            "SYSTEM ONLINE"
-        ];
-
-        let statusIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
+        // --- 2. TYPEWRITER EFFECT ---
+        const statuses = ["STATUS: AVAILABLE", "BUILDING NEW PROJECTS", "ECE STUDENT MODE: ACTIVE"];
+        let statusIndex = 0; let charIndex = 0; let isDeleting = false;
         const typeTarget = document.getElementById("typewriter-text");
 
         function typeEffect() {
             const currentText = statuses[statusIndex];
-
-            if (isDeleting) {
-                typeTarget.textContent = currentText.substring(0, charIndex - 1);
-                charIndex--;
-            } else {
-                typeTarget.textContent = currentText.substring(0, charIndex + 1);
-                charIndex++;
-            }
+            if (isDeleting) { typeTarget.textContent = currentText.substring(0, charIndex - 1); charIndex--; } 
+            else { typeTarget.textContent = currentText.substring(0, charIndex + 1); charIndex++; }
 
             let typeSpeed = isDeleting ? 40 : 100;
-
-            if (!isDeleting && charIndex === currentText.length) {
-                typeSpeed = 1800;
-                isDeleting = true;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                statusIndex = (statusIndex + 1) % statuses.length;
-                typeSpeed = 500;
-            }
-
+            if (!isDeleting && charIndex === currentText.length) { typeSpeed = 2000; isDeleting = true; } 
+            else if (isDeleting && charIndex === 0) { isDeleting = false; statusIndex = (statusIndex + 1) % statuses.length; typeSpeed = 500; }
             setTimeout(typeEffect, typeSpeed);
         }
         typeEffect();
 
+        // --- 3. PIXEL PARTICLES GENERATOR ---
         const particleCanvas = document.getElementById('particle-canvas');
-        const colors = ['#4ade80', '#3b82f6', '#bd93f9', '#ff79c6', '#facc15'];
+        const colors = ['#4ade80', '#3b82f6', '#bd93f9', '#ff79c6']; 
 
         function createParticles() {
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
+            for(let i = 0; i < 40; i++) {
+                let particle = document.createElement('div');
                 particle.className = 'pixel-particle';
                 particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + 10 + '%';
                 particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.animationDuration = (Math.random() * 3 + 2.5) + 's';
-                particle.style.animationDelay = (Math.random() * 5) + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 2) + 's'; 
+                particle.style.animationDelay = (Math.random() * 4) + 's';
                 particleCanvas.appendChild(particle);
             }
         }
         createParticles();
 
-        const observerOptions = { threshold: 0.18 };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible', 'show');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.skill-card, .reveal').forEach(el => {
-            observer.observe(el);
-        });
-
-        // FOR TESTING ONLY
-        const GROQ_API_KEY = "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";
-
+        // --- 4. GROQ AI CHAT INTEGRATION ---
+        const GROQ_API_KEY = "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"; 
+        
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
 
-        const systemPrompt = `You are Eiji AI, the personal AI assistant for Jon Lewyn Villaram Tanggaro.
-You are embedded on his developer portfolio website. Keep answers concise, friendly, and slightly retro/cyberpunk in tone.
-
-Information about Jon Lewyn:
-- He is an Electronics Engineering student at Polytechnic University of the Philippines (PUP) Santo Tomas Campus.
-- He is a Web Developer bridging hardware and software.
-- Skills: Python, JavaScript, HTML/CSS, Java, C++, Arduino Uno, FPGA, AutoCAD, MATLAB, Multisim, Proteus, MS Office, Macro automation.
-- Experience: Intern (OJT) at Bandai Wireharness Philippines (developed automated macro systems). Work Immersion at NOCECO.
-- Projects: CapySave (virtual wallet monitor), Capy OS AI, Anime Quiz, MLBB Quiz, Cyber Retro Snake Game.
-- Affiliations: OECES Special Project Officer, IECEP Batangas Student Chapter.
-
-If the user asks a question about Jon, answer accurately based on this data. If they just want to chat, be conversational and polite. Never output code formatting or markdown in your responses.`;
+        const systemPrompt = `You are Eiji AI, the personal AI assistant for Jon Lewyn Villaram Tanggaro. 
+        You are embedded on his developer portfolio website. Keep answers concise, friendly, and slightly retro/cyberpunk in tone.
+        
+        Information about Jon Lewyn:
+        - He is an Electronics Engineering student at Polytechnic University of the Philippines (PUP) Santo Tomas Campus.
+        - He is a Web Developer bridging hardware and software.
+        - Skills: Python, JavaScript, HTML/CSS, Java, C++, Arduino Uno, FPGA, AutoCAD, MATLAB, Multisim, Proteus, MS Office, Macro automation.
+        - Experience: Intern (OJT) at Bandai Wireharness Philippines (developed automated macro systems). Work Immersion at NOCECO.
+        - Projects: CapySave (virtual wallet monitor), Capy OS AI, Anime Quiz, MLBB Quiz, Cyber Retro Snake Game.
+        - Affiliations: OECES Special Project Officer, IECEP Batangas Student Chapter.
+        
+        If the user asks a question about Jon, answer accurately based on this data. If they just want to chat, be conversational and polite. Never output code formatting or markdown in your responses.`;
 
         let conversationHistory = [
             { role: "system", content: systemPrompt }
@@ -1441,21 +663,7 @@ If the user asks a question about Jon, answer accurately based on this data. If 
             msgDiv.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-ai');
             msgDiv.textContent = message;
             chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function addTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.classList.add('message', 'msg-ai');
-            typingDiv.id = 'typing-indicator';
-            typingDiv.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
-            chatMessages.appendChild(typingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function removeTypingIndicator() {
-            const typingDiv = document.getElementById('typing-indicator');
-            if (typingDiv) typingDiv.remove();
+            chatMessages.scrollTop = chatMessages.scrollHeight; 
         }
 
         async function handleSend() {
@@ -1465,11 +673,19 @@ If the user asks a question about Jon, answer accurately based on this data. If 
             addMessageToUI(userText, 'user');
             conversationHistory.push({ role: "user", content: userText });
             chatInput.value = '';
-            addTypingIndicator();
 
-            if (!GROQ_API_KEY || GROQ_API_KEY === "your_actual_groq_api_key_here") {
-                removeTypingIndicator();
-                addMessageToUI("System error: API key not configured yet.", 'ai');
+            const loadingId = "loading-" + Date.now();
+            const loadingDiv = document.createElement('div');
+            loadingDiv.classList.add('message', 'msg-ai');
+            loadingDiv.id = loadingId;
+            loadingDiv.textContent = "Processing transmission...";
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
+                setTimeout(() => {
+                    document.getElementById(loadingId).textContent = "Error: Groq API Key not configured.";
+                }, 500);
                 return;
             }
 
@@ -1481,33 +697,35 @@ If the user asks a question about Jon, answer accurately based on this data. If 
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
+                        model: "llama-3.1-8b-instant", 
                         messages: conversationHistory,
                         temperature: 0.7,
-                        max_tokens: 150
+                        max_tokens: 150 
                     })
                 });
 
                 if (!response.ok) {
                     const errorDetails = await response.json();
-                    throw new Error(errorDetails.error?.message || "Request failed.");
+                    console.error("🔍 GROQ DETAILED ERROR:", errorDetails);
+                    throw new Error(`Groq rejected the request: ${errorDetails.error?.message || "Unknown 400 Error"}`);
                 }
 
                 const data = await response.json();
-
+                
                 if (data.choices && data.choices.length > 0) {
                     const aiResponse = data.choices[0].message.content;
-                    removeTypingIndicator();
+                    
+                    document.getElementById(loadingId).remove();
                     addMessageToUI(aiResponse, 'ai');
+                    
                     conversationHistory.push({ role: "assistant", content: aiResponse });
                 } else {
                     throw new Error("Invalid API response format");
                 }
 
             } catch (error) {
-                removeTypingIndicator();
-                addMessageToUI("Transmission failed: " + error.message, 'ai');
                 console.error("Chat Error:", error);
+                document.getElementById(loadingId).textContent = error.message;
             }
         }
 
@@ -1516,11 +734,31 @@ If the user asks a question about Jon, answer accurately based on this data. If 
             if (e.key === 'Enter') handleSend();
         });
 
+        // Quick Prompts Logic
         document.querySelectorAll('.prompt-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 chatInput.value = chip.dataset.prompt;
                 handleSend();
             });
+        });
+
+        // --- 5. SCROLL REVEAL ANIMATIONS FOR TECH STACK & SECTIONS ---
+        const observerOptions = {
+            threshold: 0.15 
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        const revealElements = document.querySelectorAll('.skill-card, .reveal');
+        revealElements.forEach(el => {
+            observer.observe(el);
         });
     </script>
 </body>
