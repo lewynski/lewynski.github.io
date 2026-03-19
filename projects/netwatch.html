@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NetWatch PH | ISP Tracker</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0a0a12; --panel-bg: #151522; --text-main: #f8f8f2;
+            --text-muted: #6272a4; --retro-green: #50fa7b; --retro-blue: #8be9fd;
+            --retro-purple: #bd93f9; --retro-pink: #ff79c6; --retro-gold: #f1fa8c;
+            --retro-red: #ff5555; --border-dark: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'VT323', monospace; background-color: var(--bg-color); color: var(--text-main);
+            font-size: clamp(1rem, 2vw, 1.3rem); line-height: 1.6; padding: 20px;
+            background-image: 
+                linear-gradient(rgba(139, 233, 253, 0.05) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(139, 233, 253, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px; min-height: 100vh;
+        }
+
+        a, button, select { cursor: pointer; }
+
+        .back-btn {
+            display: inline-block; margin-bottom: 20px; background: var(--panel-bg); color: var(--text-main);
+            padding: 10px 15px; text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.6rem);
+            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
+        }
+        .back-btn:hover { background: var(--retro-blue); color: #000;}
+        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+
+        .app-container {
+            max-width: 900px; margin: 0 auto; background: var(--panel-bg); border: 6px solid var(--border-dark);
+            box-shadow: 12px 12px 0px var(--border-dark); padding: 30px;
+        }
+
+        header { text-align: center; border-bottom: 4px dashed var(--border-dark); padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { font-family: 'Press Start 2P', cursive; font-size: clamp(1.2rem, 4vw, 1.8rem); color: var(--retro-blue); text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 10px; line-height: 1.4;}
+        .subtitle { color: var(--text-muted); font-size: clamp(0.9rem, 2vw, 1.2rem); }
+
+        /* --- RADAR/STATUS DISPLAY --- */
+        .status-container {
+            background: #000; border: 4px solid var(--border-dark); padding: 30px;
+            text-align: center; margin-bottom: 30px; position: relative; overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .status-badge {
+            font-family: 'Press Start 2P', cursive; font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 15px; color: var(--text-muted); text-shadow: 4px 4px 0px var(--border-dark);
+            transition: color 0.3s;
+        }
+        
+        .ping-display { font-size: clamp(1.5rem, 3vw, 2rem); color: var(--text-main); }
+        .ping-display span { color: var(--retro-gold); }
+
+        /* Status Colors */
+        .status-online { border-color: var(--retro-green); box-shadow: inset 0 0 30px rgba(80, 250, 123, 0.2); }
+        .status-online .status-badge { color: var(--retro-green); }
+        
+        .status-degraded { border-color: var(--retro-gold); box-shadow: inset 0 0 30px rgba(241, 250, 140, 0.2); }
+        .status-degraded .status-badge { color: var(--retro-gold); }
+        
+        .status-outage { border-color: var(--retro-red); box-shadow: inset 0 0 30px rgba(255, 85, 85, 0.3); }
+        .status-outage .status-badge { color: var(--retro-red); animation: glitch 0.3s infinite; }
+
+        @keyframes glitch { 
+            0% { transform: translate(0) } 
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) } 
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) } 
+            100% { transform: translate(0) }
+        }
+
+        /* --- LAYOUT GRIDS --- */
+        .main-content { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; margin-bottom: 30px;}
+
+        /* --- INPUT FORM --- */
+        .panel { background: rgba(0,0,0,0.3); border: 4px solid var(--border-dark); padding: 20px; display: flex; flex-direction: column;}
+        .panel h2 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.65rem, 2vw, 0.8rem); color: var(--retro-blue); margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px;}
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: clamp(0.45rem, 1.5vw, 0.55rem); color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;}
+        
+        .form-group input, .form-group select {
+            width: 100%; padding: 15px; font-family: 'VT323', monospace; font-size: clamp(1.2rem, 3vw, 1.5rem); background: var(--bg-color);
+            color: var(--retro-blue); border: 4px solid var(--border-dark); outline: none; appearance: none;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--retro-blue); }
+        
+        .btn-submit {
+            width: 100%; background: var(--retro-blue); color: #000; padding: 15px; border: 4px solid var(--border-dark); 
+            box-shadow: 4px 4px 0px var(--border-dark); font-family: 'Press Start 2P', cursive; font-size: clamp(0.6rem, 2vw, 0.8rem); 
+            margin-top: 10px; transition: all 0.1s; cursor: pointer;
+        }
+        .btn-submit:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-submit:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: 0px 0px 0px var(--border-dark); transform: translate(4px, 4px);}
+
+        /* --- AI TERMINAL --- */
+        .ai-terminal {
+            flex-grow: 1; background: #000; border: 4px solid var(--text-muted); padding: 15px;
+            color: var(--text-main); font-size: 1.2rem; line-height: 1.5; min-height: 150px;
+        }
+        .ai-terminal span.label { color: var(--retro-pink); font-family: 'Press Start 2P', cursive; font-size: 0.5rem; display: block; margin-top: 10px; margin-bottom: 5px;}
+        
+        .cursor { display: inline-block; width: 10px; height: 15px; background: var(--text-main); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;}
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .disclaimer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 20px; padding: 0 10px;}
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .app-container { padding: 15px; border-width: 4px; }
+            .main-content { grid-template-columns: 1fr; gap: 20px; }
+            .form-group input, .form-group select { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="../projects.html" class="back-btn">◀ RETURN TO ARCHIVE</a>
+
+    <div class="app-container">
+        <header>
+            <h1><i class="fas fa-satellite-dish"></i> NETWATCH PH</h1>
+            <div class="subtitle">AI ISP Status Simulator</div>
+        </header>
+
+        <div class="status-container" id="status-box">
+            <div class="status-badge" id="status-text">STANDBY</div>
+            <div class="ping-display">PING: <span id="ping-text">---</span> ms</div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2><i class="fas fa-map-marker-alt"></i> TARGET NODE</h2>
+                <form id="scan-form">
+                    <div class="form-group">
+                        <label>SELECT PROVIDER (ISP)</label>
+                        <select id="isp-input">
+                            <option value="PLDT Home">PLDT Home</option>
+                            <option value="Converge ICT">Converge ICT</option>
+                            <option value="Globe Telecom">Globe Telecom</option>
+                            <option value="DITO Telecommunity">DITO Telecommunity</option>
+                            <option value="Smart Communications">Smart Communications</option>
+                            <option value="Starlink">Starlink PH</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ENTER LOCATION (CITY/PROVINCE)</label>
+                        <input type="text" id="loc-input" placeholder="e.g. Tanauan City, Manila, Cebu..." required autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-scan">RUN DIAGNOSTICS</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fas fa-terminal"></i> TRACEROUTE LOGS</h2>
+                <div class="ai-terminal" id="ai-output">
+                    > Enter ISP and Location to ping servers...<span class="cursor"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            *Notice: This is a portfolio simulation. Real-time ISP data is private. Groq AI generates a highly realistic simulated network analysis based on typical Philippine infrastructure behaviors.
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ INSERT YOUR API KEY HERE ⚠️
+        const GROQ_API_KEY = "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"; 
+        
+        const form = document.getElementById('scan-form');
+        const inputIsp = document.getElementById('isp-input');
+        const inputLoc = document.getElementById('loc-input');
+        const btnScan = document.getElementById('btn-scan');
+        const statusBox = document.getElementById('status-box');
+        const statusText = document.getElementById('status-text');
+        const pingText = document.getElementById('ping-text');
+        const aiOutput = document.getElementById('ai-output');
+        
+        let typeWriterTimeout;
+
+        function typeWriterHTML(htmlContent) {
+            clearTimeout(typeWriterTimeout);
+            aiOutput.innerHTML = "";
+            aiOutput.innerHTML = htmlContent + "<span class='cursor'></span>"; 
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const isp = inputIsp.value;
+            const loc = inputLoc.value.trim();
+            if(!loc) return;
+
+            // UI Loading State
+            btnScan.disabled = true;
+            btnScan.textContent = "PINGING SERVERS...";
+            
+            // Reset Status Colors
+            statusBox.className = "status-container";
+            statusText.textContent = "SCANNING...";
+            pingText.textContent = "---";
+            
+            aiOutput.innerHTML = `> Sending packets to ${isp} nodes in ${loc}...<br>> Awaiting handshake...<span class='cursor'></span>`;
+
+            if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
+                setTimeout(() => {
+                    aiOutput.innerHTML = "> ERROR: Groq API Key missing. Neural link severed.";
+                    btnScan.disabled = false;
+                    btnScan.textContent = "RUN DIAGNOSTICS";
+                }, 1000);
+                return;
+            }
+
+            // Prompting AI to simulate an outage report
+            const systemPrompt = `You are NetWatch, a network diagnostic AI simulator for the Philippines. 
+            The user will give you an ISP (like PLDT or Converge) and a Location.
+            You must simulate a highly realistic network diagnostic report. 
+            RANDOMLY decide the network status: 60% chance it is "ONLINE", 30% chance it is "DEGRADED" (slow), and 10% chance it is "OUTAGE" (no signal).
+            Based on the status you chose, generate a realistic ping (Online: 10-40ms, Degraded: 150-500ms, Outage: 999ms).
+            
+            You MUST format your reply EXACTLY like this on 3 lines:
+            STATUS: [ONLINE, DEGRADED, or OUTAGE]
+            PING: [Number]
+            DETAILS: [A short, highly technical-sounding explanation for the current status. e.g. "Fiber cut detected along main highway" or "Node routing functioning optimally."]`;
+
+            try {
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${GROQ_API_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.1-8b-instant", 
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: `Diagnose: ${isp} in ${loc}` }
+                        ],
+                        temperature: 0.8, // Higher temp so the "randomness" works better
+                        max_tokens: 150 
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Connection Failed");
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                let status = "ONLINE", ping = "0", details = "Simulation complete.";
+                
+                const lines = aiResponse.split('\n');
+                lines.forEach(line => {
+                    const upperLine = line.toUpperCase();
+                    if(upperLine.includes('STATUS:')) status = line.split(':')[1].trim().toUpperCase();
+                    if(upperLine.includes('PING:')) ping = line.split(':')[1].trim().replace(/ms/gi, '');
+                    if(upperLine.includes('DETAILS:')) details = line.substring(line.indexOf(':') + 1).trim();
+                });
+
+                // Update UI Dashboard Colors based on AI simulation
+                statusText.textContent = status;
+                pingText.textContent = ping;
+
+                if (status.includes('ONLINE')) {
+                    statusBox.className = "status-container status-online";
+                } else if (status.includes('DEGRADED')) {
+                    statusBox.className = "status-container status-degraded";
+                } else {
+                    statusBox.className = "status-container status-outage";
+                    pingText.textContent = "ERR"; // Outages don't have ping
+                }
+
+                // Update Terminal
+                const terminalHTML = `
+                    <span class="label">TARGET:</span> ${isp} [${loc}]
+                    <span class="label">DIAGNOSTIC TRACE:</span> ${details}
+                `;
+                typeWriterHTML(terminalHTML);
+
+            } catch (error) {
+                console.error(error);
+                aiOutput.innerHTML = "> ERROR: Unable to reach simulation servers.";
+            }
+
+            // UI Reset State
+            btnScan.disabled = false;
+            btnScan.textContent = "RUN DIAGNOSTICS";
+        });
+    </script>
+</body>
+</html>
