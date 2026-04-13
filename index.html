@@ -146,6 +146,22 @@
 
         .profile-frame { margin-bottom: 25px; display: inline-block; position: relative; padding: 10px; background: transparent; }
         .profile-pic { width: 170px; height: 170px; object-fit: cover; border: 4px solid var(--border-dark); box-shadow: 10px 10px 0px var(--retro-blue), 0 0 0 4px rgba(255,255,255,0.04); image-rendering: auto; position: relative; z-index: 2; animation: profileFloat 3s ease-in-out infinite; background: #fff; }
+        
+        /* --- NEW STICKER GIF CSS --- */
+        .sticker-gif {
+            position: absolute;
+            bottom: -5px; 
+            right: -85px; 
+            height: 160px; /* Adjust this to make it taller or shorter */
+            width: auto;
+            z-index: 5;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
+            transition: transform 0.2s ease;
+        }
+        .sticker-gif:hover {
+            transform: scale(1.1) rotate(3deg);
+        }
+
         @keyframes profileFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
         .status-badge { display: inline-flex; align-items: center; justify-content: flex-start; background: #000; color: var(--retro-green); padding: 10px 15px; border: 2px solid var(--retro-green); font-size: 0.6rem; margin: 0 auto 22px auto; box-shadow: 4px 4px 0px var(--border-dark); min-width: 300px; height: 40px; text-align: left; }
@@ -346,6 +362,13 @@
             .chat-input-area { flex-direction: column; gap: 10px; }
             .chat-input-area button { margin-left: 0; padding: 15px; }
 
+            /* Mobile adjustment for the sticker */
+            .sticker-gif {
+                right: -40px; /* Pull it slightly inwards so it doesn't overflow mobile screens */
+                height: 120px; /* Make it slightly smaller */
+                bottom: -10px;
+            }
+
             /* Hide emulator button entirely on actual mobile devices */
             .jl-badge { pointer-events: none; } 
         }
@@ -384,6 +407,7 @@
         <div class="hero-content">
             <div class="profile-frame">
                 <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
+                <img src="man.gif" alt="Animated Sticker" class="sticker-gif">
             </div>
 
             <div class="status-badge-container">
@@ -734,7 +758,7 @@
         });
 
         // --- AI CHAT LOGIC ---
-        const GROQ_API_KEY = "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";
+        const GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE"; // Keep this hidden in final deploy if possible!
 
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
