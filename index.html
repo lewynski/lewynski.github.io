@@ -164,9 +164,6 @@
 
         @keyframes profileFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-        .status-badge { display: inline-flex; align-items: center; justify-content: flex-start; background: #000; color: var(--retro-green); padding: 10px 15px; border: 2px solid var(--retro-green); font-size: 0.6rem; margin: 0 auto 22px auto; box-shadow: 4px 4px 0px var(--border-dark); min-width: 300px; height: 40px; text-align: left; }
-        .blinking-cursor { display: inline-block; width: 8px; height: 10px; background-color: var(--retro-green); margin-left: 5px; animation: blink 1s step-end infinite; vertical-align: middle; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         .gradient-text { color: var(--retro-purple); text-shadow: 3px 3px 0px var(--border-dark); }
         .bio-text { max-width: 760px; margin: 0 auto 30px auto; }
@@ -355,7 +352,6 @@
             .btn-talk { display: none; }
 
             .hero-container { min-height: auto; padding: 120px 16px 100px; }
-            .status-badge { min-width: 100%; max-width: 100%; font-size: 0.52rem; }
             h1 { font-size: 1.15rem; }
             .hero-stats { grid-template-columns: 1fr; max-width: 350px; }
             .ai-shell { grid-template-columns: 1fr; }
@@ -373,6 +369,8 @@
             .jl-badge { pointer-events: none; } 
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="typewriter-theme.css">
 </head>
 <body>
 
@@ -407,12 +405,6 @@
         <div class="hero-content">
             <div class="profile-frame">
                 <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
-            </div>
-
-            <div class="status-badge-container">
-                <div class="status-badge">
-                    > <span id="typewriter-text"></span><span class="blinking-cursor"></span>
-                </div>
             </div>
 
             <h1>Hello, I'm <br><span class="gradient-text">Jon Lewyn Villaram Tanggaro</span></h1>
@@ -661,45 +653,6 @@
                 icon.classList.replace('fa-times', 'fa-bars');
             }
         });
-
-        const statuses = [
-            "STATUS: 5ms STABLE",
-            "BUILDING NEW PROJECTS",
-            "ECE STUDENT MODE: ACTIVE",
-            "READY FOR COLLABS",
-            "SYSTEM ONLINE"
-        ];
-
-        let statusIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        const typeTarget = document.getElementById("typewriter-text");
-
-        function typeEffect() {
-            const currentText = statuses[statusIndex];
-
-            if (isDeleting) {
-                typeTarget.textContent = currentText.substring(0, charIndex - 1);
-                charIndex--;
-            } else {
-                typeTarget.textContent = currentText.substring(0, charIndex + 1);
-                charIndex++;
-            }
-
-            let typeSpeed = isDeleting ? 40 : 100;
-
-            if (!isDeleting && charIndex === currentText.length) {
-                typeSpeed = 1800;
-                isDeleting = true;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                statusIndex = (statusIndex + 1) % statuses.length;
-                typeSpeed = 500;
-            }
-
-            setTimeout(typeEffect, typeSpeed);
-        }
-        typeEffect();
 
         const particleCanvas = document.getElementById('particle-canvas');
         const colors = ['#4ade80', '#3b82f6', '#bd93f9', '#ff79c6', '#facc15'];
