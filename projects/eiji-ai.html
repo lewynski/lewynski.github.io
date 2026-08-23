@@ -440,7 +440,12 @@
                 if (!response.ok) { addSystem("Groq error: " + (data.error?.message || 'Unknown API issue')); return; }
 
                 let reply = data.choices?.[0]?.message?.content || "";
-                reply = reply.replace(/\*\*/g, '').replace(/\*/g, '').replace(/`/g, '');
+                // strip reasoning models' chain-of-thought (<think>...</think>) so only the answer shows
+                reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '');
+                if (/<\/think>/i.test(reply)) reply = reply.split(/<\/think>/i).pop();   // unclosed / trailing block
+                if (/<think>/i.test(reply)) reply = reply.split(/<think>/i)[0];
+                reply = reply.replace(/\*\*/g, '').replace(/\*/g, '').replace(/`/g, '').trim();
+                if (!reply) reply = "(no answer returned)";
                 addMessage(reply, 'capy');
                 speak(reply);
             } catch (err) {
