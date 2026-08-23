@@ -68,6 +68,19 @@
         .quick-note:focus { border-color: var(--cicada-green); }
         .btn-tool { width: 100%; background: transparent; color: var(--cicada-green); padding: 10px; font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--cicada-green); margin-top: 6px; transition: 0.15s; }
         .btn-tool:hover { background: var(--cicada-green); color: #050605; box-shadow: 0 0 14px rgba(127,174,95,0.3); }
+        .btn-tool.danger { color: var(--cicada-red); border-color: var(--cicada-red); }
+        .btn-tool.danger:hover { background: var(--cicada-red); color: #050605; box-shadow: 0 0 14px rgba(182,80,63,0.3); }
+        /* CONVERSATION ARCHIVE LIST */
+        .convo-list { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; margin: 12px 0; }
+        .convo-list:empty::after { content: 'No archives yet.'; color: var(--text-dim); font-size: 0.7rem; letter-spacing: 1px; }
+        .convo-list::-webkit-scrollbar { width: 6px; }
+        .convo-list::-webkit-scrollbar-thumb { background: var(--border-dark); }
+        .convo-item { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--border-dark); background: var(--panel-bg-2); font-size: 0.8rem; transition: 0.15s; }
+        .convo-item:hover { border-color: var(--cicada-green); }
+        .convo-item.active { border-color: var(--cicada-green); box-shadow: inset 3px 0 0 var(--cicada-green); }
+        .convo-item .ctitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-main); cursor: pointer; }
+        .convo-item .cdel { background: none; border: none; color: var(--text-dim); font-size: 1rem; line-height: 1; padding: 0 2px; flex-shrink: 0; }
+        .convo-item .cdel:hover { color: var(--cicada-red); }
         /* MAIN */
         .main-terminal { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; }
         .terminal-header { background: linear-gradient(180deg, #0d100d, #070807); padding: 14px 22px; border-bottom: 1px solid var(--border-dark); display: flex; justify-content: space-between; align-items: center; }
@@ -162,7 +175,12 @@
                         <option value="on">Text-to-Speech: ON</option>
                     </select>
                 </div>
-                <button class="btn-tool" id="btn-clear-chat"><i class="fas fa-trash"></i> Purge Memory</button>
+            </div>
+            <div class="tool-panel">
+                <h3><i class="fas fa-clock-rotate-left"></i> Archives</h3>
+                <button class="btn-tool" id="btn-new-chat" style="margin-top:0"><i class="fas fa-plus"></i> New Chat</button>
+                <div class="convo-list" id="convoList"></div>
+                <button class="btn-tool danger" id="btn-delete-all"><i class="fas fa-trash"></i> Delete All Chats</button>
             </div>
             <div class="tool-panel">
                 <h3><i class="fas fa-scroll"></i> Scratchpad</h3>
@@ -178,9 +196,9 @@
             <div class="chat-box" id="chatBox"></div>
             <div class="typing-indicator" id="typingIndicator">Decrypting response<span class="dots"></span></div>
             <div class="suggestions-container" id="suggestions">
-                <button class="sugg-pill" onclick="insertPrompt('Brainstorm features for my S.A.B.A. acoustic analysis capstone.')">Capstone Ideas</button>
-                <button class="sugg-pill" onclick="insertPrompt('Debug Kivy matrix logic for the Matematika app.')">Kivy Debug</button>
-                <button class="sugg-pill" onclick="insertPrompt('Draft a formal email for deploying the Aegis Admin panel.')">Formal Email</button>
+                <button class="sugg-pill" onclick="insertPrompt('Brainstorm project ideas for an acoustic analysis capstone.')">Capstone Ideas</button>
+                <button class="sugg-pill" onclick="insertPrompt('Help me debug a Python matrix logic bug.')">Debug Code</button>
+                <button class="sugg-pill" onclick="insertPrompt('Draft a formal deployment announcement email.')">Formal Email</button>
                 <button class="sugg-pill" onclick="insertPrompt('Describe the attached image in detail.')">Describe Image</button>
             </div>
             <div class="attach-tray" id="attachTray"></div>
@@ -226,6 +244,7 @@
         const voiceSelect = document.getElementById('voice-select');
         const scratchpad = document.getElementById('scratchpad');
         const modeLabel = document.getElementById('modeLabel');
+        const convoList = document.getElementById('convoList');
 
         const GREETING = "The path is patient. State your query, Seeker. You may attach images, PDFs, or text files.";
         let attachments = []; // { id, kind:'image'|'text', name, size, dataUrl?, content? }
@@ -240,15 +259,94 @@
 
         // Personas
         const personas = {
-            assistant: "You are 3301, Jon Lewyn's personal AI guide. Keep answers concise and calm, with a faint cryptic, thoughtful tone. Never use markdown symbols.",
+            assistant: "You are 3301, a calm personal AI guide. Keep answers concise, with a faint cryptic, thoughtful tone. Never use markdown symbols.",
             study: "You are 3301 in Academic Mode, an engineering tutor. Break down electronics and programming concepts clearly and simply. Never use markdown symbols.",
             code: "You are 3301 in Dev Mode, an expert in Python, JS, Kivy, and Arduino. Give clean, secure code and explain bugs directly. Do not use markdown backticks or asterisks.",
             creative: "You are 3301 in Cryptic Mode. Be imaginative and evocative, drawing on cryptography, primes, and mystery, while staying coherent and useful. Never use markdown symbols.",
             professional: "You are 3301 in Formal Mode. Write professional, corporate-level emails, documentation, and resumes. No slang, no markdown symbols."
         };
 
-        let conversationHistory = JSON.parse(localStorage.getItem('cicada-chat-memory')) || [];
-        if (conversationHistory.length === 0) conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
+        // ---------- Conversation store (multiple archives) ----------
+        const STORE_KEY = 'cicada-conversations';
+        let store = { conversations: [], activeId: null };
+        let conversationHistory;   // active conversation's message array (includes system prompt at [0])
+
+        const genId = () => 'c' + Date.now() + Math.floor(Math.random() * 1000);
+        const escapeHtml = s => (s || '').replace(/[&<>"]/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[ch]));
+        const persistStore = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) {} };
+        const activeConvo = () => store.conversations.find(c => c.id === store.activeId);
+
+        function deriveTitle(c) {
+            const firstUser = c.history.find(m => m.role === 'user' && m.content && m.content.trim());
+            if (firstUser) return firstUser.content.replace(/\s+/g, ' ').trim().slice(0, 34) || 'New Chat';
+            return 'New Chat';
+        }
+        function saveActive() {
+            const c = activeConvo();
+            if (c) { c.history = conversationHistory; c.updatedAt = Date.now(); c.title = deriveTitle(c); }
+            persistStore();
+            renderConvoList();
+        }
+        function newConversation() {
+            const c = { id: genId(), title: 'New Chat', updatedAt: Date.now(),
+                        history: [{ role: 'system', content: personas[personaSelect.value] }] };
+            store.conversations.unshift(c);
+            store.activeId = c.id;
+            conversationHistory = c.history;
+            persistStore(); renderConvoList(); renderHistory();
+        }
+        function switchConversation(id) {
+            const c = store.conversations.find(x => x.id === id);
+            if (!c) return;
+            store.activeId = id;
+            conversationHistory = c.history;
+            persistStore(); renderConvoList(); renderHistory();
+        }
+        function deleteConversation(id) {
+            store.conversations = store.conversations.filter(c => c.id !== id);
+            if (store.activeId === id) {
+                if (store.conversations.length) { switchConversation(store.conversations[0].id); return; }
+                newConversation(); return;
+            }
+            persistStore(); renderConvoList();
+        }
+        function deleteAllConversations() {
+            store.conversations = []; store.activeId = null; persistStore();
+            newConversation();
+        }
+        function renderConvoList() {
+            convoList.innerHTML = '';
+            store.conversations.slice().sort((a, b) => b.updatedAt - a.updatedAt).forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'convo-item' + (c.id === store.activeId ? ' active' : '');
+                item.innerHTML = '<span class="ctitle">' + escapeHtml(c.title || 'New Chat') + '</span>' +
+                                 '<button class="cdel" title="Delete">&times;</button>';
+                item.querySelector('.ctitle').addEventListener('click', () => switchConversation(c.id));
+                item.querySelector('.cdel').addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (confirm('Delete this conversation?')) deleteConversation(c.id);
+                });
+                convoList.appendChild(item);
+            });
+        }
+
+        // Load store, migrating any old single-memory build
+        (function initStore() {
+            try { store = JSON.parse(localStorage.getItem(STORE_KEY)) || store; } catch (e) {}
+            if (!store.conversations) store.conversations = [];
+            const legacy = localStorage.getItem('cicada-chat-memory');
+            if (store.conversations.length === 0 && legacy) {
+                try { const h = JSON.parse(legacy); if (Array.isArray(h) && h.length > 1)
+                    store.conversations.push({ id: genId(), title: 'New Chat', updatedAt: Date.now(), history: h }); } catch (e) {}
+            }
+            localStorage.removeItem('cicada-chat-memory');
+            if (store.conversations.length === 0)
+                store.conversations.push({ id: genId(), title: 'New Chat', updatedAt: Date.now(),
+                                           history: [{ role: 'system', content: personas[personaSelect.value] }] });
+            if (!activeConvo()) store.activeId = store.conversations[0].id;
+            conversationHistory = activeConvo().history;
+            persistStore();
+        })();
 
         function syncMode() { modeLabel.innerText = personaSelect.options[personaSelect.selectedIndex].text.toUpperCase(); }
         syncMode();
@@ -260,21 +358,19 @@
                 if (msg.role === 'assistant') addMessage(msg.content, 'capy', false);
             });
         }
+        renderConvoList();
         renderHistory();
 
         personaSelect.addEventListener('change', () => {
             conversationHistory[0].content = personas[personaSelect.value];
-            localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory));
+            saveActive();
             syncMode();
             addSystem('Persona shifted to ' + personaSelect.options[personaSelect.selectedIndex].text + '.');
         });
 
-        document.getElementById('btn-clear-chat').addEventListener('click', () => {
-            if (confirm("Purge all conversation memory. Proceed?")) {
-                conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
-                localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory));
-                renderHistory();
-            }
+        document.getElementById('btn-new-chat').addEventListener('click', () => newConversation());
+        document.getElementById('btn-delete-all').addEventListener('click', () => {
+            if (confirm('Delete ALL conversations permanently. Proceed?')) deleteAllConversations();
         });
 
         window.insertPrompt = function(text) { userInput.value = text; userInput.focus(); };
@@ -288,7 +384,7 @@
             chatBox.scrollTop = chatBox.scrollHeight;
             if (save) {
                 conversationHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: text });
-                try { localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory)); } catch (e) {}
+                saveActive();
             }
         }
         function addSystem(text) {
@@ -399,7 +495,7 @@
             // persist only a lightweight note to memory (never base64) to avoid quota errors
             const noteBits = [...imgs, ...texts].map(a => a.name);
             conversationHistory.push({ role: 'user', content: typed + (noteBits.length ? `\n[attached: ${noteBits.join(', ')}]` : '') });
-            try { localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory)); } catch (e) {}
+            saveActive();
 
             userInput.value = '';
             const outgoingImgs = imgs.slice();
