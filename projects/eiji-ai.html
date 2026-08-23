@@ -7,6 +7,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
     <style>
         :root {
@@ -34,129 +35,93 @@
                 repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 1px, transparent 1px, transparent 3px);
             overflow: hidden;
         }
-        /* animated glyph-rain canvas sits behind everything */
+        a, button, select, input, textarea { font-family: inherit; }
+        a, button, select { cursor: pointer; }
+        ::selection { background: var(--cicada-green); color: #050605; }
         #rain { position: fixed; inset: 0; z-index: 0; opacity: 0.16; pointer-events: none; }
         .top-nav, .os-container { position: relative; z-index: 1; }
-
-        /* message entrance */
         @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .message { animation: msgIn 0.35s ease both; }
-
-        /* brand glyph pulse + title flicker */
         @keyframes glyphPulse { 0%,100% { text-shadow: 0 0 6px rgba(200,169,74,0.4); } 50% { text-shadow: 0 0 16px rgba(200,169,74,0.9); } }
         .nav-brand .glyph { display: inline-block; animation: glyphPulse 3s ease-in-out infinite; }
         @keyframes flicker { 0%,19%,21%,55%,57%,100% { opacity: 1; } 20%,56% { opacity: 0.72; } }
         .nav-brand { animation: flicker 6s infinite; }
-
-        /* animated decrypting dots */
         .typing-indicator .dots::after { content: ''; animation: dots 1.4s steps(4,end) infinite; }
         @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
-
-        a, button, select, input, textarea { font-family: inherit; }
-        a, button, select { cursor: pointer; }
-        ::selection { background: var(--cicada-green); color: #050605; }
-    </style>
-    <style>
-        /* --- TOP NAV --- */
-        .top-nav {
-            background: linear-gradient(180deg, #0d100d, #070807);
-            border-bottom: 1px solid var(--border-dark);
-            padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
-            z-index: 10; letter-spacing: 2px;
-        }
-        .nav-brand {
-            font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 700;
-            color: var(--cicada-glow); text-shadow: 0 0 12px rgba(127,174,95,0.35); letter-spacing: 4px;
-        }
+        /* TOP NAV */
+        .top-nav { background: linear-gradient(180deg, #0d100d, #070807); border-bottom: 1px solid var(--border-dark); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 2px; }
+        .nav-brand { font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 700; color: var(--cicada-glow); text-shadow: 0 0 12px rgba(127,174,95,0.35); letter-spacing: 4px; }
         .nav-brand .glyph { color: var(--cicada-gold); margin-right: 8px; }
-        .back-btn {
-            background: transparent; color: var(--text-dim); padding: 8px 14px;
-            text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
-            border: 1px solid var(--border-dark); transition: all 0.15s;
-        }
+        .back-btn { background: transparent; color: var(--text-dim); padding: 8px 14px; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--border-dark); transition: all 0.15s; }
         .back-btn:hover { color: var(--cicada-green); border-color: var(--cicada-green); }
-
-        /* --- OS LAYOUT --- */
+        /* LAYOUT */
         .os-container { display: flex; flex: 1; overflow: hidden; }
-
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: 300px; background: rgba(0,0,0,0.35); border-right: 1px solid var(--border-dark);
-            padding: 22px 18px; display: flex; flex-direction: column; gap: 22px; overflow-y: auto;
-        }
+        .sidebar { width: 300px; background: rgba(0,0,0,0.35); border-right: 1px solid var(--border-dark); padding: 22px 18px; display: flex; flex-direction: column; gap: 22px; overflow-y: auto; }
         .tool-panel { background: var(--panel-bg); border: 1px solid var(--border-dark); padding: 16px; }
-        .tool-panel h3 {
-            font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--cicada-gold);
-            margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-dark); font-weight: 600;
-        }
+        .tool-panel h3 { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--cicada-gold); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-dark); font-weight: 600; }
         .tool-panel h3 i { color: var(--cicada-green); margin-right: 6px; }
         .tool-group { margin-bottom: 14px; }
         .tool-group label { display: block; font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
-        select {
-            width: 100%; padding: 9px; font-size: 0.85rem; background: var(--panel-bg-2); color: var(--text-main);
-            border: 1px solid var(--border-dark); outline: none; letter-spacing: 1px;
-        }
+        select { width: 100%; padding: 9px; font-size: 0.85rem; background: var(--panel-bg-2); color: var(--text-main); border: 1px solid var(--border-dark); outline: none; letter-spacing: 1px; }
         select:focus { border-color: var(--cicada-green); }
-        .quick-note {
-            width: 100%; height: 110px; padding: 10px; font-size: 0.85rem; background: var(--panel-bg-2);
-            color: var(--text-main); border: 1px solid var(--border-dark); resize: none; outline: none; line-height: 1.5;
-        }
+        .quick-note { width: 100%; height: 110px; padding: 10px; font-size: 0.85rem; background: var(--panel-bg-2); color: var(--text-main); border: 1px solid var(--border-dark); resize: none; outline: none; line-height: 1.5; }
         .quick-note:focus { border-color: var(--cicada-green); }
-        .btn-tool {
-            width: 100%; background: transparent; color: var(--cicada-green); padding: 10px;
-            font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--cicada-green);
-            margin-top: 6px; transition: 0.15s;
-        }
+        .btn-tool { width: 100%; background: transparent; color: var(--cicada-green); padding: 10px; font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--cicada-green); margin-top: 6px; transition: 0.15s; }
         .btn-tool:hover { background: var(--cicada-green); color: #050605; box-shadow: 0 0 14px rgba(127,174,95,0.3); }
-
-        /* --- MAIN TERMINAL --- */
-        .main-terminal { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .terminal-header {
-            background: linear-gradient(180deg, #0d100d, #070807); padding: 14px 22px;
-            border-bottom: 1px solid var(--border-dark); display: flex; justify-content: space-between; align-items: center;
-        }
+        /* MAIN */
+        .main-terminal { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; }
+        .terminal-header { background: linear-gradient(180deg, #0d100d, #070807); padding: 14px 22px; border-bottom: 1px solid var(--border-dark); display: flex; justify-content: space-between; align-items: center; }
         .terminal-header h2 { font-size: 0.78rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-main); font-weight: 600; }
         .terminal-header h2 i { color: var(--cicada-green); margin-right: 8px; }
         .status-wrap { display: flex; align-items: center; gap: 8px; font-size: 0.62rem; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+        #modeLabel { color: var(--cicada-gold); }
         .status-light { width: 9px; height: 9px; background: var(--cicada-green); border-radius: 50%; box-shadow: 0 0 10px var(--cicada-glow); animation: blink 2.4s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-
-        /* CHAT BOX */
+        /* CHAT */
         .chat-box { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
         .chat-box::-webkit-scrollbar { width: 8px; }
         .chat-box::-webkit-scrollbar-track { background: var(--bg-color); }
         .chat-box::-webkit-scrollbar-thumb { background: var(--border-dark); }
         .chat-box::-webkit-scrollbar-thumb:hover { background: var(--cicada-green); }
-        .message { max-width: 80%; padding: 14px 16px; font-size: 0.92rem; line-height: 1.6; border: 1px solid var(--border-dark); position: relative; white-space: pre-wrap; }
+        .message { max-width: 80%; padding: 14px 16px; font-size: 0.92rem; line-height: 1.6; border: 1px solid var(--border-dark); position: relative; white-space: pre-wrap; word-wrap: break-word; }
         .msg-capy { background: var(--panel-bg); color: var(--text-main); align-self: flex-start; border-left: 2px solid var(--cicada-green); }
         .msg-capy::before { content: "3301"; display: block; font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 3px; color: var(--cicada-green); margin-bottom: 8px; }
         .msg-user { background: var(--panel-bg-2); color: var(--text-main); align-self: flex-end; border-right: 2px solid var(--cicada-gold); }
         .msg-user::before { content: "SEEKER"; display: block; font-size: 0.6rem; letter-spacing: 3px; color: var(--cicada-gold); margin-bottom: 8px; }
+        .msg-user .att-thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+        .msg-user .att-thumbs img { width: 60px; height: 60px; object-fit: cover; border: 1px solid var(--border-dark); }
+        .msg-user .att-file { font-size: 0.72rem; color: var(--cicada-gold); }
         .msg-sys { align-self: center; max-width: 90%; text-align: center; font-size: 0.72rem; letter-spacing: 2px; color: var(--text-dim); border: 1px dashed var(--border-dark); background: transparent; text-transform: uppercase; }
         .msg-sys::before { display: none; }
         .typing-indicator { font-size: 0.72rem; letter-spacing: 2px; color: var(--cicada-green); align-self: flex-start; display: none; padding: 8px 12px; text-transform: uppercase; }
-
         /* SUGGESTIONS */
         .suggestions-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 22px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border-dark); }
         .sugg-pill { background: transparent; border: 1px solid var(--border-dark); color: var(--text-dim); padding: 7px 12px; font-size: 0.78rem; letter-spacing: 1px; transition: 0.15s; }
         .sugg-pill:hover { border-color: var(--cicada-green); color: var(--cicada-glow); }
-
+        /* ATTACHMENT TRAY */
+        .attach-tray { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 22px 0; }
+        .attach-tray:empty { display: none; }
+        .attach-chip { display: flex; align-items: center; gap: 8px; background: var(--panel-bg); border: 1px solid var(--border-dark); padding: 6px 8px; max-width: 230px; font-size: 0.76rem; }
+        .attach-chip img { width: 34px; height: 34px; object-fit: cover; border: 1px solid var(--border-dark); flex-shrink: 0; }
+        .attach-chip .fa-file-lines, .attach-chip .fa-file-pdf, .attach-chip .fa-file-code { color: var(--cicada-gold); font-size: 1.1rem; }
+        .attach-chip .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-main); }
+        .attach-chip .meta { color: var(--text-dim); font-size: 0.64rem; }
+        .attach-chip .rm { color: var(--cicada-red); background: none; border: none; font-size: 1rem; padding: 0 2px; line-height: 1; }
+        .attach-chip .rm:hover { color: #e06a55; }
+        .attach-chip.busy { opacity: 0.6; }
         /* INPUT */
-        .input-area { display: flex; padding: 18px 22px; background: linear-gradient(180deg, #070807, #0b0d0b); border-top: 1px solid var(--border-dark); gap: 10px; align-items: stretch; }
+        .input-area { display: flex; padding: 14px 22px 18px; background: linear-gradient(180deg, #070807, #0b0d0b); border-top: 1px solid var(--border-dark); gap: 10px; align-items: stretch; }
         .input-wrapper { flex: 1; display: flex; }
         .input-area textarea { width: 100%; height: 58px; padding: 14px; font-size: 0.95rem; background: var(--panel-bg-2); color: var(--text-main); border: 1px solid var(--border-dark); outline: none; resize: none; line-height: 1.4; }
         .input-area textarea:focus { border-color: var(--cicada-green); box-shadow: 0 0 12px rgba(127,174,95,0.15); }
         .action-btns { display: flex; gap: 8px; }
-        .btn-action { background: var(--panel-bg); color: var(--cicada-green); width: 58px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; border: 1px solid var(--border-dark); transition: 0.15s; }
+        .btn-action { background: var(--panel-bg); color: var(--cicada-green); width: 54px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; border: 1px solid var(--border-dark); transition: 0.15s; }
         .btn-action:hover { border-color: var(--cicada-green); box-shadow: 0 0 12px rgba(127,174,95,0.25); }
         .btn-action.send { color: #050605; background: var(--cicada-green); }
         .btn-action.send:hover { background: var(--cicada-glow); }
         .btn-action.mic-active { background: var(--cicada-gold); color: #050605; animation: pulse 1.2s infinite; }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-
         .disclaimer { text-align: center; font-size: 0.68rem; letter-spacing: 1px; color: var(--text-dim); padding: 7px; background: #030403; border-top: 1px solid var(--border-dark); }
-
-        /* --- MOBILE --- */
         @media (max-width: 900px) {
             body { height: auto; min-height: 100vh; overflow-y: auto; display: block; }
             .os-container { flex-direction: column; height: auto; overflow: visible; }
@@ -167,11 +132,11 @@
             .action-btns { flex-direction: row; width: 100%; }
             .btn-action { flex: 1; height: 48px; }
         }
+
     </style>
 </head>
 <body>
     <canvas id="rain"></canvas>
-
     <nav class="top-nav">
         <div class="nav-brand"><span class="glyph">&#8757;</span>3301 &middot; LIBER PRIMUS</div>
         <a href="#" class="back-btn" onclick="return false;">Sever Link</a>
@@ -208,7 +173,7 @@
         <main class="main-terminal">
             <div class="terminal-header">
                 <h2><i class="fas fa-terminal"></i> Liber Terminal</h2>
-                <div class="status-wrap"><span class="status-light"></span> Link Active</div>
+                <div class="status-wrap"><span id="modeLabel">STANDARD</span> &middot; <span class="status-light"></span> Link Active</div>
             </div>
             <div class="chat-box" id="chatBox"></div>
             <div class="typing-indicator" id="typingIndicator">Decrypting response<span class="dots"></span></div>
@@ -216,13 +181,17 @@
                 <button class="sugg-pill" onclick="insertPrompt('Brainstorm features for my S.A.B.A. acoustic analysis capstone.')">Capstone Ideas</button>
                 <button class="sugg-pill" onclick="insertPrompt('Debug Kivy matrix logic for the Matematika app.')">Kivy Debug</button>
                 <button class="sugg-pill" onclick="insertPrompt('Draft a formal email for deploying the Aegis Admin panel.')">Formal Email</button>
-                <button class="sugg-pill" onclick="insertPrompt('Summarize the text currently in my Scratchpad.')">Analyze Scratchpad</button>
+                <button class="sugg-pill" onclick="insertPrompt('Describe the attached image in detail.')">Describe Image</button>
             </div>
+            <div class="attach-tray" id="attachTray"></div>
             <div class="input-area">
                 <div class="input-wrapper">
-                    <textarea id="userInput" placeholder="Enter query or paste data block..." autocomplete="off"></textarea>
+                    <textarea id="userInput" placeholder="Enter query, attach files, or paste data..." autocomplete="off"></textarea>
                 </div>
                 <div class="action-btns">
+                    <input type="file" id="fileInput" multiple style="display:none"
+                        accept="image/*,.txt,.md,.csv,.tsv,.json,.js,.jsx,.ts,.py,.html,.css,.xml,.yml,.yaml,.log,.pdf,.c,.cpp,.java,.ino">
+                    <button class="btn-action" id="attachBtn" title="Attach files / images"><i class="fas fa-paperclip"></i></button>
                     <button class="btn-action" id="micBtn" title="Voice Input"><i class="fas fa-microphone"></i></button>
                     <button class="btn-action send" id="sendBtn" title="Transmit"><i class="fas fa-paper-plane"></i></button>
                 </div>
@@ -234,22 +203,33 @@
         // =========================================================
         //  TEST-ONLY BUILD. The key below is exposed to anyone who
         //  opens this page. Do NOT deploy publicly with a live key.
-        //  Paste your Groq key between the quotes to enable the link.
         // =========================================================
-        const API_KEY = "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";
-        const MODEL   = "openai/gpt-oss-120b"; // replaces retired llama-3.3-70b-versatile
+        const API_KEY = "YOUR_GROQ_API_KEY_HERE";
+        const MODEL        = "openai/gpt-oss-120b";  // text chats
+        const VISION_MODEL = "qwen/qwen3.6-27b";     // used automatically when an image is attached
+        const MAX_IMG_MB = 4, MAX_TEXT_MB = 1;
+
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        }
 
         // DOM
         const chatBox = document.getElementById('chatBox');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
         const micBtn = document.getElementById('micBtn');
+        const attachBtn = document.getElementById('attachBtn');
+        const fileInput = document.getElementById('fileInput');
+        const attachTray = document.getElementById('attachTray');
         const typingIndicator = document.getElementById('typingIndicator');
         const personaSelect = document.getElementById('persona-select');
         const voiceSelect = document.getElementById('voice-select');
         const scratchpad = document.getElementById('scratchpad');
+        const modeLabel = document.getElementById('modeLabel');
 
-        const GREETING = "The path is patient. State your query, Seeker.";
+        const GREETING = "The path is patient. State your query, Seeker. You may attach images, PDFs, or text files.";
+        let attachments = []; // { id, kind:'image'|'text', name, size, dataUrl?, content? }
+        let uid = 0;
 
         // Scratchpad persistence
         scratchpad.value = localStorage.getItem('cicada-scratchpad') || '';
@@ -267,12 +247,11 @@
             professional: "You are 3301 in Formal Mode. Write professional, corporate-level emails, documentation, and resumes. No slang, no markdown symbols."
         };
 
-        // History
         let conversationHistory = JSON.parse(localStorage.getItem('cicada-chat-memory')) || [];
-        if (conversationHistory.length === 0) {
-            conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
-        }
+        if (conversationHistory.length === 0) conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
 
+        function syncMode() { modeLabel.innerText = personaSelect.options[personaSelect.selectedIndex].text.toUpperCase(); }
+        syncMode();
         function renderHistory() {
             chatBox.innerHTML = '';
             addMessage(GREETING, 'capy', false);
@@ -286,6 +265,7 @@
         personaSelect.addEventListener('change', () => {
             conversationHistory[0].content = personas[personaSelect.value];
             localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory));
+            syncMode();
             addSystem('Persona shifted to ' + personaSelect.options[personaSelect.selectedIndex].text + '.');
         });
 
@@ -299,15 +279,16 @@
 
         window.insertPrompt = function(text) { userInput.value = text; userInput.focus(); };
 
-        function addMessage(text, sender, save = true) {
+        function addMessage(text, sender, save = true, thumbsHtml = '') {
             const div = document.createElement('div');
             div.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-capy');
-            div.innerText = text;
+            if (thumbsHtml) { const t = document.createElement('div'); t.className = 'att-thumbs'; t.innerHTML = thumbsHtml; div.appendChild(t); }
+            const body = document.createElement('div'); body.innerText = text; div.appendChild(body);
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
             if (save) {
                 conversationHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: text });
-                localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory));
+                try { localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory)); } catch (e) {}
             }
         }
         function addSystem(text) {
@@ -317,7 +298,6 @@
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
-
         function speak(text) {
             if (voiceSelect.value === 'on' && 'speechSynthesis' in window) {
                 const u = new SpeechSynthesisUtterance(text);
@@ -327,19 +307,103 @@
                 window.speechSynthesis.speak(u);
             }
         }
+        // ---------- Attachments ----------
+        const readAsText = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsText(f); });
+        const readAsDataURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
 
-        async function handleSend() {
-            const raw = userInput.value.trim();
-            if (!raw) return;
-
-            let text = raw;
-            if (text.toLowerCase().includes("scratchpad")) {
-                const pad = scratchpad.value.trim();
-                if (pad) text += "\n\n[ATTACHED DATA BLOCK]:\n\"" + pad + "\"";
+        async function extractPdf(file) {
+            if (!window.pdfjsLib) return "[PDF attached but pdf.js failed to load]";
+            const buf = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+            let out = '';
+            const pages = Math.min(pdf.numPages, 30);
+            for (let i = 1; i <= pages; i++) {
+                const page = await pdf.getPage(i);
+                const tc = await page.getTextContent();
+                out += tc.items.map(it => it.str).join(' ') + '\n';
             }
+            if (pdf.numPages > pages) out += `\n[...truncated, ${pdf.numPages - pages} more pages]`;
+            return out.trim() || "[PDF contained no extractable text - it may be scanned images]";
+        }
 
-            addMessage(raw, 'user');
+        function fmtSize(b) { return b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(1) + ' MB'; }
+
+        function renderTray() {
+            attachTray.innerHTML = '';
+            attachments.forEach(a => {
+                const chip = document.createElement('div');
+                chip.className = 'attach-chip' + (a.pending ? ' busy' : '');
+                const icon = a.kind === 'image'
+                    ? `<img src="${a.dataUrl}" alt="">`
+                    : `<i class="fas ${a.name.toLowerCase().endsWith('.pdf') ? 'fa-file-pdf' : /\.(js|py|json|html|css|c|cpp|java|ino|ts|jsx|xml|yml|yaml)$/i.test(a.name) ? 'fa-file-code' : 'fa-file-lines'}"></i>`;
+                chip.innerHTML = `${icon}<div style="min-width:0"><div class="fname">${a.name}</div><div class="meta">${a.pending ? 'reading...' : fmtSize(a.size)}</div></div><button class="rm" title="Remove" data-id="${a.id}">&times;</button>`;
+                attachTray.appendChild(chip);
+            });
+            attachTray.querySelectorAll('.rm').forEach(b => b.addEventListener('click', () => {
+                attachments = attachments.filter(x => x.id != b.dataset.id); renderTray();
+            }));
+        }
+
+        async function handleFiles(files) {
+            for (const file of files) {
+                const id = ++uid;
+                const isImg = file.type.startsWith('image/');
+                if (isImg && file.size > MAX_IMG_MB * 1048576) { addSystem(`${file.name} skipped: image over ${MAX_IMG_MB}MB.`); continue; }
+                if (!isImg && file.size > MAX_TEXT_MB * 1048576) { addSystem(`${file.name} skipped: file over ${MAX_TEXT_MB}MB.`); continue; }
+                const entry = { id, name: file.name, size: file.size, pending: true, kind: isImg ? 'image' : 'text' };
+                attachments.push(entry); renderTray();
+                try {
+                    if (isImg) { entry.dataUrl = await readAsDataURL(file); }
+                    else if (file.name.toLowerCase().endsWith('.pdf')) { entry.content = await extractPdf(file); }
+                    else { entry.content = await readAsText(file); }
+                } catch (err) {
+                    addSystem(`Failed to read ${file.name}: ${err.message}`);
+                    attachments = attachments.filter(x => x.id !== id); renderTray(); continue;
+                }
+                entry.pending = false; renderTray();
+            }
+        }
+
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => { handleFiles([...e.target.files]); fileInput.value = ''; });
+        // drag & drop onto the whole terminal
+        const dropZone = document.querySelector('.main-terminal');
+        ['dragover','dragenter'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); }));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files.length) handleFiles([...e.dataTransfer.files]); });
+        // paste image from clipboard
+        userInput.addEventListener('paste', e => {
+            const imgs = [...(e.clipboardData?.items || [])].filter(i => i.type.startsWith('image/')).map(i => i.getAsFile());
+            if (imgs.length) { e.preventDefault(); handleFiles(imgs); }
+        });
+        // ---------- Send ----------
+        async function handleSend() {
+            const typed = userInput.value.trim();
+            if (!typed && attachments.length === 0) return;
+            if (attachments.some(a => a.pending)) { addSystem('Still reading an attachment, wait a moment.'); return; }
+
+            const imgs = attachments.filter(a => a.kind === 'image');
+            const texts = attachments.filter(a => a.kind === 'text');
+
+            // Build the full text payload sent to the model
+            let payload = typed;
+            if (typed.toLowerCase().includes('scratchpad') && scratchpad.value.trim()) {
+                payload += `\n\n[SCRATCHPAD]:\n"${scratchpad.value.trim()}"`;
+            }
+            texts.forEach(t => { payload += `\n\n[FILE: ${t.name}]\n${t.content}`; });
+            if (!payload.trim()) payload = "Describe the attached image(s).";
+
+            // Bubble in the chat (thumbnails for images, labels for files)
+            let thumbs = imgs.map(i => `<img src="${i.dataUrl}" alt="${i.name}">`).join('');
+            thumbs += texts.map(t => `<div class="att-file"><i class="fas fa-paperclip"></i> ${t.name}</div>`).join('');
+            addMessage(typed || '(no text)', 'user', false, thumbs);
+            // persist only a lightweight note to memory (never base64) to avoid quota errors
+            const noteBits = [...imgs, ...texts].map(a => a.name);
+            conversationHistory.push({ role: 'user', content: typed + (noteBits.length ? `\n[attached: ${noteBits.join(', ')}]` : '') });
+            try { localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory)); } catch (e) {}
+
             userInput.value = '';
+            const outgoingImgs = imgs.slice();
+            attachments = []; renderTray();
             typingIndicator.style.display = 'block';
             chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -351,21 +415,29 @@
 
             try {
                 conversationHistory[0].content = personas[personaSelect.value];
-                const tempHistory = [...conversationHistory, { role: "user", content: text }];
+                const priorTurns = conversationHistory.slice(1, -1); // exclude system + the note we just pushed
+
+                // Build the outgoing user message: multimodal array if images present
+                let userMsg;
+                if (outgoingImgs.length) {
+                    userMsg = { role: 'user', content: [
+                        { type: 'text', text: payload },
+                        ...outgoingImgs.map(i => ({ type: 'image_url', image_url: { url: i.dataUrl } }))
+                    ]};
+                } else {
+                    userMsg = { role: 'user', content: payload };
+                }
+                const messages = [conversationHistory[0], ...priorTurns, userMsg];
+                const useModel = outgoingImgs.length ? VISION_MODEL : MODEL;
 
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": "Bearer " + API_KEY, "Content-Type": "application/json" },
-                    body: JSON.stringify({ model: MODEL, messages: tempHistory })
+                    body: JSON.stringify({ model: useModel, messages })
                 });
-
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
-
-                if (!response.ok) {
-                    addSystem("Groq error: " + (data.error?.message || 'Unknown API issue'));
-                    return;
-                }
+                if (!response.ok) { addSystem("Groq error: " + (data.error?.message || 'Unknown API issue')); return; }
 
                 let reply = data.choices?.[0]?.message?.content || "";
                 reply = reply.replace(/\*\*/g, '').replace(/\*/g, '').replace(/`/g, '');
@@ -376,7 +448,6 @@
                 addSystem("Network failure: " + err.message);
             }
         }
-
         // Voice input
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -384,15 +455,12 @@
             recognition.continuous = false;
             recognition.onstart = () => { micBtn.classList.add('mic-active'); userInput.placeholder = "Listening..."; };
             recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; };
-            recognition.onend = () => { micBtn.classList.remove('mic-active'); userInput.placeholder = "Enter query or paste data block..."; };
+            recognition.onend = () => { micBtn.classList.remove('mic-active'); userInput.placeholder = "Enter query, attach files, or paste data..."; };
             recognition.onerror = () => { micBtn.classList.remove('mic-active'); };
             micBtn.addEventListener('click', () => {
-                if (micBtn.classList.contains('mic-active')) recognition.stop();
-                else recognition.start();
+                if (micBtn.classList.contains('mic-active')) recognition.stop(); else recognition.start();
             });
-        } else {
-            micBtn.style.display = 'none';
-        }
+        } else { micBtn.style.display = 'none'; }
 
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
@@ -403,12 +471,10 @@
         (function () {
             const canvas = document.getElementById('rain');
             const ctx = canvas.getContext('2d');
-            // runes + primes-flavoured glyph set
             const glyphs = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ0123456789∴".split('');
             let cols, drops, fontSize = 16;
             function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
                 cols = Math.floor(canvas.width / fontSize);
                 drops = new Array(cols).fill(0).map(() => Math.random() * -50);
             }
@@ -429,6 +495,9 @@
             }
             setInterval(draw, 60);
         })();
+
+
+
     </script>
 
 
