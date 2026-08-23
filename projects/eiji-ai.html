@@ -3,245 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capy OS | AI Terminal</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <title>3301 // Liber Terminal</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
-            --bg-color: #2b0a1a;        
-            --panel-bg: #4a152c;        
-            --text-main: #ffe6f2;       
-            --retro-light-pink: #ffb3d9;
-            --retro-hot-pink: #ff007f;  
-            --retro-magenta: #d10056;   
-            --border-dark: #240010;     
-            --retro-cyan: #00ffff;
+            --bg-color: #050605;
+            --panel-bg: #0b0d0b;
+            --panel-bg-2: #0f120f;
+            --text-main: #c9d1c9;
+            --text-dim: #6f7a6f;
+            --cicada-green: #7fae5f;
+            --cicada-glow: #9fd97a;
+            --cicada-gold: #c8a94a;
+            --cicada-red: #b6503f;
+            --border-dark: #1a201a;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            font-family: 'VT323', monospace;
+            font-family: 'IBM Plex Mono', monospace;
             background-color: var(--bg-color);
             color: var(--text-main);
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
-            background-size: 30px 30px;
-            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(127,174,95,0.06), transparent 60%),
+                repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 1px, transparent 1px, transparent 3px);
             overflow: hidden;
         }
+        /* animated glyph-rain canvas sits behind everything */
+        #rain { position: fixed; inset: 0; z-index: 0; opacity: 0.16; pointer-events: none; }
+        .top-nav, .os-container { position: relative; z-index: 1; }
 
-        a, button, select, input { cursor: pointer; }
+        /* message entrance */
+        @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message { animation: msgIn 0.35s ease both; }
 
+        /* brand glyph pulse + title flicker */
+        @keyframes glyphPulse { 0%,100% { text-shadow: 0 0 6px rgba(200,169,74,0.4); } 50% { text-shadow: 0 0 16px rgba(200,169,74,0.9); } }
+        .nav-brand .glyph { display: inline-block; animation: glyphPulse 3s ease-in-out infinite; }
+        @keyframes flicker { 0%,19%,21%,55%,57%,100% { opacity: 1; } 20%,56% { opacity: 0.72; } }
+        .nav-brand { animation: flicker 6s infinite; }
+
+        /* animated decrypting dots */
+        .typing-indicator .dots::after { content: ''; animation: dots 1.4s steps(4,end) infinite; }
+        @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+        a, button, select, input, textarea { font-family: inherit; }
+        a, button, select { cursor: pointer; }
+        ::selection { background: var(--cicada-green); color: #050605; }
+    </style>
+    <style>
         /* --- TOP NAV --- */
         .top-nav {
-            background: var(--panel-bg); border-bottom: 4px solid var(--border-dark);
-            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 0px var(--border-dark); z-index: 10;
+            background: linear-gradient(180deg, #0d100d, #070807);
+            border-bottom: 1px solid var(--border-dark);
+            padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+            z-index: 10; letter-spacing: 2px;
         }
-        .nav-brand { font-family: 'Press Start 2P', cursive; font-size: 1rem; color: var(--retro-hot-pink); text-shadow: 2px 2px 0 var(--border-dark);}
+        .nav-brand {
+            font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 700;
+            color: var(--cicada-glow); text-shadow: 0 0 12px rgba(127,174,95,0.35); letter-spacing: 4px;
+        }
+        .nav-brand .glyph { color: var(--cicada-gold); margin-right: 8px; }
         .back-btn {
-            background: var(--bg-color); color: var(--text-main); padding: 8px 12px; 
-            text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
-            border: 2px solid var(--border-dark); transition: all 0.1s;
+            background: transparent; color: var(--text-dim); padding: 8px 14px;
+            text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+            border: 1px solid var(--border-dark); transition: all 0.15s;
         }
-        .back-btn:active { transform: translate(2px, 2px); }
+        .back-btn:hover { color: var(--cicada-green); border-color: var(--cicada-green); }
 
         /* --- OS LAYOUT --- */
         .os-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* --- SIDEBAR TOOLS --- */
+        /* --- SIDEBAR --- */
         .sidebar {
-            width: 300px; background: rgba(0,0,0,0.4); border-right: 4px solid var(--border-dark);
-            padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto;
+            width: 300px; background: rgba(0,0,0,0.35); border-right: 1px solid var(--border-dark);
+            padding: 22px 18px; display: flex; flex-direction: column; gap: 22px; overflow-y: auto;
         }
-        
-        .tool-panel { background: var(--panel-bg); border: 4px solid var(--border-dark); padding: 15px; box-shadow: 4px 4px 0 var(--border-dark);}
-        .tool-panel h3 { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--retro-light-pink); margin-bottom: 15px; border-bottom: 2px dashed var(--retro-hot-pink); padding-bottom: 10px;}
-        
-        .tool-group { margin-bottom: 15px; }
-        .tool-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: var(--retro-cyan); margin-bottom: 5px; }
+        .tool-panel { background: var(--panel-bg); border: 1px solid var(--border-dark); padding: 16px; }
+        .tool-panel h3 {
+            font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--cicada-gold);
+            margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-dark); font-weight: 600;
+        }
+        .tool-panel h3 i { color: var(--cicada-green); margin-right: 6px; }
+        .tool-group { margin-bottom: 14px; }
+        .tool-group label { display: block; font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
         select {
-            width: 100%; padding: 8px; font-family: 'VT323', monospace; font-size: 1.1rem;
-            background: var(--bg-color); color: var(--text-main); border: 2px solid var(--border-dark); outline: none;
+            width: 100%; padding: 9px; font-size: 0.85rem; background: var(--panel-bg-2); color: var(--text-main);
+            border: 1px solid var(--border-dark); outline: none; letter-spacing: 1px;
         }
-
+        select:focus { border-color: var(--cicada-green); }
         .quick-note {
-            width: 100%; height: 100px; padding: 10px; font-family: 'VT323', monospace; font-size: 1.1rem;
-            background: var(--bg-color); color: var(--text-main); border: 2px solid var(--border-dark); resize: none; outline: none;
+            width: 100%; height: 110px; padding: 10px; font-size: 0.85rem; background: var(--panel-bg-2);
+            color: var(--text-main); border: 1px solid var(--border-dark); resize: none; outline: none; line-height: 1.5;
         }
-
+        .quick-note:focus { border-color: var(--cicada-green); }
         .btn-tool {
-            width: 100%; background: var(--retro-magenta); color: #fff; padding: 10px;
-            font-family: 'Press Start 2P', cursive; font-size: 0.6rem; border: 2px solid var(--border-dark);
-            margin-top: 5px; transition: 0.1s;
+            width: 100%; background: transparent; color: var(--cicada-green); padding: 10px;
+            font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--cicada-green);
+            margin-top: 6px; transition: 0.15s;
         }
-        .btn-tool:active { transform: translateY(2px); }
+        .btn-tool:hover { background: var(--cicada-green); color: #050605; box-shadow: 0 0 14px rgba(127,174,95,0.3); }
 
         /* --- MAIN TERMINAL --- */
         .main-terminal { flex: 1; display: flex; flex-direction: column; position: relative; }
-        
         .terminal-header {
-            background: var(--retro-magenta); padding: 15px 20px; border-bottom: 4px solid var(--border-dark);
-            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(180deg, #0d100d, #070807); padding: 14px 22px;
+            border-bottom: 1px solid var(--border-dark); display: flex; justify-content: space-between; align-items: center;
         }
-        .terminal-header h2 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: #fff; text-shadow: 2px 2px 0 var(--border-dark); margin: 0; }
-        .status-light { width: 12px; height: 12px; background: var(--retro-hot-pink); border: 2px solid var(--border-dark); border-radius: 50%; box-shadow: 0 0 10px var(--retro-hot-pink); animation: blink 2s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .terminal-header h2 { font-size: 0.78rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-main); font-weight: 600; }
+        .terminal-header h2 i { color: var(--cicada-green); margin-right: 8px; }
+        .status-wrap { display: flex; align-items: center; gap: 8px; font-size: 0.62rem; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+        .status-light { width: 9px; height: 9px; background: var(--cicada-green); border-radius: 50%; box-shadow: 0 0 10px var(--cicada-glow); animation: blink 2.4s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
         /* CHAT BOX */
-        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        .chat-box::-webkit-scrollbar { width: 10px; }
-        .chat-box::-webkit-scrollbar-track { background: var(--bg-color); border-left: 2px solid var(--border-dark); }
-        .chat-box::-webkit-scrollbar-thumb { background: var(--retro-hot-pink); border: 2px solid var(--border-dark); }
-
-        .message { max-width: 85%; padding: 15px; font-size: 1.3rem; line-height: 1.5; border: 4px solid var(--border-dark); position: relative; }
-        
-        .msg-capy { background: var(--retro-light-pink); color: #000; align-self: flex-start; box-shadow: 6px 6px 0px var(--retro-hot-pink); border-bottom-left-radius: 0; }
-        .msg-capy::before { content: "CAPY OS"; display: block; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: var(--retro-hot-pink); margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
-
-        .msg-user { background: var(--retro-magenta); color: #fff; align-self: flex-end; box-shadow: -6px 6px 0px var(--border-dark); border-bottom-right-radius: 0; }
-        .msg-user::before { content: "PLAYER 1"; display: block; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: #fff; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
-
-        .typing-indicator { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--retro-light-pink); align-self: flex-start; display: none; margin-left: 10px; padding: 10px;}
+        .chat-box { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+        .chat-box::-webkit-scrollbar { width: 8px; }
+        .chat-box::-webkit-scrollbar-track { background: var(--bg-color); }
+        .chat-box::-webkit-scrollbar-thumb { background: var(--border-dark); }
+        .chat-box::-webkit-scrollbar-thumb:hover { background: var(--cicada-green); }
+        .message { max-width: 80%; padding: 14px 16px; font-size: 0.92rem; line-height: 1.6; border: 1px solid var(--border-dark); position: relative; white-space: pre-wrap; }
+        .msg-capy { background: var(--panel-bg); color: var(--text-main); align-self: flex-start; border-left: 2px solid var(--cicada-green); }
+        .msg-capy::before { content: "3301"; display: block; font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 3px; color: var(--cicada-green); margin-bottom: 8px; }
+        .msg-user { background: var(--panel-bg-2); color: var(--text-main); align-self: flex-end; border-right: 2px solid var(--cicada-gold); }
+        .msg-user::before { content: "SEEKER"; display: block; font-size: 0.6rem; letter-spacing: 3px; color: var(--cicada-gold); margin-bottom: 8px; }
+        .msg-sys { align-self: center; max-width: 90%; text-align: center; font-size: 0.72rem; letter-spacing: 2px; color: var(--text-dim); border: 1px dashed var(--border-dark); background: transparent; text-transform: uppercase; }
+        .msg-sys::before { display: none; }
+        .typing-indicator { font-size: 0.72rem; letter-spacing: 2px; color: var(--cicada-green); align-self: flex-start; display: none; padding: 8px 12px; text-transform: uppercase; }
 
         /* SUGGESTIONS */
-        .suggestions-container { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px 20px; background: rgba(0,0,0,0.2); border-top: 2px dashed var(--border-dark);}
-        .sugg-pill {
-            background: var(--bg-color); border: 2px solid var(--retro-hot-pink); color: var(--retro-light-pink);
-            padding: 8px 12px; font-family: 'VT323', monospace; font-size: 1.1rem; transition: 0.2s;
-        }
-        .sugg-pill:hover { background: var(--retro-hot-pink); color: #fff; }
+        .suggestions-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 22px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--border-dark); }
+        .sugg-pill { background: transparent; border: 1px solid var(--border-dark); color: var(--text-dim); padding: 7px 12px; font-size: 0.78rem; letter-spacing: 1px; transition: 0.15s; }
+        .sugg-pill:hover { border-color: var(--cicada-green); color: var(--cicada-glow); }
 
-        /* INPUT AREA */
-        .input-area { display: flex; padding: 20px; background: var(--panel-bg); border-top: 4px solid var(--border-dark); gap: 10px; align-items: stretch;}
-        
-        .input-wrapper { flex: 1; display: flex; flex-direction: column; position: relative;}
-        .input-area textarea {
-            width: 100%; height: 60px; padding: 15px; font-family: 'VT323', monospace; font-size: 1.4rem;
-            background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark); outline: none; resize: none;
-        }
-        .input-area textarea:focus { border-color: var(--retro-hot-pink); }
-        
-        /* Voice & Action Buttons */
-        .action-btns { display: flex; gap: 10px; }
-        .btn-action {
-            background: var(--retro-hot-pink); color: #fff; width: 60px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: 0.1s;
-        }
-        .btn-action:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-        .btn-action.mic-active { background: var(--retro-cyan); color: #000; animation: pulse 1s infinite;}
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        /* INPUT */
+        .input-area { display: flex; padding: 18px 22px; background: linear-gradient(180deg, #070807, #0b0d0b); border-top: 1px solid var(--border-dark); gap: 10px; align-items: stretch; }
+        .input-wrapper { flex: 1; display: flex; }
+        .input-area textarea { width: 100%; height: 58px; padding: 14px; font-size: 0.95rem; background: var(--panel-bg-2); color: var(--text-main); border: 1px solid var(--border-dark); outline: none; resize: none; line-height: 1.4; }
+        .input-area textarea:focus { border-color: var(--cicada-green); box-shadow: 0 0 12px rgba(127,174,95,0.15); }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-action { background: var(--panel-bg); color: var(--cicada-green); width: 58px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; border: 1px solid var(--border-dark); transition: 0.15s; }
+        .btn-action:hover { border-color: var(--cicada-green); box-shadow: 0 0 12px rgba(127,174,95,0.25); }
+        .btn-action.send { color: #050605; background: var(--cicada-green); }
+        .btn-action.send:hover { background: var(--cicada-glow); }
+        .btn-action.mic-active { background: var(--cicada-gold); color: #050605; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 
-        /* DISCLAIMER */
-        .disclaimer { text-align: center; font-size: 0.9rem; color: var(--text-muted); padding: 5px; background: #000; }
+        .disclaimer { text-align: center; font-size: 0.68rem; letter-spacing: 1px; color: var(--text-dim); padding: 7px; background: #030403; border-top: 1px solid var(--border-dark); }
 
-        /* --- RESPONSIVE MOBILE FIX --- */
+        /* --- MOBILE --- */
         @media (max-width: 900px) {
-            /* Remove fixed height constraints on mobile so layout can flow naturally */
             body { height: auto; min-height: 100vh; overflow-y: auto; display: block; }
             .os-container { flex-direction: column; height: auto; overflow: visible; }
-            
-            /* Sidebar takes full width and stacks on top */
-            .sidebar { width: 100%; height: auto; max-height: none; border-right: none; border-bottom: 4px solid var(--border-dark); padding: 15px; }
-            
-            /* Give terminal a fixed height so you can still scroll inside the chat box */
-            .main-terminal { height: 80vh; }
-            
-            /* Resize the chunky text and boxes for mobile screens */
-            .message { max-width: 95%; font-size: 1.1rem; padding: 12px; }
-            .sugg-pill { font-size: 0.9rem; padding: 6px 10px; }
-            
-            /* Rearrange the input area to be more thumb-friendly */
-            .input-area { flex-direction: column; padding: 15px; }
-            .input-area textarea { height: 60px; font-size: 1.1rem; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-dark); }
+            .main-terminal { height: 82vh; }
+            .message { max-width: 95%; }
+            .input-area { flex-direction: column; }
             .action-btns { flex-direction: row; width: 100%; }
-            .btn-action { flex: 1; height: 50px; }
+            .btn-action { flex: 1; height: 48px; }
         }
     </style>
 </head>
 <body>
+    <canvas id="rain"></canvas>
 
     <nav class="top-nav">
-        <div class="nav-brand"><i class="fas fa-microchip"></i> CAPY OS v2.0</div>
-        <a href="../index.html" class="back-btn">EXIT SYSTEM</a>
+        <div class="nav-brand"><span class="glyph">&#8757;</span>3301 &middot; LIBER PRIMUS</div>
+        <a href="#" class="back-btn" onclick="return false;">Sever Link</a>
     </nav>
-
     <div class="os-container">
-        
         <aside class="sidebar">
             <div class="tool-panel">
-                <h3><i class="fas fa-sliders-h"></i> SYSTEM PREFS</h3>
+                <h3><i class="fas fa-key"></i> Cipher Prefs</h3>
                 <div class="tool-group">
-                    <label>AI PERSONA MODE</label>
+                    <label>Persona Mode</label>
                     <select id="persona-select">
-                        <option value="assistant">Standard Assistant</option>
-                        <option value="study">Study & Academic Mode</option>
+                        <option value="assistant">Standard Guide</option>
+                        <option value="study">Study &amp; Academic</option>
                         <option value="code">Code Debugger</option>
-                        <option value="creative">Creative Writer</option>
-                        <option value="professional">Professional / Formal</option>
+                        <option value="creative">Creative / Cryptic</option>
+                        <option value="professional">Formal / Professional</option>
                     </select>
                 </div>
                 <div class="tool-group">
-                    <label>VOICE OUTPUT</label>
+                    <label>Voice Output</label>
                     <select id="voice-select">
-                        <option value="on">Text-to-Speech: ON</option>
                         <option value="off">Text-to-Speech: OFF</option>
+                        <option value="on">Text-to-Speech: ON</option>
                     </select>
                 </div>
-                <button class="btn-tool" id="btn-clear-chat"><i class="fas fa-trash"></i> WIPE MEMORY</button>
+                <button class="btn-tool" id="btn-clear-chat"><i class="fas fa-trash"></i> Purge Memory</button>
             </div>
-
             <div class="tool-panel">
-                <h3><i class="fas fa-sticky-note"></i> SCRATCHPAD</h3>
-                <textarea class="quick-note" id="scratchpad" placeholder="Paste data here or jot down ideas..."></textarea>
-                <button class="btn-tool" id="btn-save-note">SAVE TO LOCAL</button>
+                <h3><i class="fas fa-scroll"></i> Scratchpad</h3>
+                <textarea class="quick-note" id="scratchpad" placeholder="Paste data / notes / ciphertext..."></textarea>
+                <button class="btn-tool" id="btn-save-note">Commit to Local</button>
             </div>
         </aside>
-
         <main class="main-terminal">
             <div class="terminal-header">
-                <h2><i class="fas fa-terminal"></i> TERMINAL INTERFACE</h2>
-                <div class="status-light" title="Neural Link Active"></div>
+                <h2><i class="fas fa-terminal"></i> Liber Terminal</h2>
+                <div class="status-wrap"><span class="status-light"></span> Link Active</div>
             </div>
-
-            <div class="chat-box" id="chatBox">
-                <div class="message msg-capy">System online. Memory protocols active. How can I assist you today, Player 1?</div>
-            </div>
-            
-            <div class="typing-indicator" id="typingIndicator">Processing syntax...</div>
-
+            <div class="chat-box" id="chatBox"></div>
+            <div class="typing-indicator" id="typingIndicator">Decrypting response<span class="dots"></span></div>
             <div class="suggestions-container" id="suggestions">
-                <button class="sugg-pill" onclick="insertPrompt('Brainstorm features for my S.A.B.A. acoustic analysis capstone.')">S.A.B.A. Capstone Ideas</button>
-                <button class="sugg-pill" onclick="insertPrompt('Debug Kivy matrix logic for the Matematika app.')">Matematika App Debug</button>
-                <button class="sugg-pill" onclick="insertPrompt('Draft a formal email for deploying the Aegis Admin panel.')">Aegis Admin Email</button>
+                <button class="sugg-pill" onclick="insertPrompt('Brainstorm features for my S.A.B.A. acoustic analysis capstone.')">Capstone Ideas</button>
+                <button class="sugg-pill" onclick="insertPrompt('Debug Kivy matrix logic for the Matematika app.')">Kivy Debug</button>
+                <button class="sugg-pill" onclick="insertPrompt('Draft a formal email for deploying the Aegis Admin panel.')">Formal Email</button>
                 <button class="sugg-pill" onclick="insertPrompt('Summarize the text currently in my Scratchpad.')">Analyze Scratchpad</button>
             </div>
-
             <div class="input-area">
                 <div class="input-wrapper">
-                    <textarea id="userInput" placeholder="Enter command or paste data block..." autocomplete="off"></textarea>
+                    <textarea id="userInput" placeholder="Enter query or paste data block..." autocomplete="off"></textarea>
                 </div>
                 <div class="action-btns">
                     <button class="btn-action" id="micBtn" title="Voice Input"><i class="fas fa-microphone"></i></button>
-                    <button class="btn-action" id="sendBtn" title="Execute Command" style="background: var(--retro-cyan); color: #000;"><i class="fas fa-paper-plane"></i></button>
+                    <button class="btn-action send" id="sendBtn" title="Transmit"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-            
-            <div class="disclaimer">⚠️ Capy OS AI can make mistakes. Verify critical code and academic data.</div>
+            <div class="disclaimer">&#9888; 3301 can err. Verify critical code and academic data. Nothing is unknowable.</div>
         </main>
     </div>
-
     <script>
-        // ⚠️ SECURE YOUR API KEY HERE ⚠️
-        const API_KEY = "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"; 
+        // =========================================================
+        //  TEST-ONLY BUILD. The key below is exposed to anyone who
+        //  opens this page. Do NOT deploy publicly with a live key.
+        //  Paste your Groq key between the quotes to enable the link.
+        // =========================================================
+        const API_KEY = "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";
+        const MODEL   = "openai/gpt-oss-120b"; // replaces retired llama-3.3-70b-versatile
 
-        // DOM Elements
+        // DOM
         const chatBox = document.getElementById('chatBox');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
@@ -251,33 +249,33 @@
         const voiceSelect = document.getElementById('voice-select');
         const scratchpad = document.getElementById('scratchpad');
 
-        // Load Scratchpad
-        scratchpad.value = localStorage.getItem('capy-scratchpad') || '';
+        const GREETING = "The path is patient. State your query, Seeker.";
+
+        // Scratchpad persistence
+        scratchpad.value = localStorage.getItem('cicada-scratchpad') || '';
         document.getElementById('btn-save-note').addEventListener('click', () => {
-            localStorage.setItem('capy-scratchpad', scratchpad.value);
-            alert('Scratchpad saved to local memory!');
+            localStorage.setItem('cicada-scratchpad', scratchpad.value);
+            addSystem('Scratchpad committed to local memory.');
         });
 
-        // Personas Contexts
+        // Personas
         const personas = {
-            assistant: "You are Capy OS, Jon Lewyn's personal AI assistant. Keep answers brief, retro, and arcade-themed. No markdown.",
-            study: "You are Capy OS Academic Mode. You act as an engineering tutor. Break down complex electronics and programming concepts simply. No markdown.",
-            code: "You are Capy OS Dev Mode. You are an expert in Python, JS, Kivy, and Arduino. Provide clean, secure code snippets and explain bugs directly. Do not use markdown backticks.",
-            creative: "You are Capy OS Creative Mode. You are highly imaginative. Use cyberpunk slang, neon aesthetics, and vivid language. No markdown.",
-            professional: "You are Capy OS Formal Mode. You write highly professional, corporate-level emails, documentation, and resumes. No slang. No markdown."
+            assistant: "You are 3301, Jon Lewyn's personal AI guide. Keep answers concise and calm, with a faint cryptic, thoughtful tone. Never use markdown symbols.",
+            study: "You are 3301 in Academic Mode, an engineering tutor. Break down electronics and programming concepts clearly and simply. Never use markdown symbols.",
+            code: "You are 3301 in Dev Mode, an expert in Python, JS, Kivy, and Arduino. Give clean, secure code and explain bugs directly. Do not use markdown backticks or asterisks.",
+            creative: "You are 3301 in Cryptic Mode. Be imaginative and evocative, drawing on cryptography, primes, and mystery, while staying coherent and useful. Never use markdown symbols.",
+            professional: "You are 3301 in Formal Mode. Write professional, corporate-level emails, documentation, and resumes. No slang, no markdown symbols."
         };
 
-        // Chat History Memory (LocalStorage)
-        let conversationHistory = JSON.parse(localStorage.getItem('capy-chat-memory')) || [];
-        
-        // Initialize history if empty
+        // History
+        let conversationHistory = JSON.parse(localStorage.getItem('cicada-chat-memory')) || [];
         if (conversationHistory.length === 0) {
             conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
         }
 
-        // Render past messages on load
         function renderHistory() {
-            chatBox.innerHTML = '<div class="message msg-capy">System online. Memory protocols active. How can I assist you today, Player 1?</div>';
+            chatBox.innerHTML = '';
+            addMessage(GREETING, 'capy', false);
             conversationHistory.forEach(msg => {
                 if (msg.role === 'user') addMessage(msg.content, 'user', false);
                 if (msg.role === 'assistant') addMessage(msg.content, 'capy', false);
@@ -285,155 +283,154 @@
         }
         renderHistory();
 
-        // Change Persona Warning
         personaSelect.addEventListener('change', () => {
             conversationHistory[0].content = personas[personaSelect.value];
-            localStorage.setItem('capy-chat-memory', JSON.stringify(conversationHistory));
-            addMessage(`SYSTEM OVERRIDE: Persona switched to ${personaSelect.options[personaSelect.selectedIndex].text}.`, 'capy');
+            localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory));
+            addSystem('Persona shifted to ' + personaSelect.options[personaSelect.selectedIndex].text + '.');
         });
 
-        // Clear Memory
         document.getElementById('btn-clear-chat').addEventListener('click', () => {
-            if(confirm("WARNING: This will purge all conversation history. Proceed?")) {
+            if (confirm("Purge all conversation memory. Proceed?")) {
                 conversationHistory = [{ role: "system", content: personas[personaSelect.value] }];
-                localStorage.setItem('capy-chat-memory', JSON.stringify(conversationHistory));
+                localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory));
                 renderHistory();
             }
         });
 
-        // Insert prompt from suggestions
-        window.insertPrompt = function(text) {
-            userInput.value = text;
-            userInput.focus();
-        };
+        window.insertPrompt = function(text) { userInput.value = text; userInput.focus(); };
 
         function addMessage(text, sender, save = true) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-capy');
-            msgDiv.innerText = text;
-            chatBox.appendChild(msgDiv);
+            const div = document.createElement('div');
+            div.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-capy');
+            div.innerText = text;
+            chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            if(save) {
+            if (save) {
                 conversationHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: text });
-                localStorage.setItem('capy-chat-memory', JSON.stringify(conversationHistory));
+                localStorage.setItem('cicada-chat-memory', JSON.stringify(conversationHistory));
             }
         }
+        function addSystem(text) {
+            const div = document.createElement('div');
+            div.classList.add('message', 'msg-sys');
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
-        // Text to Speech
         function speak(text) {
             if (voiceSelect.value === 'on' && 'speechSynthesis' in window) {
-                const synth = window.speechSynthesis;
-                const utterance = new SpeechSynthesisUtterance(text);
-                const voices = synth.getVoices();
-                utterance.voice = voices.find(v => v.name.includes('Google') || v.name.includes('Zira')) || voices[0];
-                utterance.rate = 1.1;
-                synth.speak(utterance);
+                const u = new SpeechSynthesisUtterance(text);
+                const voices = window.speechSynthesis.getVoices();
+                u.voice = voices.find(v => v.name.includes('Google') || v.name.includes('Zira')) || voices[0];
+                u.rate = 1.05;
+                window.speechSynthesis.speak(u);
             }
         }
 
-        // Main sending function
         async function handleSend() {
-            let text = userInput.value.trim();
-            if (!text) return;
+            const raw = userInput.value.trim();
+            if (!raw) return;
 
-            // Handle Scratchpad injection
+            let text = raw;
             if (text.toLowerCase().includes("scratchpad")) {
-                const padContent = scratchpad.value.trim();
-                if (padContent) {
-                    text += `\n\n[ATTACHED DATA BLOCK]:\n"${padContent}"`;
-                }
+                const pad = scratchpad.value.trim();
+                if (pad) text += "\n\n[ATTACHED DATA BLOCK]:\n\"" + pad + "\"";
             }
 
-            addMessage(userInput.value.trim(), 'user'); 
-            userInput.value = ''; 
-            
+            addMessage(raw, 'user');
+            userInput.value = '';
             typingIndicator.style.display = 'block';
             chatBox.scrollTop = chatBox.scrollHeight;
-            
-            if (API_KEY === "YOUR_GROQ_API_KEY_HERE") {
-                setTimeout(() => {
-                    typingIndicator.style.display = 'none';
-                    addMessage("SYSTEM ERROR: Groq API Key missing. Neural link severed.", 'capy');
-                }, 1000);
+
+            if (!API_KEY || API_KEY === "YOUR_GROQ_API_KEY_HERE") {
+                typingIndicator.style.display = 'none';
+                addSystem("Link severed: paste a valid Groq API key into API_KEY.");
                 return;
             }
 
             try {
-                // Ensure system prompt is accurate before sending
                 conversationHistory[0].content = personas[personaSelect.value];
-                
-                // Add actual text sent to Groq
                 const tempHistory = [...conversationHistory, { role: "user", content: text }];
 
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
-                    headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile", 
-                        messages: tempHistory
-                    })
+                    headers: { "Authorization": "Bearer " + API_KEY, "Content-Type": "application/json" },
+                    body: JSON.stringify({ model: MODEL, messages: tempHistory })
                 });
 
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
 
                 if (!response.ok) {
-                    addMessage(`GROQ ERROR: ${data.error?.message || 'Unknown API issue'}`, 'capy', false);
-                    return; 
+                    addSystem("Groq error: " + (data.error?.message || 'Unknown API issue'));
+                    return;
                 }
 
-                let capyResponse = data.choices[0].message.content;
-                
-                // Remove Markdown asterisks for pure retro look
-                capyResponse = capyResponse.replace(/\*\*/g, '').replace(/\*/g, '');
-
-                addMessage(capyResponse, 'capy');
-                speak(capyResponse);
-
-            } catch (error) {
+                let reply = data.choices?.[0]?.message?.content || "";
+                reply = reply.replace(/\*\*/g, '').replace(/\*/g, '').replace(/`/g, '');
+                addMessage(reply, 'capy');
+                speak(reply);
+            } catch (err) {
                 typingIndicator.style.display = 'none';
-                addMessage("SYSTEM ERROR: Total network failure.", 'capy');
+                addSystem("Network failure: " + err.message);
             }
         }
 
-        // Voice Input (Speech to Text)
+        // Voice input
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SR();
             recognition.continuous = false;
-            
-            recognition.onstart = function() {
-                micBtn.classList.add('mic-active');
-                userInput.placeholder = "Listening...";
-            };
-            
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                userInput.value = transcript;
-            };
-            
-            recognition.onend = function() {
-                micBtn.classList.remove('mic-active');
-                userInput.placeholder = "Enter command or paste data block...";
-            };
-
+            recognition.onstart = () => { micBtn.classList.add('mic-active'); userInput.placeholder = "Listening..."; };
+            recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; };
+            recognition.onend = () => { micBtn.classList.remove('mic-active'); userInput.placeholder = "Enter query or paste data block..."; };
+            recognition.onerror = () => { micBtn.classList.remove('mic-active'); };
             micBtn.addEventListener('click', () => {
-                if(micBtn.classList.contains('mic-active')) recognition.stop();
+                if (micBtn.classList.contains('mic-active')) recognition.stop();
                 else recognition.start();
             });
         } else {
-            micBtn.style.display = 'none'; // Hide if browser doesn't support
+            micBtn.style.display = 'none';
         }
 
-        // Listeners
-        userInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) { // Allow Shift+Enter for new lines
-                e.preventDefault();
-                handleSend();
-            }
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
         });
         sendBtn.addEventListener('click', handleSend);
+
+        // ---- Cicada glyph-rain background ----
+        (function () {
+            const canvas = document.getElementById('rain');
+            const ctx = canvas.getContext('2d');
+            // runes + primes-flavoured glyph set
+            const glyphs = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ0123456789∴".split('');
+            let cols, drops, fontSize = 16;
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                cols = Math.floor(canvas.width / fontSize);
+                drops = new Array(cols).fill(0).map(() => Math.random() * -50);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+            function draw() {
+                ctx.fillStyle = 'rgba(5,6,5,0.10)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = fontSize + "px 'IBM Plex Mono', monospace";
+                for (let i = 0; i < cols; i++) {
+                    const g = glyphs[Math.floor(Math.random() * glyphs.length)];
+                    const x = i * fontSize, y = drops[i] * fontSize;
+                    ctx.fillStyle = Math.random() > 0.97 ? '#c8a94a' : '#7fae5f';
+                    ctx.fillText(g, x, y);
+                    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i] += 0.5;
+                }
+            }
+            setInterval(draw, 60);
+        })();
     </script>
+
+
 </body>
 </html>
