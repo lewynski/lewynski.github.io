@@ -4,40 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jon Lewyn | Project Archive</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --bg-color: #1e1e2f; --panel-bg: #2a2a40; --panel-bg-2: #343454;
             --text-main: #f8f8f2; --text-muted: #a8a8b2; --retro-green: #4ade80;
             --retro-blue: #3b82f6; --retro-purple: #bd93f9; --retro-pink: #ff79c6;
-            --retro-gold: #facc15; --retro-orange: #ffb86c; --retro-cyan: #8be9fd; 
+            --retro-gold: #facc15; --retro-orange: #ffb86c; --retro-cyan: #8be9fd;
             --border-dark: #000000; --grid-color: rgba(255, 255, 255, 0.03);
         }
-
         [data-theme="light"] {
             --bg-color: #f0f0f5; --panel-bg: #ffffff; --panel-bg-2: #ededf6;
             --text-main: #1a1a2e; --text-muted: #4a4a6a; --border-dark: #111111;
             --grid-color: rgba(0, 0, 0, 0.05);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
-        
+
         body {
             font-family: 'Press Start 2P', cursive; background-color: var(--bg-color); color: var(--text-main);
             line-height: 1.8; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; position: relative;
             background-image: linear-gradient(var(--grid-color) 2px, transparent 2px), linear-gradient(90deg, var(--grid-color) 2px, transparent 2px);
             background-size: 30px 30px; animation: scrollGrid 20s linear infinite;
         }
-
         @keyframes scrollGrid { 0% { background-position: 0px 0px; } 100% { background-position: 60px 60px; } }
-
         .scanlines { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; z-index: 9999; pointer-events: none; }
-
         a, button { cursor: pointer; }
-
         /* --- SYNCHRONIZED NAV BAR --- */
         nav {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 1200px;
@@ -45,18 +39,15 @@
             display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; z-index: 1000; backdrop-filter: blur(4px);
         }
         [data-theme="light"] nav { background: rgba(255, 255, 255, 0.95); }
-
         .nav-left { display: flex; align-items: center; gap: 15px; }
         .jl-badge { background: var(--retro-blue); color: #fff; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 3px solid var(--border-dark); box-shadow: inset -3px -3px 0 rgba(0,0,0,0.3); text-shadow: 2px 2px 0 #000; }
         .nav-brand-text { display: flex; flex-direction: column; justify-content: center; }
         .nav-brand-text .name { color: var(--text-main); font-size: 0.8rem; text-shadow: 2px 2px 0 var(--border-dark); margin-bottom: 4px;}
         .nav-brand-text .title { font-family: 'VT323', monospace; color: var(--retro-green); font-size: 1rem; line-height: 1;}
-
         .nav-center { display: flex; align-items: center; gap: 5px; }
         .nav-center a { color: var(--text-main); text-decoration: none; font-size: 0.6rem; padding: 10px 15px; background: transparent; border: 2px solid transparent; font-family: inherit; text-transform: uppercase; transition: 0.2s; }
         .nav-center a.active { background: var(--panel-bg-2); border-color: var(--border-dark); color: var(--retro-gold); box-shadow: 2px 2px 0 var(--border-dark); }
         .nav-center a:hover { color: var(--retro-pink); background: rgba(0,0,0,0.2);}
-
         .nav-right { display: flex; align-items: center; gap: 15px; }
         .btn-talk { background: var(--retro-blue); color: #fff; text-decoration: none; font-size: 0.6rem; padding: 12px 18px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0 var(--border-dark); transition: all 0.1s; text-transform: uppercase; }
         .btn-talk:hover { filter: brightness(1.1); }
@@ -64,57 +55,42 @@
         .theme-toggle-btn { background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1rem; color: var(--retro-gold); display: flex; align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); transition: 0.1s;}
         .theme-toggle-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
         .mobile-menu-btn { display: none; background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1.2rem; color: var(--text-main); align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); }
-
         /* --- ARCHIVE LAYOUT --- */
         .archive-container { padding: 150px 20px 80px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
-        
         .back-btn-container { width: 100%; max-width: 1100px; text-align: left; margin-bottom: 30px; }
         .back-btn { display: inline-block; background: var(--panel-bg); color: var(--text-main); padding: 12px 18px; text-decoration: none; font-size: 0.6rem; border: 4px solid var(--border-dark); box-shadow: 6px 6px 0px var(--border-dark); transition: transform 0.1s; text-transform: uppercase; }
         .back-btn:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
         .back-btn:hover { background: var(--retro-blue); color: #fff; }
-
         .archive-header { margin-bottom: 50px; }
         .archive-header h1 { font-size: 1.5rem; color: var(--retro-gold); text-shadow: 4px 4px 0 var(--border-dark); margin-bottom: 15px; }
         .archive-header p { font-size: 0.65rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.8; }
-
         /* --- THE CARD GRID --- */
         .card-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; max-width: 1150px; margin: 0 auto; }
-        
         .item-card { background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 10px 10px 0px var(--border-dark); width: 340px; padding: 25px 20px 20px; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; opacity: 0; }
         .item-card:hover { transform: translateY(-5px); }
         .item-card.show { animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        
-        /* Animation Delays for all 8 cards */
-        .item-card:nth-child(1).show { animation-delay: 0.1s; } 
-        .item-card:nth-child(2).show { animation-delay: 0.3s; } 
+        .item-card:nth-child(1).show { animation-delay: 0.1s; }
+        .item-card:nth-child(2).show { animation-delay: 0.3s; }
         .item-card:nth-child(3).show { animation-delay: 0.5s; }
         .item-card:nth-child(4).show { animation-delay: 0.7s; }
         .item-card:nth-child(5).show { animation-delay: 0.9s; }
         .item-card:nth-child(6).show { animation-delay: 1.1s; }
         .item-card:nth-child(7).show { animation-delay: 1.3s; }
         .item-card:nth-child(8).show { animation-delay: 1.5s; }
-        
         @keyframes popInReveal { 0% { opacity: 0; transform: translateY(60px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-
-        /* The Pink Pin */
         .item-card::before { content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; background: var(--retro-pink); border: 4px solid var(--border-dark); border-radius: 50%; z-index: 3; box-shadow: inset -2px -2px 0 rgba(0,0,0,0.3); }
         .item-card::after { content: ""; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 4px; height: 25px; background: var(--border-dark); z-index: 1; }
-
         .item-img-wrapper { border: 4px solid var(--border-dark); width: 100%; height: 180px; margin-bottom: 20px; background: #000; position: relative; z-index: 2; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: var(--retro-purple); box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
         .item-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-        
         .item-title { color: var(--retro-green); font-size: 0.8rem; line-height: 1.5; margin-bottom: 12px; text-transform: uppercase; text-shadow: 2px 2px 0 var(--border-dark); }
-        .item-desc { color: var(--text-muted); font-size: 0.55rem; line-height: 1.6; margin-bottom: 25px; flex-grow: 1; font-family: 'VT323', monospace; font-size: 1.1rem; }
-        
+        .item-desc { color: var(--text-muted); line-height: 1.6; margin-bottom: 25px; flex-grow: 1; font-family: 'VT323', monospace; font-size: 1.1rem; }
         .btn-card { display: block; width: 100%; background: var(--retro-blue); color: #fff; border: 4px solid var(--border-dark); padding: 15px; font-size: 0.6rem; text-decoration: none; text-transform: uppercase; box-shadow: 4px 4px 0 var(--border-dark); transition: transform 0.1s, box-shadow 0.1s; margin-top: auto; }
         .btn-card:hover { filter: brightness(1.1); }
         .btn-card:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-
         footer { background: var(--panel-bg); border-top: 4px solid var(--border-dark); padding: 30px; text-align: center; margin-top: auto; transition: background-color 0.3s; position: relative; z-index: 2;}
         .social-links { margin-top: 15px; display: flex; justify-content: center; gap: 20px; }
         .social-links a { color: var(--text-main); font-size: 1.2rem; text-shadow: 2px 2px 0px var(--border-dark); transition: color 0.2s; }
         .social-links a:hover { color: var(--retro-blue); transform: translateY(-3px); }
-
         @media (max-width: 900px) {
             nav { position: absolute; top: 0; left: 0; transform: none; width: 100%; max-width: 100%; border-left: none; border-right: none; border-top: none; padding: 15px 20px; margin: 0; border-radius: 0; }
             .nav-brand-text { display: none; }
@@ -126,12 +102,11 @@
             .btn-talk { display: none; }
             .archive-container { padding-top: 100px; }
         }
+
     </style>
 </head>
 <body>
-
     <div class="scanlines"></div>
-
     <nav>
         <div class="nav-left">
             <div class="jl-badge">JL</div>
@@ -140,33 +115,28 @@
                 <div class="title">Electronics + Software Builder</div>
             </div>
         </div>
-
         <div class="nav-center" id="nav-center-menu">
             <a href="index.html">Home</a>
             <a href="index.html#skills">Skills</a>
             <a href="projects.html" class="active">Projects</a>
             <a href="index.html#contact">Contact</a>
         </div>
-
         <div class="nav-right">
             <a href="index.html#ai-chat" class="btn-talk"><i class="fas fa-comment-dots"></i> TALK TO EIJI</a>
             <button id="theme-btn" class="theme-toggle-btn"><i class="fas fa-sun"></i></button>
             <button id="mobile-menu-btn" class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
-
     <div class="archive-container">
         <div class="back-btn-container">
-            <a href="index.html" class="back-btn">◀ RETURN TO BASE</a>
+            <a href="index.html" class="back-btn">&#9664; RETURN TO BASE</a>
         </div>
-
         <div class="archive-header">
             <h1><i class="fas fa-folder-open"></i> PROJECT ARCHIVE</h1>
             <p>A collection of deployed computational tools and interactive applications built by Jon Lewyn.</p>
         </div>
-
         <div class="card-grid">
-            
+
             <div class="item-card">
                 <div class="item-img-wrapper">
                     <i class="fas fa-wallet"></i>
@@ -175,16 +145,14 @@
                 <p class="item-desc">A neural-linked virtual wealth terminal and budget tracker. Features real-time dashboard analytics and Groq AI financial diagnostics.</p>
                 <a href="projects/capysave.html" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
             <div class="item-card">
-                <div class="item-img-wrapper">
-                    <i class="fas fa-robot"></i>
+                <div class="item-img-wrapper" style="color: var(--retro-green); box-shadow: inset 0 0 20px rgba(74, 222, 128, 0.2);">
+                    <i class="fas fa-user-secret"></i>
                 </div>
-                <h3 class="item-title">Capy OS AI</h3>
-                <p class="item-desc">A customized cyberpunk AI assistant terminal. Features multi-mode personas, persistent memory, and scratchpad context injection.</p>
-                <a href="projects/eiji-ai.html" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
+                <h3 class="item-title">3301 Liber Terminal</h3>
+                <p class="item-desc">A Cicada 3301-inspired AI terminal with a cryptic glyph-rain interface. Multi-mode personas, persistent memory, scratchpad context injection, and voice I/O, powered by Groq AI.</p>
+                <a href="projects/eiji-ai.html" class="btn-card" style="background: var(--retro-green); color: #000; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
             <div class="item-card">
                 <div class="item-img-wrapper" style="color: var(--retro-orange); box-shadow: inset 0 0 20px rgba(255, 184, 108, 0.2);">
                     <i class="fas fa-barcode"></i>
@@ -193,7 +161,6 @@
                 <p class="item-desc">An AI-powered pricing database for the Philippines. Queries Groq AI for standard retail SRP estimates in PHP and USD.</p>
                 <a href="projects/presyodex.html" class="btn-card" style="background: var(--retro-orange); color: #000; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
             <div class="item-card">
                 <div class="item-img-wrapper">
                     <i class="fas fa-gamepad"></i>
@@ -202,7 +169,6 @@
                 <p class="item-desc">An interactive pixelated browser game built entirely with JavaScript, HTML Canvas, and retro physics mechanics.</p>
                 <a href="projects/snake-game.html" class="btn-card"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
             <div class="item-card">
                 <div class="item-img-wrapper" style="color: var(--retro-green); box-shadow: inset 0 0 20px rgba(74, 222, 128, 0.2);">
                     <i class="fas fa-leaf"></i>
@@ -211,7 +177,6 @@
                 <p class="item-desc">An API-chained botanical database. Fetches dynamic plant data via Groq AI while simultaneously retrieving imagery via Wikipedia's Open API.</p>
                 <a href="projects/floradex.html" class="btn-card" style="background: var(--retro-green); color: #000; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
             <div class="item-card">
                 <div class="item-img-wrapper" style="color: var(--retro-blue); box-shadow: inset 0 0 20px rgba(139, 233, 253, 0.2);">
                     <i class="fas fa-satellite-dish"></i>
@@ -220,7 +185,6 @@
                 <p class="item-desc">An AI-driven ISP diagnostic simulator. Uses complex Groq AI prompting to generate realistic network status and latency reports for Philippine regions.</p>
                 <a href="projects/netwatch.html" class="btn-card" style="background: var(--retro-blue); color: #fff; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
             <div class="item-card">
                 <div class="item-img-wrapper" style="color: var(--retro-cyan); box-shadow: inset 0 0 20px rgba(139, 233, 253, 0.2);">
                     <i class="fas fa-fish"></i>
@@ -229,7 +193,6 @@
                 <p class="item-desc">A marine biology database specializing in local Philippine fishes. Uses API Chaining to fetch Groq AI analysis and Wikipedia imagery.</p>
                 <a href="projects/isdadex.html" class="btn-card" style="background: var(--retro-cyan); color: #000; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
             <div class="item-card">
                 <div class="item-img-wrapper" style="color: var(--retro-purple); box-shadow: inset 0 0 20px rgba(189, 147, 249, 0.2);">
                     <i class="fas fa-file-export"></i>
@@ -238,10 +201,8 @@
                 <p class="item-desc">A deployed file conversion utility running on Vercel. Upload a file, choose a target format, and download the converted output straight from the browser.</p>
                 <a href="https://xorn-file-converter.vercel.app/" class="btn-card" style="background: var(--retro-purple); color: #000; border-color: var(--border-dark);"><i class="fas fa-play"></i> LAUNCH APP</a>
             </div>
-
         </div>
     </div>
-
     <footer>
         <p>&copy; 2026 Unfiltered Portfolio.<br>Built by Jon Lewyn Villaram Tanggaro.</p>
         <div class="social-links">
@@ -250,7 +211,6 @@
             <a href="mailto:lewynvllram@gmail.com"><i class="fas fa-envelope"></i></a>
         </div>
     </footer>
-
     <script>
         // UI ONLY - No AI Chat logic here to keep the console clean
         const themeBtn = document.getElementById('theme-btn');
@@ -271,7 +231,6 @@
                 themeIcon.classList.replace('fa-sun', 'fa-moon'); themeIcon.style.color = 'var(--retro-purple)';
             }
         });
-
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const navMenu = document.getElementById('nav-center-menu');
         mobileBtn.addEventListener('click', () => {
@@ -280,7 +239,6 @@
             if (navMenu.classList.contains('show')) icon.classList.replace('fa-bars', 'fa-times');
             else icon.classList.replace('fa-times', 'fa-bars');
         });
-
         const observerOptions = { threshold: 0.1 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -292,5 +250,7 @@
         }, observerOptions);
         document.querySelectorAll('.item-card').forEach(el => observer.observe(el));
     </script>
+
+
 </body>
 </html>
