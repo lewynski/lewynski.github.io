@@ -652,7 +652,7 @@
                     <div class="term-bar">
                         <span class="term-path">eiji@lewyn:~/portfolio$</span>
                         <span class="term-meta">
-                            <span>MODEL <b>llama-3.1-8b</b></span>
+                            <span>MODEL <b>gpt-oss-20b</b></span>
                             <span>LINK <b>/api/chat</b></span>
                         </span>
                     </div>
@@ -918,7 +918,7 @@
         const BOOT_LINES = [
             'eiji-term v1.0 :: cold start',
             'loading persona ......... OK',
-            'model llama-3.1-8b-instant OK',
+            'model openai/gpt-oss-20b .... OK',
             'api key ......... server-side (not in browser)',
             'ready.'
         ];
@@ -968,9 +968,13 @@
 
                 stopWork();
 
-                /* GitHub Pages cannot run serverless functions, so /api/chat 404s there
-                   and often returns an HTML error page instead of JSON. */
-                if (res.status === 404) {
+                let data = null;
+                try { data = await res.json(); } catch (_) { data = null; }
+
+                /* A 404 with no JSON body is Vercel/Pages saying the route does not exist.
+                   A 404 WITH a JSON body came from our own function, so it is an upstream
+                   problem (e.g. a retired model), not a missing backend. */
+                if (res.status === 404 && !data) {
                     linkOnline = false;
                     setReadout('bad', 'OFFLINE');
                     termLine('err', 'no backend at /api/chat (404). this console only runs on the Vercel deployment, not on GitHub Pages.', 'sys>');
@@ -979,13 +983,11 @@
                     return;
                 }
 
-                let data = null;
-                try { data = await res.json(); } catch (_) { data = null; }
-
                 if (!res.ok || !data || data.error) {
                     linkOnline = false;
                     setReadout('warn', 'ERROR');
-                    const msg = (data && data.error) ? data.error : ('request failed (' + res.status + ')');
+                    let msg = (data && data.error) ? data.error : ('request failed (' + res.status + ')');
+                    if (data && data.upstreamStatus) msg += ' [upstream ' + data.upstreamStatus + ']';
                     termLine('err', msg, 'sys>');
                     setBusy(false);
                     setCaret();
