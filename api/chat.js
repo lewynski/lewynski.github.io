@@ -8,7 +8,10 @@
  * { reply: "..." } or { error: "..." }.
  */
 
-const MODEL = 'llama-3.1-8b-instant';
+/* llama-3.1-8b-instant was decommissioned; Groq answers retired models with a
+   404 model_not_found. Override with a MODEL env var if you want to swap it
+   without editing code. Check console.groq.com/docs/deprecations if this 404s. */
+const MODEL = process.env.MODEL || 'openai/gpt-oss-20b';
 const MAX_TOKENS = 220;
 const MAX_MESSAGES = 24;      // trim runaway histories
 const MAX_CHARS = 4000;       // per message
@@ -117,8 +120,13 @@ module.exports = async function handler(req, res) {
 
     if (!upstream.ok) {
       const detail = (data && data.error && data.error.message) || 'Upstream request failed.';
-      /* Never echo the key or raw upstream headers back to the browser. */
-      return res.status(upstream.status).json({ error: detail });
+      /* Never echo the key or raw upstream headers back to the browser.
+         Do NOT forward the upstream status verbatim: a 404 from Groq (retired model)
+         would look identical to "/api/chat does not exist" on the client, which is
+         exactly the wrong diagnosis. Collapse all upstream failures to 502 and keep
+         401/429 distinguishable since the user can act on those. */
+      const status = (upstream.status === 401 || upstream.status === 429) ? upstream.status : 502;
+      return res.status(status).json({ error: detail, upstreamStatus: upstream.status });
     }
 
     const reply =
