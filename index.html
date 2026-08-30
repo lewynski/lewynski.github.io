@@ -217,56 +217,194 @@
         .tags span:hover { transform: scale(1.06); }
 
         .ai-chat-section .section-title p { max-width: 760px; margin: 0 auto; }
-        .ai-shell { max-width: 1150px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: stretch; }
-        .ai-side-panel { background: linear-gradient(180deg, #111827, #1b1b2f); border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark); padding: 24px 18px; text-align: center; position: relative; overflow: hidden; }
-        .ai-side-panel::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(74, 222, 128, 0.08), transparent 40%), linear-gradient(315deg, rgba(59, 130, 246, 0.08), transparent 40%); pointer-events: none; }
-        .ai-avatar-wrap { position: relative; width: 110px; height: 110px; margin: 0 auto 20px; }
-        .ai-avatar-ring { position: absolute; inset: 0; border: 3px dashed var(--retro-blue); border-radius: 50%; animation: spinRing 8s linear infinite; }
-        .ai-avatar { position: absolute; inset: 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at top, #1f2937, #000); border: 3px solid var(--retro-green); color: var(--retro-green); font-size: 2rem; box-shadow: 0 0 20px rgba(74, 222, 128, 0.25); }
-        @keyframes spinRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .ai-side-panel h3 { color: var(--retro-green); font-size: 0.9rem; margin-bottom: 10px; text-shadow: 2px 2px 0px var(--border-dark); }
-        .ai-side-text { font-size: 0.55rem; margin-bottom: 20px; }
-        .ai-status-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
-        .ai-status-item { display: flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.45); border: 2px solid var(--border-dark); padding: 10px; font-size: 0.5rem; color: var(--text-main); text-align: left; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-        .dot.online { background: var(--retro-green); box-shadow: 0 0 12px var(--retro-green); }
-        .dot.thinking { background: var(--retro-gold); box-shadow: 0 0 12px var(--retro-gold); }
-        .dot.secure { background: var(--retro-blue); box-shadow: 0 0 12px var(--retro-blue); }
-        .ai-mini-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .ai-mini-tags span { font-size: 0.45rem; padding: 6px 8px; border: 2px solid var(--border-dark); background: #000; color: var(--retro-pink); }
+        /* ===== AI CONSOLE: CRT TERMINAL ===== */
+        .ai-shell { max-width: 960px; margin: 0 auto; }
+        .crt-cabinet {
+            background: linear-gradient(180deg, #3a3a4e, #23232f 60%, #1a1a24);
+            border: 5px solid var(--border-dark);
+            box-shadow: 10px 10px 0px var(--border-dark), inset 0 2px 0 rgba(255,255,255,0.08);
+            padding: 16px 16px 14px;
+            position: relative;
+        }
+        [data-theme="light"] .crt-cabinet { background: linear-gradient(180deg, #c9c9d8, #a7a7bd 60%, #8f8fa6); }
+        .crt-bezel-top {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap; margin-bottom: 12px; padding: 0 4px;
+        }
+        .crt-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.55rem; color: #e6e6f0; letter-spacing: 1px;
+        }
+        .crt-led {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--retro-green); box-shadow: 0 0 10px var(--retro-green);
+            animation: crtLed 1.6s ease-in-out infinite; flex-shrink: 0;
+        }
+        @keyframes crtLed { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+        .crt-knobs { display: flex; gap: 8px; }
+        .crt-knobs span {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #6b6b80, #2b2b38);
+            border: 2px solid var(--border-dark); display: block;
+        }
+        /* The glass itself */
+        .crt-screen {
+            background: radial-gradient(ellipse at center, #0d1a11 0%, #060a07 70%, #020403 100%);
+            border: 4px solid #000;
+            border-radius: 10px / 16px;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 44px rgba(0,0,0,0.95), inset 0 0 14px rgba(74,222,128,0.10), 0 0 22px rgba(74,222,128,0.10);
+        }
+        /* Scanlines + a faint vignette, drawn over the content */
+        .crt-screen::after {
+            content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+            background:
+                repeating-linear-gradient(to bottom, rgba(0,0,0,0.30) 0px, rgba(0,0,0,0.30) 1px, transparent 1px, transparent 3px),
+                radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+            animation: crtFlicker 5.5s steps(60) infinite;
+        }
+        @keyframes crtFlicker { 0%, 96%, 100% { opacity: 0.85; } 97% { opacity: 0.62; } 98% { opacity: 0.95; } }
 
-        .chat-container { background: var(--panel-bg); max-width: 100%; margin: 0 auto; border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .cool-chat { background: linear-gradient(180deg, var(--panel-bg), #1d2038); }
-        .chat-container::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 2px, transparent 2px, transparent 4px); pointer-events: none; opacity: 0.22; }
-        .chat-header { background: #000; padding: 15px; color: var(--retro-green); border-bottom: 4px solid var(--border-dark); display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.8rem; text-align: left; position: relative; z-index: 2; }
-        .chat-header-left { display: flex; align-items: center; gap: 10px; }
-        .chat-header-right { display: flex; gap: 8px; }
-        .chat-header-right span { width: 12px; height: 12px; border-radius: 50%; display: block; }
-        .chat-header-right span:nth-child(1) { background: #ff5f56; }
-        .chat-header-right span:nth-child(2) { background: #ffbd2e; }
-        .chat-header-right span:nth-child(3) { background: #27c93f; }
 
-        .chat-messages { height: 320px; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: var(--bg-color); font-family: Arial, sans-serif; font-size: 0.9rem; text-align: left; position: relative; z-index: 2; }
-        .chat-messages::-webkit-scrollbar { width: 8px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: var(--border-dark); }
-        .message { padding: 12px 15px; border-radius: 8px; max-width: 80%; line-height: 1.5; border: 2px solid var(--border-dark); animation: messageIn 0.25s ease; }
-        @keyframes messageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .msg-ai { background: var(--panel-bg); color: var(--text-main); align-self: flex-start; box-shadow: 3px 3px 0px var(--border-dark); }
-        .msg-user { background: var(--retro-blue); color: #fff; align-self: flex-end; box-shadow: -3px 3px 0px var(--border-dark); }
+        /* Title bar drawn inside the glass */
+        .term-bar {
+            position: relative; z-index: 6;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; flex-wrap: wrap;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(74,222,128,0.35);
+            background: rgba(74,222,128,0.06);
+            font-family: 'VT323', monospace; font-size: 1rem;
+            color: var(--retro-green); text-align: left;
+            text-shadow: 0 0 6px rgba(74,222,128,0.55);
+        }
+        .term-bar .term-path { opacity: 0.8; }
+        .term-meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.9rem; opacity: 0.85; }
+        .term-meta b { color: var(--retro-gold); font-weight: normal; }
+        /* Readout strip: model / link / state */
+        .term-readout {
+            position: relative; z-index: 6;
+            display: flex; flex-wrap: wrap; gap: 8px;
+            padding: 8px 14px;
+            border-bottom: 1px dashed rgba(74,222,128,0.22);
+            font-family: 'VT323', monospace; font-size: 0.95rem;
+            color: #8fe3ad; text-align: left;
+        }
+        .term-readout span {
+            border: 1px solid rgba(74,222,128,0.32);
+            padding: 1px 8px;
+            background: rgba(0,0,0,0.35);
+            white-space: nowrap;
+        }
+        .term-readout span.warn { color: var(--retro-gold); border-color: rgba(250,204,21,0.45); }
+        .term-readout span.bad { color: var(--retro-red); border-color: rgba(255,85,85,0.5); }
 
-        .quick-prompts { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 15px 15px; background: var(--panel-bg); border-top: 2px solid rgba(255,255,255,0.06); position: relative; z-index: 2; }
-        .prompt-chip { font-family: 'Press Start 2P', cursive; font-size: 0.5rem; padding: 10px 12px; border: 3px solid var(--border-dark); background: #000; color: var(--retro-green); box-shadow: 4px 4px 0px var(--border-dark); transition: transform 0.15s, color 0.2s; }
-        .prompt-chip:hover { transform: translateY(-2px); color: var(--retro-pink); }
+        /* The log: no bubbles, just phosphor lines */
+        .term-log {
+            position: relative; z-index: 6;
+            height: 340px; overflow-y: auto;
+            padding: 14px;
+            font-family: 'VT323', monospace; font-size: 1.15rem; line-height: 1.45;
+            text-align: left; color: #b9f5cd;
+        }
+        .term-log::-webkit-scrollbar { width: 10px; }
+        .term-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+        .term-log::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.35); border: 1px solid rgba(74,222,128,0.5); }
+        .term-line { margin-bottom: 8px; white-space: pre-wrap; word-break: break-word; animation: termIn 0.18s ease; }
+        @keyframes termIn { from { opacity: 0; } to { opacity: 1; } }
+        .term-line .tag { font-weight: bold; margin-right: 8px; }
+        .term-line.boot { color: #6fbf88; opacity: 0.9; }
+        .term-line.boot .tag { color: #6fbf88; }
+        .term-line.ai { color: #c9ffdb; text-shadow: 0 0 7px rgba(74,222,128,0.45); }
+        .term-line.ai .tag { color: var(--retro-green); }
+        .term-line.user { color: #fde68a; text-shadow: 0 0 7px rgba(250,204,21,0.35); }
+        .term-line.user .tag { color: var(--retro-gold); }
+        .term-line.err { color: #ffb3b3; text-shadow: 0 0 7px rgba(255,85,85,0.4); }
+        .term-line.err .tag { color: var(--retro-red); }
+        /* Blinking block cursor */
+        .term-caret {
+            display: inline-block; width: 9px; height: 1.05em;
+            background: var(--retro-green); vertical-align: text-bottom;
+            box-shadow: 0 0 8px rgba(74,222,128,0.7);
+            animation: caretBlink 1s steps(1) infinite;
+        }
+        @keyframes caretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        /* Working indicator: rotating ASCII spinner instead of dots */
+        .term-work { color: var(--retro-green); }
+        .term-work .spin { display: inline-block; width: 1ch; }
 
-        .typing { display: inline-flex; gap: 5px; align-items: center; }
-        .typing span { width: 7px; height: 7px; background: var(--retro-green); display: inline-block; animation: typingBlink 1s infinite ease-in-out; }
-        .typing span:nth-child(2) { animation-delay: 0.15s; } .typing span:nth-child(3) { animation-delay: 0.3s; }
-        @keyframes typingBlink { 0%, 100% { opacity: 0.3; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+        /* Bracketed macro keys */
+        .term-prompts {
+            position: relative; z-index: 6;
+            display: flex; flex-wrap: wrap; gap: 8px;
+            padding: 10px 14px;
+            border-top: 1px dashed rgba(74,222,128,0.22);
+            text-align: left;
+        }
+        .prompt-chip {
+            font-family: 'VT323', monospace; font-size: 1rem;
+            padding: 2px 10px;
+            border: 1px solid rgba(74,222,128,0.45);
+            background: rgba(74,222,128,0.06);
+            color: var(--retro-green);
+            text-transform: uppercase;
+            transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+        }
+        .prompt-chip:hover {
+            background: var(--retro-green); color: #04120a;
+            box-shadow: 0 0 12px rgba(74,222,128,0.55);
+        }
+        .prompt-chip:active { transform: translateY(1px); }
 
-        .chat-input-area { display: flex; padding: 15px; background: var(--panel-bg); border-top: 4px solid var(--border-dark); position: relative; z-index: 2; }
-        .chat-input-area input { flex: 1; padding: 12px; font-family: 'Press Start 2P', cursive; font-size: 0.6rem; background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark); outline: none; }
-        .chat-input-area button { background: var(--retro-green); color: #000; border: 4px solid var(--border-dark); padding: 0 20px; margin-left: 10px; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; transition: transform 0.1s; }
-        .chat-input-area button:active { transform: translateY(2px); }
+        /* Command line */
+        .term-input-row {
+            position: relative; z-index: 6;
+            display: flex; align-items: stretch; gap: 10px;
+            padding: 12px 14px;
+            border-top: 1px solid rgba(74,222,128,0.35);
+            background: rgba(74,222,128,0.05);
+        }
+        .term-sigil {
+            font-family: 'VT323', monospace; font-size: 1.3rem;
+            color: var(--retro-green); align-self: center;
+            text-shadow: 0 0 8px rgba(74,222,128,0.6);
+        }
+        .term-input-row input {
+            flex: 1; min-width: 0;
+            background: transparent; border: none; outline: none;
+            font-family: 'VT323', monospace; font-size: 1.25rem;
+            color: #d6ffe4; caret-color: var(--retro-green);
+            text-shadow: 0 0 7px rgba(74,222,128,0.4);
+        }
+        .term-input-row input::placeholder { color: rgba(185,245,205,0.4); }
+        .term-send {
+            font-family: 'VT323', monospace; font-size: 1.05rem;
+            padding: 4px 14px; letter-spacing: 1px;
+            border: 1px solid var(--retro-green);
+            background: rgba(74,222,128,0.10); color: var(--retro-green);
+            text-transform: uppercase;
+            transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+        }
+        .term-send:hover { background: var(--retro-green); color: #04120a; box-shadow: 0 0 14px rgba(74,222,128,0.6); }
+        .term-send:active { transform: translateY(1px); }
+        /* Cabinet footer plate */
+        .crt-footplate {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; flex-wrap: wrap;
+            margin-top: 12px; padding: 0 4px;
+            font-size: 0.45rem; color: #cfcfe0; opacity: 0.75; letter-spacing: 1px;
+        }
+
+        @media (max-width: 640px) {
+            .crt-cabinet { padding: 12px 10px 10px; box-shadow: 6px 6px 0px var(--border-dark); }
+            .term-log { height: 300px; font-size: 1.05rem; }
+            .term-bar { font-size: 0.9rem; }
+            .term-meta { font-size: 0.8rem; gap: 10px; }
+            .term-readout { font-size: 0.85rem; }
+            .term-input-row input { font-size: 1.1rem; }
+        }
 
         .contact-form { background: var(--panel-bg); max-width: 650px; margin: 0 auto; padding: 30px; border: 4px solid var(--border-dark); box-shadow: 8px 8px 0px var(--border-dark); display: flex; flex-direction: column; gap: 20px; transition: background-color 0.3s; }
         .contact-form input, .contact-form textarea { font-family: 'Press Start 2P', cursive; background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark); padding: 15px; font-size: 0.6rem; outline: none; width: 100%; transition: background-color 0.3s, color 0.3s, transform 0.2s; }
@@ -354,9 +492,9 @@
             .hero-container { min-height: auto; padding: 120px 16px 100px; }
             h1 { font-size: 1.15rem; }
             .hero-stats { grid-template-columns: 1fr; max-width: 350px; }
-            .ai-shell { grid-template-columns: 1fr; }
-            .chat-input-area { flex-direction: column; gap: 10px; }
-            .chat-input-area button { margin-left: 0; padding: 15px; }
+            .ai-shell { max-width: 100%; }
+            .term-input-row { flex-wrap: wrap; }
+            .term-send { width: 100%; padding: 8px; }
 
     
             .sticker-gif {
@@ -370,7 +508,6 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght;700&family=Special+Elite&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="typewriter-theme.css">
 </head>
 <body>
 
@@ -496,70 +633,56 @@
     <section id="ai-chat" class="ai-chat-section reveal">
         <div class="section-title">
             <h2>Lewyn's AI Console</h2>
-            <p>Talk to my personal AI assistant about my projects, skills, and developer journey.</p>
+            <p>A terminal wired to my personal assistant. Ask about my projects, skills, or developer journey.</p>
         </div>
 
         <div class="ai-shell">
-            <div class="ai-side-panel">
-                <div class="ai-avatar-wrap">
-                    <div class="ai-avatar-ring"></div>
-                    <div class="ai-avatar">
-                        <i class="fas fa-robot"></i>
+            <div class="crt-cabinet">
+                <div class="crt-bezel-top">
+                    <div class="crt-brand">
+                        <span class="crt-led"></span>
+                        <span>EIJI-TERM MODEL 01</span>
                     </div>
-                </div>
-
-                <h3>Personal Assistant</h3>
-                <p class="ai-side-text">AI assistant is online and ready to respond.</p>
-
-                <div class="ai-status-list">
-                    <div class="ai-status-item">
-                        <span class="dot online"></span>
-                        <span>STATUS: ONLINE</span>
-                    </div>
-                    <div class="ai-status-item">
-                        <span class="dot thinking"></span>
-                        <span>MODE: ASSISTANT</span>
-                    </div>
-                    <div class="ai-status-item">
-                        <span class="dot secure"></span>
-                        <span>SPEED: 5ms STABLE</span>
-                    </div>
-                </div>
-
-                <div class="ai-mini-tags">
-                    <span>Projects</span>
-                    <span>Skills</span>
-                    <span>Portfolio</span>
-                    <span>ECE</span>
-                </div>
-            </div>
-
-            <div class="chat-container cool-chat">
-                <div class="chat-header">
-                    <div class="chat-header-left">
-                        <i class="fas fa-terminal"></i>
-                        <span>Jon Lewyn's Neural AI Assistant</span>
-                    </div>
-                    <div class="chat-header-right">
+                    <div class="crt-knobs" aria-hidden="true">
                         <span></span><span></span><span></span>
                     </div>
                 </div>
 
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message msg-ai">
-                        Yo, I’m Jon Lewyn's personal AI. Ask me about his Projects, Skills, Tech Stack, or Experience.
+                <div class="crt-screen">
+                    <div class="term-bar">
+                        <span class="term-path">eiji@lewyn:~/portfolio$</span>
+                        <span class="term-meta">
+                            <span>MODEL <b>llama-3.1-8b</b></span>
+                            <span>LINK <b>/api/chat</b></span>
+                        </span>
+                    </div>
+
+                    <div class="term-readout" id="term-readout">
+                        <span id="stat-link">[ LINK: CHECKING ]</span>
+                        <span>[ KEY: SERVER-SIDE ]</span>
+                        <span>[ MODE: ASSISTANT ]</span>
+                        <span>[ TOPICS: PROJECTS / SKILLS / ECE ]</span>
+                    </div>
+
+                    <div class="term-log" id="chat-messages"></div>
+
+                    <div class="term-prompts">
+                        <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's projects">[ projects ]</button>
+                        <button class="prompt-chip" data-prompt="What are Jon Lewyn's technical skills?">[ skills ]</button>
+                        <button class="prompt-chip" data-prompt="What makes Jon Lewyn different as a developer?">[ why him ]</button>
+                        <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's OJT and work experience">[ experience ]</button>
+                    </div>
+
+                    <div class="term-input-row">
+                        <span class="term-sigil">&gt;</span>
+                        <input type="text" id="chat-input" placeholder="type a question and hit enter" autocomplete="off" aria-label="Ask Eiji AI">
+                        <button id="chat-send-btn" class="term-send">send</button>
                     </div>
                 </div>
 
-                <div class="quick-prompts">
-                    <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's projects">Projects</button>
-                    <button class="prompt-chip" data-prompt="What are Jon Lewyn's technical skills?">Skills</button>
-                    <button class="prompt-chip" data-prompt="What makes Jon Lewyn different as a developer?">Why him?</button>
-                </div>
-
-                <div class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Ask Eiji AI something..." autocomplete="off">
-                    <button id="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                <div class="crt-footplate">
+                    <span>EIJI AI CONSOLE</span>
+                    <span>NO KEYS STORED IN BROWSER</span>
                 </div>
             </div>
         </div>
@@ -709,118 +832,208 @@
             }
         });
 
-        // --- AI CHAT LOGIC ---
-        const GROQ_API_KEY = "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";
+        // --- AI CHAT LOGIC (CRT TERMINAL) ---
+        /* No API key here. The key lives in Vercel as GROQ_API_KEY and is only
+           ever read by /api/chat on the server. The browser just talks to /api/chat. */
+        const CHAT_ENDPOINT = '/api/chat';
 
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
+        const chatLog     = document.getElementById('chat-messages');
+        const chatInput   = document.getElementById('chat-input');
         const chatSendBtn = document.getElementById('chat-send-btn');
+        const statLink    = document.getElementById('stat-link');
 
-        const systemPrompt = `You are Eiji AI, the personal AI assistant for Jon Lewyn Villaram Tanggaro.
-You are embedded on his developer portfolio website. Keep answers concise, friendly, and slightly retro/cyberpunk in tone.
+        /* Only user/assistant turns. The system prompt is injected server-side. */
+        let conversationHistory = [];
+        let chatBusy = false;
+        let linkOnline = null;   /* null = untested, true/false after first call */
 
-Information about Jon Lewyn:
-- He is an Electronics Engineering student at Polytechnic University of the Philippines (PUP) Santo Tomas Campus.
-- He is a Web Developer bridging hardware and software.
-- Skills: Python, JavaScript, HTML/CSS, Java, C++, Arduino Uno, FPGA, AutoCAD, MATLAB, Multisim, Proteus, MS Office, Macro automation.
-- Experience: Intern (OJT) at Bandai Wireharness Philippines (developed automated system with the help of Macro Programming Language). Work Immersion at NOCECO.
-- Projects: CapySave (Virtual Wallet Monitoring), Capy Save AI, NetWatch (Ping Monitoring), Retro Snake Game, Floradex (Flower WIKI).
-- Affiliations: OECES Special Project Officer, IECEP Batangas Student Chapter.
+        function scrollLog() {
+            if (chatLog) chatLog.scrollTop = chatLog.scrollHeight;
+        }
 
-If the user asks a question about Jon Lewyn Tanggaro, answer accurately based on this data. If they just want to chat, be conversational and polite. Never output code formatting or markdown in your responses.`;
+        function termLine(kind, text, tag) {
+            if (!chatLog) return null;
+            const line = document.createElement('div');
+            line.className = 'term-line ' + kind;
+            if (tag) {
+                const t = document.createElement('span');
+                t.className = 'tag';
+                t.textContent = tag;
+                line.appendChild(t);
+            }
+            const body = document.createElement('span');
+            body.textContent = text;
+            line.appendChild(body);
+            chatLog.appendChild(line);
+            scrollLog();
+            return line;
+        }
 
-        let conversationHistory = [
-            { role: "system", content: systemPrompt }
+        function setReadout(state, label) {
+            if (!statLink) return;
+            statLink.textContent = '[ LINK: ' + label + ' ]';
+            statLink.classList.remove('warn', 'bad');
+            if (state === 'warn') statLink.classList.add('warn');
+            if (state === 'bad')  statLink.classList.add('bad');
+        }
+        const SPIN_FRAMES = ['|', '/', '-', '\\'];
+        let spinTimer = null;
+
+        function startWork() {
+            const line = document.createElement('div');
+            line.className = 'term-line term-work';
+            line.id = 'term-working';
+            const spin = document.createElement('span');
+            spin.className = 'spin';
+            spin.textContent = SPIN_FRAMES[0];
+            const label = document.createElement('span');
+            label.textContent = ' querying model...';
+            line.appendChild(spin);
+            line.appendChild(label);
+            chatLog.appendChild(line);
+            scrollLog();
+            let i = 0;
+            spinTimer = setInterval(() => {
+                i = (i + 1) % SPIN_FRAMES.length;
+                spin.textContent = SPIN_FRAMES[i];
+            }, 120);
+        }
+
+        function stopWork() {
+            if (spinTimer) { clearInterval(spinTimer); spinTimer = null; }
+            const line = document.getElementById('term-working');
+            if (line) line.remove();
+        }
+
+        function setCaret() {
+            const old = chatLog.querySelector('.term-caret');
+            if (old) old.remove();
+            const caret = document.createElement('span');
+            caret.className = 'term-caret';
+            chatLog.appendChild(caret);
+            scrollLog();
+        }
+
+        /* Boot sequence: prints a few lines with a small delay so it feels like a console. */
+        const BOOT_LINES = [
+            'eiji-term v1.0 :: cold start',
+            'loading persona ......... OK',
+            'model llama-3.1-8b-instant OK',
+            'api key ......... server-side (not in browser)',
+            'ready.'
         ];
 
-        function addMessageToUI(message, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-ai');
-            msgDiv.textContent = message;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        function bootSequence() {
+            if (!chatLog) return;
+            let i = 0;
+            const step = () => {
+                if (i < BOOT_LINES.length) {
+                    termLine('boot', BOOT_LINES[i]);
+                    i++;
+                    setTimeout(step, 260);
+                } else {
+                    termLine('ai', "Hey, I'm Eiji AI. Ask me anything about Jon Lewyn's projects, skills, or engineering journey.", 'eiji>');
+                    setCaret();
+                }
+            };
+            setTimeout(step, 400);
+        }
+        function setBusy(busy) {
+            chatBusy = busy;
+            if (chatSendBtn) chatSendBtn.disabled = busy;
+            if (chatInput)   chatInput.disabled = busy;
         }
 
-        function addTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.classList.add('message', 'msg-ai');
-            typingDiv.id = 'typing-indicator';
-            typingDiv.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
-            chatMessages.appendChild(typingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+        async function handleSend(presetText) {
+            if (chatBusy) return;
+            const text = (presetText !== undefined ? presetText : (chatInput ? chatInput.value : '')).trim();
+            if (!text) return;
 
-        function removeTypingIndicator() {
-            const typingDiv = document.getElementById('typing-indicator');
-            if (typingDiv) typingDiv.remove();
-        }
+            const caret = chatLog.querySelector('.term-caret');
+            if (caret) caret.remove();
 
-        async function handleSend() {
-            const userText = chatInput.value.trim();
-            if (!userText) return;
+            if (chatInput && presetText === undefined) chatInput.value = '';
+            termLine('user', text, 'you>');
+            conversationHistory.push({ role: 'user', content: text });
 
-            addMessageToUI(userText, 'user');
-            conversationHistory.push({ role: "user", content: userText });
-            chatInput.value = '';
-            addTypingIndicator();
-
-            if (!GROQ_API_KEY || GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
-                setTimeout(() => {
-                    removeTypingIndicator();
-                    addMessageToUI("System error: API key not configured yet.", 'ai');
-                }, 500);
-                return;
-            }
+            setBusy(true);
+            startWork();
 
             try {
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${GROQ_API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
-                        messages: conversationHistory,
-                        temperature: 0.7,
-                        max_tokens: 150
-                    })
+                const res = await fetch(CHAT_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: conversationHistory })
                 });
 
-                if (!response.ok) {
-                    const errorDetails = await response.json();
-                    throw new Error(errorDetails.error?.message || "Request failed.");
+                stopWork();
+
+                /* GitHub Pages cannot run serverless functions, so /api/chat 404s there
+                   and often returns an HTML error page instead of JSON. */
+                if (res.status === 404) {
+                    linkOnline = false;
+                    setReadout('bad', 'OFFLINE');
+                    termLine('err', 'no backend at /api/chat (404). this console only runs on the Vercel deployment, not on GitHub Pages.', 'sys>');
+                    setBusy(false);
+                    setCaret();
+                    return;
                 }
 
-                const data = await response.json();
+                let data = null;
+                try { data = await res.json(); } catch (_) { data = null; }
 
-                if (data.choices && data.choices.length > 0) {
-                    const aiResponse = data.choices[0].message.content;
-                    removeTypingIndicator();
-                    addMessageToUI(aiResponse, 'ai');
-                    conversationHistory.push({ role: "assistant", content: aiResponse });
-                } else {
-                    throw new Error("Invalid API response format");
+                if (!res.ok || !data || data.error) {
+                    linkOnline = false;
+                    setReadout('warn', 'ERROR');
+                    const msg = (data && data.error) ? data.error : ('request failed (' + res.status + ')');
+                    termLine('err', msg, 'sys>');
+                    setBusy(false);
+                    setCaret();
+                    return;
                 }
 
-            } catch (error) {
-                removeTypingIndicator();
-                addMessageToUI("Transmission failed: " + error.message, 'ai');
-                console.error("Chat Error:", error);
+                linkOnline = true;
+                setReadout('ok', 'ONLINE');
+                const reply = data.reply || '(empty response)';
+                termLine('ai', reply, 'eiji>');
+                conversationHistory.push({ role: 'assistant', content: reply });
+            } catch (err) {
+                stopWork();
+                linkOnline = false;
+                setReadout('bad', 'OFFLINE');
+                termLine('err', 'could not reach /api/chat. if you are viewing this on GitHub Pages, the AI backend only exists on the Vercel deployment.', 'sys>');
             }
+
+            setBusy(false);
+            setCaret();
+        }
+        if (chatSendBtn) chatSendBtn.addEventListener('click', () => handleSend());
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
+            });
         }
 
-        chatSendBtn.addEventListener('click', handleSend);
-        chatInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') handleSend();
-        });
-
-        document.querySelectorAll('.prompt-chip').forEach(chip => {
+        document.querySelectorAll('.prompt-chip').forEach((chip) => {
             chip.addEventListener('click', () => {
-                chatInput.value = chip.dataset.prompt;
-                handleSend();
+                const q = chip.getAttribute('data-prompt');
+                if (q) handleSend(q);
             });
         });
+
+        /* Probe the backend once so the readout is honest before the first question.
+           A HEAD/GET on the endpoint returns 405 when the function exists, 404 when it doesn't. */
+        (function probeLink() {
+            if (!statLink) return;
+            fetch(CHAT_ENDPOINT, { method: 'GET' })
+                .then((res) => {
+                    if (res.status === 404) { setReadout('bad', 'OFFLINE'); linkOnline = false; }
+                    else { setReadout('ok', 'READY'); linkOnline = true; }
+                })
+                .catch(() => { setReadout('bad', 'OFFLINE'); linkOnline = false; });
+        })();
+
+        bootSequence();
     </script>
 </body>
 </html>
