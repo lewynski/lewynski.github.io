@@ -93,8 +93,27 @@
         }
 
         .cert-info { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .cert-info h3 { font-size: 0.65rem; color: var(--retro-green); margin-bottom: 10px; line-height: 1.5; }
-        .cert-info p { font-size: 0.55rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;}
+        .cert-info h3 { font-size: 0.65rem; color: var(--retro-green); margin-bottom: 12px; line-height: 1.5; }
+
+        /* Intro blurb describing each seminar/event */
+        .cert-desc {
+            font-size: 0.5rem;
+            color: var(--text-main);
+            line-height: 1.9;
+            text-align: left;
+            margin-bottom: 16px;
+            opacity: 0.92;
+        }
+
+        /* Institution + date meta line */
+        .cert-meta {
+            font-size: 0.5rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 18px;
+            padding-top: 12px;
+            border-top: 2px solid rgba(189, 147, 249, 0.25);
+        }
 
         /* Pin icon */
         .pin {
@@ -136,7 +155,8 @@
             <img src="certificates/cert1.png" alt="RF Engineering Certificate" class="cert-image">
             <div class="cert-info">
                 <h3>HARNESSING INVISIBLE WAVES: RF ENGINEERING</h3>
-                <p>Polytechnic University of the Philippines - Sto. Tomas Campus<br>March 14, 2026</p>
+                <p class="cert-desc">A seminar on how radio frequency engineering reaches beyond communications into therapeutic and medical innovation &mdash; covering RF fundamentals, wave behavior, and their real-world biomedical applications.</p>
+                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>March 14, 2026</p>
                 <a href="certificates/cert1.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
             </div>
         </div>
@@ -146,7 +166,8 @@
             <img src="certificates/cert2.png" alt="Manufacturing Certificate" class="cert-image">
             <div class="cert-info">
                 <h3>FUTURE-READY MANUFACTURING</h3>
-                <p>Polytechnic University of the Philippines - Sto. Tomas Campus<br>March 14, 2026</p>
+                <p class="cert-desc">A deep dive into the trends and technologies reshaping modern industry &mdash; from automation and smart factories to the innovations driving the next wave of industrial evolution.</p>
+                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>March 14, 2026</p>
                 <a href="certificates/cert2.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
             </div>
         </div>
@@ -156,7 +177,8 @@
             <img src="certificates/cert3.png" alt="Electronext Certificate" class="cert-image">
             <div class="cert-info">
                 <h3>ELECTRONEXT: TRANSCEIVER REGS & PRACTICE</h3>
-                <p>Polytechnic University of the Philippines - Sto. Tomas Campus<br>May 24, 2024</p>
+                <p class="cert-desc">A comprehensive guide to radio transceiver regulations, permitting, and professional practice in Electronics Engineering &mdash; essential groundwork for licensure and real-world compliance.</p>
+                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>May 24, 2024</p>
                 <a href="certificates/cert3.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
             </div>
         </div>
@@ -166,18 +188,53 @@
             <img src="certificates/cert4.png" alt="Batangas ECE Student Summit" class="cert-image">
             <div class="cert-info">
                 <h3>2ND BATANGAS ECE STUDENT SUMMIT</h3>
-                <p>IECEP-BatESC / Batangas State University<br>March 8, 2025</p>
+                <p class="cert-desc">A regional gathering of ECE students under the theme "Beyond BoundarECE: Harnessing Innovation and Unlocking Possibilities" &mdash; a day of industry talks, networking, and professional development.</p>
+                <p class="cert-meta">IECEP-BatESC &middot; Batangas State University, Alangilan<br>March 8, 2025</p>
                 <a href="certificates/cert4.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
             </div>
         </div>
 
-                <div class="cert-card">
+        <div class="cert-card">
             <div class="pin"></div>
-            <img src="certificates/cert5.png" alt="Batangas ECE Student Summit" class="cert-image">
+            <img src="certificates/cert5.png" alt="The Future of Connectivity Certificate" class="cert-image">
             <div class="cert-info">
                 <h3>THE FUTURE OF CONNECTIVITY</h3>
-                <p>THE FUTURE OF CONNECTIVITY - How Fiber Networks Power Emerging Technologies.<br>APRIL 18, 2025</p>
-                <a href="certificates/cert4.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
+                <p class="cert-desc">A seminar on how fiber optic networks power emerging technologies &mdash; the backbone behind high-speed connectivity, 5G, and an increasingly data-driven world.</p>
+                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>April 18, 2026</p>
+                <a href="certificates/cert5.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
+            </div>
+        </div>
+
+        <div class="cert-card">
+            <div class="pin"></div>
+            <img src="certificates/cert6.png" alt="Basic Fiber Optics Training Certificate" class="cert-image">
+            <div class="cert-info">
+                <h3>BASIC FIBER OPTICS TRAINING</h3>
+                <p class="cert-desc">Hands-on training in the fundamentals of fiber optics &mdash; cable types, splicing, termination, and testing &mdash; completed through G-Connect's technical program.</p>
+                <p class="cert-meta">G-Connect Systems & Trading Corp. - Malvar, Batangas<br>July 20, 2026</p>
+                <a href="certificates/cert6.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
+            </div>
+        </div>
+
+        <div class="cert-card">
+            <div class="pin"></div>
+            <img src="certificates/cert7.png" alt="Data Center, FTTH & Networking Training Certificate" class="cert-image">
+            <div class="cert-info">
+                <h3>DATA CENTER, FTTH & NETWORKING TRAINING</h3>
+                <p class="cert-desc">Practical training in data center operations, Fiber-to-the-Home (FTTH) deployment, and core networking &mdash; building real-world skills in modern connectivity infrastructure.</p>
+                <p class="cert-meta">G-Connect Systems & Trading Corp. - Malvar, Batangas<br>August 16, 2026</p>
+                <a href="certificates/cert7.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
+            </div>
+        </div>
+
+        <div class="cert-card">
+            <div class="pin"></div>
+            <img src="certificates/cert8.png" alt="On-the-Job Training Completion Certificate" class="cert-image">
+            <div class="cert-info">
+                <h3>ON-THE-JOB TRAINING (240 HRS)</h3>
+                <p class="cert-desc">Completion of a 240-hour on-the-job training program at G-Connect Systems & Trading Corp., applying fiber optics and networking skills in a live industry setting.</p>
+                <p class="cert-meta">G-Connect Systems & Trading Corp. - Malvar, Batangas<br>July 6 &ndash; August 21, 2026</p>
+                <a href="certificates/cert8.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
             </div>
         </div>
 
