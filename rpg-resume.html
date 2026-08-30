@@ -3,30 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lewyn's Journey - Spider-GBA Edition</title>
+    <title>Lewyn's Journey - Web-Slinger Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* City Night / Spider-Verse Background */
-            --body-bg-1: #0f172a;
-            --body-bg-2: #020617;
-            
-            /* Spider-Man Red Shell Colors */
-            --gba-shell: #c81912;
-            --gba-shell-dark: #8b120d;
-            --gba-shell-light: #ea2922;
-            
-            /* Spider-Man Blue Accent Colors */
-            --spidey-blue: #0953a7;
-            --spidey-blue-dark: #053266;
-            --spidey-blue-light: #1b73d3;
-            
-            --screen-frame: #111111;
-            --screen-inner: #98c870; /* Kept classic green for the screen itself */
-            --text-dark: #1b1b1b;
-            --panel-border: #1e293b;
+            --ink: #14100f;
+            --paper: #f6ecd6;
+            --paper-dark: #e4d5b7;
+            --web-red: #d12b2b;
+            --web-red-dark: #98191c;
+            --web-blue: #1d3fa8;
+            --web-blue-dark: #12266b;
+            --caption-yellow: #ffd93d;
+            --halftone: rgba(20, 16, 15, 0.16);
         }
         * {
             box-sizing: border-box;
@@ -40,18 +31,48 @@
         body {
             min-height: 100vh;
             padding: 20px;
-            font-family: 'Press Start 2P', cursive;
-            color: #fff;
-            background:
-                radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 30%),
-                linear-gradient(180deg, var(--body-bg-1), var(--body-bg-2));
+            font-family: 'Comic Neue', 'Segoe UI', sans-serif;
+            font-weight: 700;
+            color: var(--ink);
+            background-color: var(--web-red);
+            background-image:
+                radial-gradient(circle, var(--halftone) 1.3px, transparent 1.4px),
+                linear-gradient(135deg, var(--web-red) 0%, var(--web-red-dark) 45%, var(--web-blue-dark) 100%);
+            background-size: 7px 7px, 100% 100%;
             cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
+        }
+        /* --- CORNER WEBBING (decorative) --- */
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 260px;
+            height: 260px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23140f0f' stroke-width='2'%3E%3Cpath d='M0 0 L120 40'/%3E%3Cpath d='M0 0 L120 80'/%3E%3Cpath d='M0 0 L120 120'/%3E%3Cpath d='M0 0 L80 120'/%3E%3Cpath d='M0 0 L40 120'/%3E%3Cpath d='M30 0 Q26 26 0 30'/%3E%3Cpath d='M55 0 Q48 48 0 55'/%3E%3Cpath d='M80 0 Q70 70 0 80'/%3E%3Cpath d='M105 0 Q92 92 0 105'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        body::before {
+            top: 0;
+            left: 0;
+        }
+        body::after {
+            top: 0;
+            right: 0;
+            transform: scaleX(-1);
         }
         .page-wrap {
             max-width: 1450px;
             margin: 0 auto;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
+
+        /* --- TOP BAR --- */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -63,18 +84,20 @@
         .back-btn {
             display: inline-block;
             text-decoration: none;
-            color: #fff;
-            font-size: 0.65rem;
-            /* Updated to Spider-Man Blue */
-            background: linear-gradient(180deg, var(--spidey-blue-light), var(--spidey-blue));
-            padding: 14px 18px;
-            border: 4px solid #03152b;
-            box-shadow: 5px 5px 0 #020b17;
+            color: var(--ink);
+            font-family: 'Bangers', cursive;
+            font-size: 1.15rem;
+            letter-spacing: 1.5px;
+            background: var(--caption-yellow);
+            padding: 12px 20px;
+            border: 4px solid var(--ink);
+            box-shadow: 6px 6px 0 var(--ink);
             transition: 0.12s ease;
         }
         .back-btn:hover {
             transform: translate(-2px, -2px);
-            box-shadow: 7px 7px 0 #020b17;
+            box-shadow: 8px 8px 0 var(--ink);
+            background: #fff;
         }
         .page-header {
             text-align: center;
@@ -82,21 +105,23 @@
             min-width: 0;
         }
         .page-header h1 {
-            font-size: 1.4rem;
-            color: #ffffff;
-            /* Spider-Man text styling */
-            text-shadow:
-                3px 3px 0 var(--spidey-blue),
-                -3px -3px 0 var(--gba-shell),
-                6px 6px 0 rgba(0,0,0,0.5);
-            margin-bottom: 10px;
-            line-height: 1.4;
+            font-family: 'Bangers', cursive;
+            font-size: 3.1rem;
+            line-height: 1;
+            letter-spacing: 3px;
+            color: var(--caption-yellow);
+            -webkit-text-stroke: 3px var(--ink);
+            paint-order: stroke fill;
+            text-shadow: 6px 6px 0 var(--web-blue);
+            margin-bottom: 8px;
         }
         .page-header p {
-            font-size: 0.60rem;
-            color: #94a3b8;
-            letter-spacing: 1px;
-            line-height: 1.6;
+            font-family: 'Comic Neue', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+            text-shadow: 2px 2px 0 var(--ink);
+            letter-spacing: 0.5px;
         }
         .layout-container {
             display: grid;
@@ -110,362 +135,280 @@
             gap: 18px;
             min-width: 0;
         }
+
+        /* --- COMIC PANELS (left column) --- */
         .panel {
-            background: linear-gradient(180deg, #fcfcfc, #ececec);
-            color: var(--text-dark);
-            border: 6px solid var(--panel-border);
-            border-radius: 14px;
-            padding: 18px;
-            box-shadow:
-                inset 0 0 0 3px #d8d8d8,
-                8px 8px 0 rgba(0,0,0,0.4);
+            background-color: var(--paper);
+            background-image: radial-gradient(circle, rgba(20,16,15,0.10) 1.1px, transparent 1.2px);
+            background-size: 6px 6px;
+            color: var(--ink);
+            border: 5px solid var(--ink);
+            padding: 16px;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.45);
             position: relative;
-            overflow: hidden;
-        }
-        .panel::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            /* Spidey gradient on panels */
-            background: linear-gradient(90deg, var(--gba-shell), var(--spidey-blue), #ffffff);
         }
         .panel h3 {
-            margin-top: 8px;
-            margin-bottom: 16px;
-            font-size: 0.8rem;
-            color: var(--gba-shell);
-            border-bottom: 2px dashed #aaaaaa;
-            padding-bottom: 10px;
+            font-family: 'Bangers', cursive;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            color: var(--paper);
+            background: var(--web-red);
+            border: 3px solid var(--ink);
+            padding: 6px 12px;
+            margin: -6px -6px 16px -6px;
+            transform: rotate(-1.2deg);
+            box-shadow: 4px 4px 0 var(--ink);
         }
+
+        /* --- SPEECH BUBBLES --- */
         .chat-msg {
             background: #fff;
-            border: 3px solid #b0b0b0;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
-            font-family: 'VT323', monospace;
-            font-size: 1.25rem;
-            line-height: 1.2;
+            border: 3px solid var(--ink);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-family: 'Comic Neue', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            line-height: 1.35;
+            position: relative;
+        }
+        .chat-msg::after {
+            content: "";
+            position: absolute;
+            left: 26px;
+            bottom: -14px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 16px solid transparent;
+            border-top: 14px solid var(--ink);
+        }
+        .chat-msg::before {
+            content: "";
+            position: absolute;
+            left: 29px;
+            bottom: -9px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 13px solid transparent;
+            border-top: 11px solid #fff;
+            z-index: 1;
         }
         .chat-msg.tip {
-            border-color: var(--spidey-blue);
-            background: #f0f5ff;
+            background: var(--caption-yellow);
         }
+        .chat-msg.tip::before { border-top-color: var(--caption-yellow); }
+        .speaker-name {
+            font-family: 'Bangers', cursive;
+            font-size: 1.15rem;
+            letter-spacing: 1px;
+            color: var(--web-red);
+        }
+        .speaker-name.blue { color: var(--web-blue); }
+
+        /* --- CONTROLS KEYS --- */
         .keyboard-layout {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 16px;
+            gap: 7px;
+            margin-bottom: 14px;
         }
         .key-row {
             display: flex;
-            gap: 6px;
+            gap: 7px;
         }
         .key {
-            width: 42px;
-            height: 42px;
-            border-radius: 6px;
-            background: linear-gradient(180deg, #f2f2f2, #d9d9d9);
-            border: 4px solid #8b8b8b;
+            width: 44px;
+            height: 44px;
+            background: var(--paper);
+            border: 4px solid var(--ink);
+            box-shadow: 4px 4px 0 var(--ink);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #333;
-            font-size: 0.75rem;
-            box-shadow: inset -2px -2px 0 #bfbfbf;
+            color: var(--ink);
+            font-family: 'Bangers', cursive;
+            font-size: 1.4rem;
         }
         .instruction-text {
             text-align: center;
-            font-family: 'VT323', monospace;
-            font-size: 1.25rem;
-            color: #444;
-            line-height: 1.25;
+            font-family: 'Comic Neue', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--ink);
+            line-height: 1.4;
         }
         .right-column {
             display: flex;
             justify-content: center;
             min-width: 0;
         }
-        .gba-console {
+        /* --- COMIC PAGE (the outer newsprint page holding the panels) --- */
+        .comic-page {
             width: 100%;
             max-width: 980px;
-            /* Simulated Web Pattern + Red Shell */
-            background: 
-                repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 18px),
-                repeating-linear-gradient(-45deg, rgba(0,0,0,0.08) 0, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 18px),
-                linear-gradient(180deg, var(--gba-shell-light), var(--gba-shell));
-            border: 8px solid var(--gba-shell-dark);
-            border-radius: 34px 34px 90px 34px;
-            padding: 24px 24px 22px;
-            box-shadow:
-                inset 0 2px 0 rgba(255,255,255,0.4),
-                0 18px 35px rgba(0,0,0,0.6);
-            position: relative;
+            background-color: var(--paper);
+            background-image: radial-gradient(circle, rgba(20,16,15,0.09) 1.1px, transparent 1.2px);
+            background-size: 6px 6px;
+            border: 7px solid var(--ink);
+            padding: 18px;
+            box-shadow: 12px 12px 0 rgba(0,0,0,0.45);
         }
-        .gba-top-label {
+
+        /* Masthead strip: issue no. / title / price */
+        .page-masthead {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
-            padding: 0 8px;
-            color: #ffffff;
-            font-size: 0.52rem;
-            opacity: 0.95;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+            border-bottom: 4px solid var(--ink);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
         }
-        .power-led-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.45rem;
+        .masthead-issue {
+            font-family: 'Bangers', cursive;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            background: var(--web-blue);
+            color: #fff;
+            border: 3px solid var(--ink);
+            padding: 3px 10px;
         }
-        .power-led {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #ff3d3d;
-            box-shadow: 0 0 8px #ff3d3d;
-            animation: ledPulse 1.2s infinite;
+        .masthead-title {
+            font-family: 'Bangers', cursive;
+            font-size: 1.35rem;
+            letter-spacing: 2px;
+            color: var(--web-red);
         }
-        @keyframes ledPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: .55; transform: scale(.92); }
+        .masthead-price {
+            font-family: 'Bangers', cursive;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: var(--ink);
+            border: 3px solid var(--ink);
+            padding: 3px 10px;
+            background: var(--caption-yellow);
         }
-        .screen-shell {
-            background: linear-gradient(180deg, #1f1f1f, #050505);
-            border-radius: 22px 22px 46px 22px;
-            padding: 18px 18px 24px;
-            box-shadow:
-                inset 0 2px 0 rgba(255,255,255,0.08),
-                inset 0 -3px 0 rgba(0,0,0,0.7);
+        /* --- SPLASH PANEL (holds the game canvas) --- */
+        .splash-panel {
+            border: 5px solid var(--ink);
+            background: #fff;
+            padding: 0;
             position: relative;
         }
-        .screen-top-deco {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            color: #888;
-            font-size: 0.48rem;
-            padding: 0 6px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .screen-top-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .screen-led {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ff3d3d;
-            box-shadow: 0 0 6px #ff3d3d;
+        .panel-caption {
+            font-family: 'Comic Neue', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            background: var(--caption-yellow);
+            border-bottom: 5px solid var(--ink);
+            padding: 8px 12px;
+            color: var(--ink);
+            letter-spacing: 0.3px;
         }
         #game-wrapper {
             width: 100%;
             height: 650px;
-            background: #000;
-            border: 10px solid #050505;
-            border-radius: 10px;
+            background: #1b2340;
             overflow: hidden;
             position: relative;
-            box-shadow:
-                inset 0 0 0 4px #1d1d1d,
-                0 6px 0 rgba(0,0,0,0.6);
         }
-        .screen-bottom-logo {
-            text-align: center;
-            font-size: 0.5rem;
-            color: #cfcfcf;
-            margin-top: 14px;
+        .panel-footer {
+            font-family: 'Bangers', cursive;
+            font-size: 1rem;
             letter-spacing: 2px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
+            text-align: center;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 6px;
         }
-        .screen-bottom-logo i {
-            color: #444; /* Dark Spider Logo */
-            font-size: 1.4rem;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.1);
-        }
-        .gba-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 26px;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .dpad-shell {
-            width: 170px;
-            height: 170px;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .dpad-piece {
-            position: absolute;
-            /* Updated to Spidey Blue */
-            background: linear-gradient(180deg, var(--spidey-blue-light), var(--spidey-blue-dark));
-            border: 3px solid #010c17;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-        .dpad-v {
-            width: 54px;
-            height: 170px;
-            left: 58px;
-            top: 0;
-            border-radius: 10px;
-        }
-        .dpad-h {
-            width: 170px;
-            height: 54px;
-            left: 0;
-            top: 58px;
-            border-radius: 10px;
-        }
-        .dpad-center-dot {
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            /* Center of the D-Pad */
-            background: var(--spidey-blue);
-            border: 2px solid #010c17;
-            left: 72px;
-            top: 72px;
-            z-index: 2;
-        }
-        .controls-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            flex: 1;
-            min-width: 140px;
-        }
-        .select-start {
-            display: flex;
-            gap: 14px;
-            align-items: center;
-            justify-content: center;
-        }
-        .oval-btn {
-            width: 58px;
-            height: 16px;
-            border-radius: 20px;
-            background: linear-gradient(180deg, #333, #111);
-            border: 2px solid #000;
-            transform: rotate(-18deg);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-        .oval-labels {
-            display: flex;
-            gap: 26px;
-            font-size: 0.42rem;
-            color: #ffffff;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-            opacity: 0.9;
-        }
-        .speaker {
+
+        /* --- CONTROL STRIP (3 mini comic panels) --- */
+        .comic-strip {
             display: grid;
-            grid-template-columns: repeat(5, 8px);
-            gap: 8px 10px;
-            transform: rotate(-18deg);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 16px;
         }
-        .speaker span {
-            width: 4px;
-            height: 18px;
-            border-radius: 5px;
-            background: rgba(0,0,0,0.6);
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.2);
+        .strip-panel {
+            border: 4px solid var(--ink);
+            background: #fff;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 5px 5px 0 var(--ink);
+        }
+        .strip-panel i {
+            font-size: 1.5rem;
+            color: var(--web-red);
+            margin-bottom: 6px;
             display: block;
         }
-        .ab-shell {
-            width: 200px;
-            height: 140px;
-            position: relative;
-            flex-shrink: 0;
+        .strip-panel .strip-title {
+            font-family: 'Bangers', cursive;
+            font-size: 1.05rem;
+            letter-spacing: 1.5px;
+            color: var(--web-blue);
+            display: block;
+            margin-bottom: 3px;
         }
-        .ab-btn {
-            position: absolute;
-            width: 74px;
-            height: 74px;
-            border-radius: 50%;
-            /* Bright Spidey Blue Buttons */
-            background: linear-gradient(180deg, var(--spidey-blue-light), var(--spidey-blue));
-            border: 4px solid #021124;
-            color: #fff;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow:
-                inset 0 3px 0 rgba(255,255,255,0.3),
-                0 6px 0 rgba(0,0,0,0.5);
+        .strip-panel .strip-body {
+            font-family: 'Comic Neue', sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            line-height: 1.3;
+            color: var(--ink);
         }
-        .ab-btn.a { right: 10px; top: 20px; }
-        .ab-btn.b { left: 25px; top: 52px; }
-        .ab-label {
-            position: absolute;
-            color: #ffffff;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-            font-size: 0.55rem;
-            opacity: 0.9;
-        }
-        .ab-label.a { right: 34px; top: 102px; }
-        .ab-label.b { left: 54px; top: 132px; }
+
+        /* --- DIALOGUE (speech bubble over the canvas) --- */
         #dialogue-overlay {
             position: absolute;
             left: 50%;
             bottom: 18px;
             transform: translateX(-50%);
-            width: calc(100% - 20px);
+            width: calc(100% - 24px);
             max-width: 720px;
-            background: #f8f8f8;
-            border: 6px solid #3f3f3f;
-            border-radius: 12px;
-            box-shadow:
-                inset 0 0 0 4px #b9b9b9,
-                0 8px 0 rgba(0,0,0,0.42);
-            padding: 18px 20px 34px;
+            background: #fff;
+            border: 5px solid var(--ink);
+            border-radius: 18px;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+            padding: 0 0 26px;
             display: none;
             z-index: 10;
+            overflow: hidden;
         }
         #dialogue-title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.65rem;
-            color: var(--gba-shell);
-            margin-bottom: 10px;
+            font-family: 'Bangers', cursive;
+            font-size: 1.35rem;
+            letter-spacing: 2px;
+            color: var(--ink);
+            background: var(--caption-yellow);
+            border-bottom: 4px solid var(--ink);
+            padding: 7px 16px;
             text-transform: uppercase;
-            line-height: 1.5;
         }
         #dialogue-text {
-            font-family: 'VT323', monospace;
-            font-size: 1.65rem;
-            line-height: 1.22;
-            color: #1b1b1b;
+            font-family: 'Comic Neue', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            line-height: 1.4;
+            color: var(--ink);
+            padding: 14px 18px 0;
         }
-        #dialogue-text strong {
-            color: var(--spidey-blue);
-        }
+        #dialogue-text strong { color: var(--web-blue); }
+        #dialogue-text em { color: var(--web-red-dark); }
         #close-dialogue {
             position: absolute;
             right: 16px;
-            bottom: 8px;
+            bottom: 6px;
             background: none;
             border: none;
-            color: var(--gba-shell);
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.8rem;
+            color: var(--web-red);
+            font-family: 'Bangers', cursive;
+            font-size: 1.3rem;
             cursor: pointer;
             animation: blink 1s infinite;
         }
@@ -473,6 +416,36 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.15; }
         }
+
+        /* --- SFX BURST ("THWIP!") --- */
+        #sfx-burst {
+            position: absolute;
+            top: 16%;
+            right: 8%;
+            z-index: 11;
+            display: none;
+            font-family: 'Bangers', cursive;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            color: var(--caption-yellow);
+            -webkit-text-stroke: 3px var(--ink);
+            paint-order: stroke fill;
+            text-shadow: 4px 4px 0 var(--web-red);
+            transform: rotate(-14deg);
+            pointer-events: none;
+        }
+        #sfx-burst.show {
+            display: block;
+            animation: burstPop 0.75s ease-out forwards;
+        }
+        @keyframes burstPop {
+            0%   { opacity: 0; transform: rotate(-14deg) scale(0.4); }
+            35%  { opacity: 1; transform: rotate(-14deg) scale(1.15); }
+            70%  { opacity: 1; transform: rotate(-14deg) scale(1); }
+            100% { opacity: 0; transform: rotate(-14deg) scale(1.05); }
+        }
+
+        /* --- MOBILE D-PAD --- */
         #mobile-controls {
             position: absolute;
             bottom: 14px;
@@ -484,45 +457,37 @@
             display: grid;
             grid-template-columns: repeat(3, 42px);
             grid-template-rows: repeat(3, 42px);
-            background: rgba(30,30,30,0.95);
+            background: var(--ink);
             padding: 5px;
             border-radius: 50%;
-            border: 4px solid #111;
+            border: 4px solid var(--paper);
         }
         .ctrl-btn {
-            background: #555;
-            border: 2px solid #222;
-            color: #111;
+            background: var(--web-red);
+            border: 2px solid var(--ink);
+            color: var(--paper);
             font-size: 18px;
             display: flex;
             justify-content: center;
             align-items: center;
             user-select: none;
         }
-        .ctrl-btn:active {
-            background: #333;
-        }
+        .ctrl-btn:active { background: var(--caption-yellow); color: var(--ink); }
         #btn-up { grid-column: 2; grid-row: 1; border-radius: 8px 8px 0 0; border-bottom: none; }
         #btn-left { grid-column: 1; grid-row: 2; border-radius: 8px 0 0 8px; border-right: none; }
         #btn-right { grid-column: 3; grid-row: 2; border-radius: 0 8px 8px 0; border-left: none; }
         #btn-down { grid-column: 2; grid-row: 3; border-radius: 0 0 8px 8px; border-top: none; }
-        .d-pad-center { grid-column: 2; grid-row: 2; background: #555; }
+        .d-pad-center { grid-column: 2; grid-row: 2; background: var(--web-blue); }
+        /* --- RESPONSIVE --- */
         @media (max-width: 1100px) {
-            .layout-container {
-                grid-template-columns: 1fr;
-            }
+            .layout-container { grid-template-columns: 1fr; }
             .left-column,
-            .right-column {
-                width: 100%;
-            }
-            .right-column {
-                justify-content: center;
-            }
+            .right-column { width: 100%; }
+            .right-column { justify-content: center; }
+            body::before, body::after { width: 170px; height: 170px; opacity: 0.35; }
         }
         @media (max-width: 900px) {
-            body {
-                padding: 14px;
-            }
+            body { padding: 14px; }
             .top-bar {
                 flex-direction: column;
                 align-items: stretch;
@@ -532,187 +497,98 @@
             .back-btn {
                 width: 100%;
                 text-align: center;
-                font-size: 0.58rem;
-                padding: 12px 14px;
+                font-size: 1rem;
+                padding: 10px 14px;
             }
-            .page-header {
-                width: 100%;
-            }
+            .page-header { width: 100%; }
             .page-header h1 {
-                font-size: 0.95rem;
-                line-height: 1.5;
+                font-size: 2.1rem;
+                -webkit-text-stroke: 2px var(--ink);
+                text-shadow: 4px 4px 0 var(--web-blue);
             }
-            .page-header p {
-                font-size: 0.48rem;
-                line-height: 1.7;
-            }
-            .layout-container {
-                gap: 16px;
-            }
-            .left-column {
-                gap: 14px;
-            }
-            .panel {
-                padding: 14px;
+            .page-header p { font-size: 0.78rem; }
+            .layout-container { gap: 16px; }
+            .left-column { gap: 14px; }
+            .panel { padding: 13px; border-width: 4px; box-shadow: 5px 5px 0 rgba(0,0,0,0.4); }
+            .panel h3 { font-size: 1.15rem; margin-bottom: 13px; }
+            .chat-msg { font-size: 0.92rem; padding: 10px 12px; }
+            .instruction-text { font-size: 0.92rem; }
+            .key { width: 38px; height: 38px; font-size: 1.15rem; }
+            .comic-page {
                 border-width: 5px;
-                box-shadow:
-                    inset 0 0 0 3px #d8d8d8,
-                    5px 5px 0 rgba(0,0,0,0.5);
+                padding: 12px;
+                box-shadow: 7px 7px 0 rgba(0,0,0,0.4);
             }
-            .panel h3 {
-                font-size: 0.66rem;
-                margin-bottom: 12px;
-            }
-            .chat-msg {
-                font-size: 1.05rem;
-                padding: 10px;
-            }
-            .instruction-text {
-                font-size: 1.05rem;
-            }
-            .key {
-                width: 38px;
-                height: 38px;
-                font-size: 0.65rem;
-            }
-            .gba-console {
-                border-width: 6px;
-                border-radius: 24px 24px 48px 24px;
-                padding: 14px 14px 16px;
-            }
-            .gba-top-label {
-                font-size: 0.42rem;
-                margin-bottom: 12px;
-                padding: 0 2px;
-            }
-            .screen-shell {
-                padding: 12px 12px 16px;
-                border-radius: 16px 16px 28px 16px;
-            }
-            .screen-top-deco {
-                font-size: 0.40rem;
-                margin-bottom: 8px;
-                padding: 0 2px;
-            }
-            #game-wrapper {
-                height: min(62vw, 430px);
-                min-height: 260px;
-                border-width: 7px;
-            }
-            .screen-bottom-logo {
-                font-size: 0.40rem;
-                margin-top: 10px;
-                letter-spacing: 1px;
-            }
-            .gba-controls {
-                display: none;
-            }
+            .page-masthead { padding-bottom: 8px; margin-bottom: 11px; }
+            .masthead-issue { font-size: 0.9rem; }
+            .masthead-title { font-size: 1.05rem; }
+            .masthead-price { font-size: 0.85rem; }
+            .panel-caption { font-size: 0.8rem; padding: 6px 10px; }
+            #game-wrapper { height: min(62vw, 430px); min-height: 260px; }
+            .panel-footer { font-size: 0.85rem; }
+            .comic-strip { grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+            .strip-panel { padding: 8px; box-shadow: 4px 4px 0 var(--ink); }
+            .strip-panel i { font-size: 1.2rem; }
             #dialogue-overlay {
-                width: calc(100% - 12px);
+                width: calc(100% - 14px);
                 bottom: 10px;
                 border-width: 4px;
-                padding: 12px 14px 26px;
-                border-radius: 10px;
+                padding-bottom: 22px;
             }
-            #dialogue-title {
-                font-size: 0.50rem;
-                margin-bottom: 8px;
-            }
-            #dialogue-text {
-                font-size: 1.28rem;
-                line-height: 1.15;
-            }
-            #close-dialogue {
-                font-size: 0.62rem;
-                right: 12px;
-                bottom: 6px;
-            }
+            #dialogue-title { font-size: 1.05rem; padding: 6px 12px; }
+            #dialogue-text { font-size: 0.98rem; padding: 11px 14px 0; }
+            #close-dialogue { font-size: 1.05rem; right: 12px; }
+            #sfx-burst { font-size: 1.5rem; }
         }
         @media (max-width: 520px) {
-            body {
-                padding: 10px;
-            }
-            .page-header h1 {
-                font-size: 0.80rem;
-            }
-            .page-header p {
-                font-size: 0.42rem;
-            }
-            .panel {
-                padding: 12px;
-            }
-            .panel h3 {
-                font-size: 0.58rem;
-            }
-            .chat-msg {
-                font-size: 0.95rem;
-            }
-            .instruction-text {
-                font-size: 0.95rem;
-            }
-            .gba-console {
-                padding: 10px 10px 12px;
-                border-radius: 18px 18px 34px 18px;
-            }
-            .gba-top-label {
-                font-size: 0.34rem;
-                gap: 6px;
-            }
-            .power-led {
-                width: 9px;
-                height: 9px;
-            }
-            .screen-top-deco {
-                font-size: 0.32rem;
-            }
-            #game-wrapper {
-                height: min(68vw, 360px);
-                min-height: 220px;
-                border-width: 6px;
-            }
-            .screen-bottom-logo {
-                font-size: 0.32rem;
-            }
-            #dialogue-title {
-                font-size: 0.42rem;
-            }
-            #dialogue-text {
-                font-size: 1.1rem;
-            }
+            body { padding: 10px; }
+            .page-header h1 { font-size: 1.6rem; letter-spacing: 2px; }
+            .page-header p { font-size: 0.7rem; }
+            .panel { padding: 11px; }
+            .panel h3 { font-size: 1rem; }
+            .chat-msg { font-size: 0.86rem; }
+            .instruction-text { font-size: 0.86rem; }
+            .comic-page { padding: 9px; border-width: 4px; }
+            .page-masthead { justify-content: center; }
+            .masthead-issue, .masthead-price { font-size: 0.72rem; }
+            .masthead-title { font-size: 0.9rem; }
+            .panel-caption { font-size: 0.72rem; }
+            #game-wrapper { height: min(68vw, 360px); min-height: 220px; }
+            #dialogue-title { font-size: 0.9rem; }
+            #dialogue-text { font-size: 0.9rem; }
+            #sfx-burst { font-size: 1.2rem; }
             .d-pad {
                 grid-template-columns: repeat(3, 36px);
                 grid-template-rows: repeat(3, 36px);
             }
-            .ctrl-btn {
-                font-size: 15px;
-            }
+            .ctrl-btn { font-size: 15px; }
         }
     </style>
 </head>
 <body>
     <div class="page-wrap">
         <div class="top-bar">
-            <a href="index.html" class="back-btn">◀ EXIT SIMULATION</a>
+            <a href="index.html" class="back-btn">&#9664; EXIT ISSUE</a>
             <div class="page-header">
                 <h1>LEWYN'S JOURNEY</h1>
-                <p>A 16-bit interactive space to explore my background.</p>
+                <p>Swing the rooftops of my background &mdash; one panel at a time.</p>
             </div>
         </div>
         <div class="layout-container">
             <div class="left-column">
                 <div class="panel">
-                    <h3>SYSTEM LOG</h3>
+                    <h3>Issue #1: Origin</h3>
                     <div class="chat-msg">
-                        <span style="color: var(--gba-shell); font-weight: bold;">PETER:</span>
-                        Welcome to the neighborhood! The web-simulation is active.
+                        <span class="speaker-name">MENTOR:</span>
+                        With great engineering comes great responsibility. The city is yours &mdash; go read the signs.
                     </div>
                     <div class="chat-msg tip">
-                        <span style="color: var(--spidey-blue); font-weight: bold;">TIP:</span>
-                        Use WASD to swing around the route and step near signposts to interact.
+                        <span class="speaker-name blue">WEB-SENSE:</span>
+                        Follow the web-lines across the rooftops. Stop at any billboard to read it.
                     </div>
                 </div>
                 <div class="panel" id="pc-instructions">
-                    <h3>CONTROLS</h3>
+                    <h3>Controls</h3>
                     <div class="keyboard-layout">
                         <div class="key-row"><div class="key">W</div></div>
                         <div class="key-row">
@@ -722,33 +598,28 @@
                         </div>
                     </div>
                     <p class="instruction-text">
-                        Hold WASD or Arrow keys to walk.<br><br>
-                        Step near signs or buildings to inspect them.
+                        Hold <strong>WASD</strong> or the arrow keys to swing across the roof.<br><br>
+                        Walk into a billboard or the HQ to read that panel.
                     </p>
                 </div>
             </div>
             <div class="right-column">
-                <div class="gba-console">
-                    <div class="gba-top-label">
-                        <div>WEB-SLINGER ADVANCE</div>
-                        <div class="power-led-wrap">
-                            <div class="power-led"></div>
-                            <span>POWER</span>
-                        </div>
+                <div class="comic-page">
+                    <div class="page-masthead">
+                        <div class="masthead-issue">NO. 01</div>
+                        <div class="masthead-title">THE WEB-SLINGER FILES</div>
+                        <div class="masthead-price">ORIGIN STORY</div>
                     </div>
-                    <div class="screen-shell">
-                        <div class="screen-top-deco">
-                            <div class="screen-top-left">
-                                <div class="screen-led"></div>
-                                <span>BATTERY</span>
-                            </div>
-                            <span>DOT MATRIX TFT COLOR LCD</span>
+                    <div class="splash-panel">
+                        <div class="panel-caption">
+                            MEANWHILE&hellip; high above the city, our hero surveys the skyline of his own history.
                         </div>
                         <div id="game-wrapper">
+                            <div id="sfx-burst">THWIP!</div>
                             <div id="dialogue-overlay">
-                                <div id="dialogue-title">Signpost</div>
+                                <div id="dialogue-title">Billboard</div>
                                 <div id="dialogue-text">Details go here...</div>
-                                <button id="close-dialogue">▼</button>
+                                <button id="close-dialogue">&#9660;</button>
                             </div>
                             <div id="mobile-controls">
                                 <div class="d-pad">
@@ -760,37 +631,23 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="screen-bottom-logo">
-                            <i class="fas fa-spider"></i>
-                            SPIDER-OS SYSTEM
-                        </div>
+                        <div class="panel-footer">TO BE CONTINUED&hellip;</div>
                     </div>
-                    <div class="gba-controls">
-                        <div class="dpad-shell">
-                            <div class="dpad-piece dpad-v"></div>
-                            <div class="dpad-piece dpad-h"></div>
-                            <div class="dpad-center-dot"></div>
+                    <div class="comic-strip">
+                        <div class="strip-panel">
+                            <i class="fas fa-arrows-up-down-left-right"></i>
+                            <span class="strip-title">Move</span>
+                            <span class="strip-body">WASD or arrow keys to travel the web-lines.</span>
                         </div>
-                        <div class="controls-center">
-                            <div class="select-start">
-                                <div class="oval-btn"></div>
-                                <div class="oval-btn"></div>
-                            </div>
-                            <div class="oval-labels">
-                                <span>SELECT</span>
-                                <span>START</span>
-                            </div>
-                            <div class="speaker" aria-hidden="true">
-                                <span></span><span></span><span></span><span></span><span></span>
-                                <span></span><span></span><span></span><span></span><span></span>
-                                <span></span><span></span><span></span><span></span><span></span>
-                            </div>
+                        <div class="strip-panel">
+                            <i class="fas fa-signs-post"></i>
+                            <span class="strip-title">Inspect</span>
+                            <span class="strip-body">Step into a billboard to open its panel.</span>
                         </div>
-                        <div class="ab-shell">
-                            <div class="ab-btn b">B</div>
-                            <div class="ab-btn a">A</div>
-                            <div class="ab-label b">B</div>
-                            <div class="ab-label a">A</div>
+                        <div class="strip-panel">
+                            <i class="fas fa-forward"></i>
+                            <span class="strip-title">Continue</span>
+                            <span class="strip-body">Press Space or click the bubble to close it.</span>
                         </div>
                     </div>
                 </div>
@@ -798,6 +655,7 @@
         </div>
     </div>
     <script>
+        /* ---------- INPUT ---------- */
         let activeKeys = { up: false, down: false, left: false, right: false, space: false };
         window.addEventListener('keydown', (e) => {
             if (!e.key) return;
@@ -823,10 +681,26 @@
                 if (isDialogueOpen) closeDialogue();
             }
         });
+
+        /* ---------- WORLD CONSTANTS ---------- */
         const WORLD_WIDTH = 1600;
         const WORLD_HEIGHT = 1200;
         const MOVE_SPEED = 170;
         const DIAG_SPEED = MOVE_SPEED / Math.SQRT2;
+
+        /* Comic palette (hex ints for Phaser) */
+        const C_ROOF        = 0x39456b;
+        const C_ROOF_GRIT   = 0x323d5f;
+        const C_ROOF_EDGE   = 0x232c47;
+        const C_WEB_LANE    = 0x2b3557;
+        const C_WEB_STRAND  = 0xeef2ff;
+        const C_INK         = 0x14100f;
+        const C_PAPER       = 0xf6ecd6;
+        const C_RED         = 0xd12b2b;
+        const C_BLUE        = 0x1d3fa8;
+        const C_YELLOW      = 0xffd93d;
+        const C_GLASS       = 0x8fb6ff;
+        /* ---------- CONTENT (unchanged) ---------- */
         const resumeData = [
             { id: 'elem',       x: 300,  y: 1000, title: "Primary Education",  text: "<strong>Jose G. Peralta Memorial School</strong><br>Valedictorian (2011-2017)" },
             { id: 'jhs',        x: 300,  y: 800,  title: "Junior High School", text: "<strong>Fellowship Baptist College</strong><br>With Honor (2017-2021)" },
@@ -840,6 +714,15 @@
             { id: 'proj_game',  x: 1100, y: 200,  title: "Games",              text: "<strong>Projects:</strong> Cyber Viper, Neon Flap, Minimax AI Tic-Tac-Toe, Neon 2048.<br><em>Game development testing complex logic.</em>" },
             { id: 'proj_ai',    x: 1300, y: 200,  title: "Eiji AI",            text: "<strong>Project:</strong> Eiji / D Dwarf Mini.<br><em>A sleek conversational assistant powered by Groq LPUs.</em>" }
         ];
+
+        /* Web-lane layout: [x, y, width, height] centred rects */
+        const WEB_LANES = [
+            { x: 300,  y: 700, w: 90,   h: 700 },
+            { x: 1300, y: 600, w: 90,   h: 900 },
+            { x: 800,  y: 650, w: 1100, h: 90  },
+            { x: 1050, y: 200, w: 500,  h: 90  }
+        ];
+
         const config = {
             type: Phaser.AUTO,
             scale: {
@@ -848,7 +731,7 @@
                 width: 800,
                 height: 600
             },
-            backgroundColor: '#98c870',
+            backgroundColor: '#39456b',
             pixelArt: true,
             physics: {
                 default: 'arcade',
@@ -867,242 +750,452 @@
         let playerShadow;
         let isDialogueOpen = false;
         let triggerCooldown = false;
+        /* ---------- SCENE ---------- */
         function create() {
             this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-            const graphics = this.add.graphics();
-            graphics.fillStyle(0x98c870, 1);
-            graphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-            graphics.fillStyle(0x7fb35a, 1);
-            for (let i = 0; i < WORLD_WIDTH; i += 60) {
-                for (let j = 0; j < WORLD_HEIGHT; j += 60) {
-                    graphics.fillRect(i, j + 12, 6, 14);
-                    graphics.fillRect(i + 8, j + 18, 6, 10);
+
+            const g = this.add.graphics();
+
+            /* Rooftop surface */
+            g.fillStyle(C_ROOF, 1);
+            g.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+            /* Gravel / halftone grit so the roof reads as textured print */
+            g.fillStyle(C_ROOF_GRIT, 1);
+            for (let i = 0; i < WORLD_WIDTH; i += 28) {
+                for (let j = 0; j < WORLD_HEIGHT; j += 28) {
+                    g.fillRect(i + 6, j + 4, 3, 3);
+                    g.fillRect(i + 16, j + 15, 2, 2);
                 }
             }
-            graphics.fillStyle(0xdfc898, 1);
-            graphics.fillRect(250, 350, 100, 700);
-            graphics.fillRect(1250, 150, 100, 900);
-            graphics.fillRect(250, 600, 1100, 100);
-            graphics.fillRect(800, 150, 500, 100);
-            graphics.lineStyle(4, 0xc1a66c, 1);
-            graphics.strokeRect(250, 350, 100, 700);
-            graphics.strokeRect(1250, 150, 100, 900);
-            graphics.strokeRect(250, 600, 1100, 100);
-            graphics.strokeRect(800, 150, 500, 100);
-            const createSignpost = (scene, x, y, title) => {
-                scene.add.ellipse(x, y + 25, 34, 12, 0x000000, 0.22);
-                scene.add.rectangle(x, y + 16, 8, 20, 0x6b4b2a);
-                const board = scene.add.rectangle(x, y, 54, 34, 0xc18545);
-                board.setStrokeStyle(4, 0x70411c);
-                scene.add.rectangle(x, y - 6, 42, 4, 0xe9d3aa);
-                scene.add.rectangle(x, y + 3, 42, 4, 0xe9d3aa);
-                scene.add.text(x, y - 34, title, {
-                    fontFamily: '"Press Start 2P"',
-                    fontSize: '10px',
-                    fill: '#ffffff',
-                    stroke: '#000000',
-                    strokeThickness: 4
-                }).setOrigin(0.5);
-            };
-            const createGymZone = (scene, x, y, width, height, title) => {
-                scene.add.rectangle(x, y + height / 2, width + 20, 20, 0x000000, 0.2);
-                const building = scene.add.rectangle(x, y, width, height, 0xd7d7d7);
-                building.setStrokeStyle(6, 0x565656);
-                scene.add.rectangle(x, y - height / 2 + 15, width + 14, 30, 0xb71c1c);
-                scene.add.rectangle(x, y + height / 2 - 20, 44, 40, 0x70411c);
-                scene.add.rectangle(x, y - 8, 66, 30, 0x9dc7ff);
-                scene.add.rectangle(x - 60, y - 8, 38, 26, 0x9dc7ff);
-                scene.add.rectangle(x + 60, y - 8, 38, 26, 0x9dc7ff);
-                scene.add.text(x, y - height / 2 - 24, "GYM: " + title, {
-                    fontFamily: '"Press Start 2P"',
-                    fontSize: '14px',
-                    fill: '#ffcb05',
-                    stroke: '#3c5aa6',
-                    strokeThickness: 6
-                }).setOrigin(0.5);
-            };
+
+            /* Roof panel seams */
+            g.lineStyle(2, C_ROOF_EDGE, 0.85);
+            for (let i = 200; i < WORLD_WIDTH; i += 200) {
+                g.lineBetween(i, 0, i, WORLD_HEIGHT);
+            }
+            for (let j = 200; j < WORLD_HEIGHT; j += 200) {
+                g.lineBetween(0, j, WORLD_WIDTH, j);
+            }
+
+            /* Parapet wall around the rooftop edge */
+            g.fillStyle(C_ROOF_EDGE, 1);
+            g.fillRect(0, 0, WORLD_WIDTH, 26);
+            g.fillRect(0, WORLD_HEIGHT - 26, WORLD_WIDTH, 26);
+            g.fillRect(0, 0, 26, WORLD_HEIGHT);
+            g.fillRect(WORLD_WIDTH - 26, 0, 26, WORLD_HEIGHT);
+            g.lineStyle(6, C_INK, 1);
+            g.strokeRect(3, 3, WORLD_WIDTH - 6, WORLD_HEIGHT - 6);
+
+            /* Web-lines replace the old dirt paths */
+            WEB_LANES.forEach(lane => drawWebLane(g, lane));
+
+            /* Rooftop clutter for depth */
+            drawRoofClutter(this);
+            /* Landmarks: billboards for every entry, HQ for work experience */
             resumeData.forEach(data => {
                 if (data.id === 'work') {
-                    createGymZone(this, data.x, data.y, 220, 120, data.title);
+                    createHQ(this, data.x, data.y, 220, 120, data.title);
                 } else {
-                    createSignpost(this, data.x, data.y, data.title);
+                    createBillboard(this, data.x, data.y, data.title);
                 }
             });
-            playerShadow = this.add.ellipse(800, 1068, 26, 12, 0x000000, 0.28);
-            player = createTrainer(this, 800, 1050);
+
+            /* Hero */
+            playerShadow = this.add.ellipse(800, 1068, 26, 12, 0x000000, 0.35);
+            player = createSlinger(this, 800, 1050);
             this.physics.add.existing(player);
             player.body.setCollideWorldBounds(true);
             player.body.setSize(18, 24);
             player.body.setOffset(-9, -12);
+
             resumeData.forEach(data => {
                 const w = data.id === 'work' ? 240 : 60;
                 const h = data.id === 'work' ? 140 : 60;
                 createTrigger(this, data.x, data.y, w, h, data);
             });
+
             this.cameras.main.startFollow(player, true, 0.1, 0.1);
             this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
             setupMobileControls();
             document.getElementById('dialogue-overlay').addEventListener('click', closeDialogue);
         }
-        function createTrainer(scene, x, y) {
-            const trainer = scene.add.container(x, y);
-            trainer.setSize(24, 32);
-            const outline = 0x1a1a1a;
-            const skin = 0xf2c49b;
-            const hair = 0x2f2f2f;
-            const shirt = 0xd83434;
-            const shirtDark = 0xa81e1e;
-            const pants = 0x2d4ea2;
-            const pantsDark = 0x1d3470;
-            const shoes = 0x2b2b2b;
-            const bag = 0xf4c542;
-            const px = (x, y, w, h, color) => {
-                const r = scene.add.rectangle(x, y, w, h, color).setOrigin(0.5);
-                trainer.add(r);
-                return r;
-            };
-            trainer.parts = {};
-            trainer.parts.shadowHair = px(0, -11, 16, 6, outline);
-            trainer.parts.head = px(0, -8, 14, 12, skin);
-            trainer.parts.hairTop = px(0, -13, 16, 6, hair);
-            trainer.parts.hairLeft = px(-6, -9, 4, 8, hair);
-            trainer.parts.hairRight = px(6, -9, 4, 8, hair);
-            trainer.parts.body = px(0, 3, 16, 12, shirt);
-            trainer.parts.bodyShade = px(0, 6, 16, 4, shirtDark);
-            trainer.parts.armLeft = px(-9, 2, 4, 10, skin);
-            trainer.parts.armRight = px(9, 2, 4, 10, skin);
-            trainer.parts.bag = px(7, 1, 4, 8, bag);
-            trainer.parts.legLeft = px(-4, 14, 6, 10, pants);
-            trainer.parts.legRight = px(4, 14, 6, 10, pants);
-            trainer.parts.legLeftShade = px(-4, 17, 6, 4, pantsDark);
-            trainer.parts.legRightShade = px(4, 17, 6, 4, pantsDark);
-            trainer.parts.shoeLeft = px(-4, 22, 6, 4, shoes);
-            trainer.parts.shoeRight = px(4, 22, 6, 4, shoes);
-            trainer.facing = 'down';
-            return trainer;
-        }
-        function setTrainerFacing(direction) {
-            if (!player || !player.parts) return;
-            const p = player.parts;
-            player.facing = direction;
-            if (direction === 'left') {
-                p.bag.x = -8;
-                p.hairLeft.visible = true;
-                p.hairRight.visible = false;
-            } else if (direction === 'right') {
-                p.bag.x = 8;
-                p.hairLeft.visible = false;
-                p.hairRight.visible = true;
-            } else {
-                p.bag.x = 7;
-                p.hairLeft.visible = true;
-                p.hairRight.visible = true;
-            }
-        }
-        function animateTrainerWalk(time, moving) {
-            if (!player || !player.parts) return;
-            const p = player.parts;
-            if (!moving) {
-                p.legLeft.y = 14;
-                p.legRight.y = 14;
-                p.legLeftShade.y = 17;
-                p.legRightShade.y = 17;
-                p.shoeLeft.y = 22;
-                p.shoeRight.y = 22;
-                p.armLeft.y = 2;
-                p.armRight.y = 2;
-                return;
-            }
-            const swing = Math.sin(time / 110);
-            p.legLeft.y = 14 + swing * 2;
-            p.legRight.y = 14 - swing * 2;
-            p.legLeftShade.y = 17 + swing * 2;
-            p.legRightShade.y = 17 - swing * 2;
-            p.shoeLeft.y = 22 + swing * 1.5;
-            p.shoeRight.y = 22 - swing * 1.5;
-            p.armLeft.y = 2 - swing * 1.2;
-            p.armRight.y = 2 + swing * 1.2;
-        }
-        function update() {
-            if (!player || !playerShadow) return;
-            if (isDialogueOpen) {
-                player.body.setVelocity(0, 0);
-                animateTrainerWalk(this.time.now, false);
-                playerShadow.x = player.x;
-                playerShadow.y = player.y + 18;
-                return;
-            }
-            const goLeft = activeKeys.left;
-            const goRight = activeKeys.right;
-            const goUp = activeKeys.up;
-            const goDown = activeKeys.down;
-            const diagonal = (goLeft || goRight) && (goUp || goDown);
-            const speed = diagonal ? DIAG_SPEED : MOVE_SPEED;
-            let velX = 0;
-            let velY = 0;
-            if (goLeft) velX = -speed;
-            if (goRight) velX = speed;
-            if (goUp) velY = -speed;
-            if (goDown) velY = speed;
-            player.body.setVelocity(velX, velY);
-            if (velX < 0) setTrainerFacing('left');
-            else if (velX > 0) setTrainerFacing('right');
-            else if (velY < 0) setTrainerFacing('up');
-            else if (velY > 0) setTrainerFacing('down');
-            const moving = velX !== 0 || velY !== 0;
-            animateTrainerWalk(this.time.now, moving);
-            playerShadow.x = player.x;
-            playerShadow.y = player.y + 18;
-        }
-        function createTrigger(scene, x, y, width, height, data) {
-            const pad = scene.add.rectangle(x, y, width, height, 0x000000, 0);
-            scene.physics.add.existing(pad, true);
-            scene.physics.add.overlap(player, pad, () => {
-                if (!isDialogueOpen && !triggerCooldown) {
-                    showDialogue(data.title, data.text);
+
+        /* Draw one web-line lane: darker track plus white strands and cross-ties */
+        function drawWebLane(g, lane) {
+            const left = lane.x - lane.w / 2;
+            const top = lane.y - lane.h / 2;
+            const vertical = lane.h > lane.w;
+
+            g.fillStyle(C_WEB_LANE, 1);
+            g.fillRect(left, top, lane.w, lane.h);
+            g.lineStyle(3, C_INK, 0.55);
+            g.strokeRect(left, top, lane.w, lane.h);
+
+            g.lineStyle(2, C_WEB_STRAND, 0.75);
+            if (vertical) {
+                [0.22, 0.5, 0.78].forEach(t => {
+                    const x = left + lane.w * t;
+                    g.lineBetween(x, top, x, top + lane.h);
+                });
+                for (let y = top + 20; y < top + lane.h; y += 40) {
+                    g.lineBetween(left + 6, y, left + lane.w - 6, y + 8);
+                    g.lineBetween(left + 6, y + 8, left + lane.w - 6, y);
                 }
+            } else {
+                [0.22, 0.5, 0.78].forEach(t => {
+                    const y = top + lane.h * t;
+                    g.lineBetween(left, y, left + lane.w, y);
+                });
+                for (let x = left + 20; x < left + lane.w; x += 40) {
+                    g.lineBetween(x, top + 6, x + 8, top + lane.h - 6);
+                    g.lineBetween(x + 8, top + 6, x, top + lane.h - 6);
+                }
+            }
+        }
+
+        /* Vents, AC units and water towers scattered off the lanes */
+        function drawRoofClutter(scene) {
+            const vents = [
+                [520, 420], [640, 900], [1050, 950], [1150, 430],
+                [480, 1080], [700, 380], [980, 780], [520, 780]
+            ];
+            vents.forEach(([x, y]) => {
+                scene.add.ellipse(x, y + 14, 40, 12, 0x000000, 0.28);
+                const box = scene.add.rectangle(x, y, 38, 26, 0x4c5a86);
+                box.setStrokeStyle(3, C_INK);
+                scene.add.rectangle(x, y - 4, 26, 4, 0x6a79ab);
+                scene.add.rectangle(x, y + 3, 26, 4, 0x6a79ab);
+            });
+
+            const towers = [[620, 1080], [1150, 1080], [560, 260]];
+            towers.forEach(([x, y]) => {
+                scene.add.ellipse(x, y + 26, 56, 16, 0x000000, 0.3);
+                const legs = scene.add.rectangle(x, y + 16, 44, 14, 0x3d3128);
+                legs.setStrokeStyle(3, C_INK);
+                const barrel = scene.add.rectangle(x, y - 6, 52, 40, 0x7b5c3a);
+                barrel.setStrokeStyle(4, C_INK);
+                scene.add.rectangle(x, y - 6, 52, 5, 0x5d432a);
+                const roof = scene.add.triangle(x, y - 34, 0, 12, 26, -12, 52, 12, 0x8f3b2c);
+                roof.setStrokeStyle(3, C_INK);
             });
         }
+        /* Rooftop billboard = the old signpost, restyled as a comic panel on legs */
+        function createBillboard(scene, x, y, title) {
+            scene.add.ellipse(x, y + 26, 40, 12, 0x000000, 0.3);
+
+            /* Support legs */
+            scene.add.rectangle(x - 12, y + 18, 6, 18, 0x2f2a25).setStrokeStyle(2, C_INK);
+            scene.add.rectangle(x + 12, y + 18, 6, 18, 0x2f2a25).setStrokeStyle(2, C_INK);
+
+            /* Panel face */
+            const board = scene.add.rectangle(x, y, 58, 38, C_PAPER);
+            board.setStrokeStyle(4, C_INK);
+
+            /* Red header band, like a comic panel caption */
+            scene.add.rectangle(x, y - 13, 58, 10, C_RED).setStrokeStyle(2, C_INK);
+
+            /* Two text ruling lines */
+            scene.add.rectangle(x, y + 1, 42, 3, 0xbdb08f);
+            scene.add.rectangle(x, y + 9, 42, 3, 0xbdb08f);
+
+            /* Tiny spider mark bottom-left of the board */
+            drawSpiderMark(scene, x - 19, y + 6, 0.75);
+
+            scene.add.text(x, y - 36, title, {
+                fontFamily: '"Press Start 2P"',
+                fontSize: '10px',
+                fill: '#ffd93d',
+                stroke: '#14100f',
+                strokeThickness: 5
+            }).setOrigin(0.5);
+        }
+
+        /* Small pixel spider emblem */
+        function drawSpiderMark(scene, x, y, scale) {
+            const s = scale || 1;
+            scene.add.rectangle(x, y, 5 * s, 7 * s, C_INK);
+            scene.add.rectangle(x, y - 4 * s, 3 * s, 3 * s, C_INK);
+            for (let i = -1; i <= 1; i++) {
+                scene.add.rectangle(x - 5 * s, y + i * 2.5 * s, 5 * s, 1.6 * s, C_INK);
+                scene.add.rectangle(x + 5 * s, y + i * 2.5 * s, 5 * s, 1.6 * s, C_INK);
+            }
+        }
+        /* Rooftop HQ penthouse = the old gym building */
+        function createHQ(scene, x, y, w, h, title) {
+            scene.add.ellipse(x, y + h / 2 + 10, w * 0.95, 22, 0x000000, 0.3);
+
+            /* Main block */
+            const wall = scene.add.rectangle(x, y, w, h, 0x4a5680);
+            wall.setStrokeStyle(6, C_INK);
+
+            /* Halftone-ish shading band down the right side */
+            scene.add.rectangle(x + w / 2 - 22, y, 40, h - 12, 0x3b456b);
+
+            /* Roof cap */
+            scene.add.rectangle(x, y - h / 2 - 8, w + 16, 18, C_RED).setStrokeStyle(5, C_INK);
+            scene.add.rectangle(x, y - h / 2 - 8, w + 16, 5, C_YELLOW);
+
+            /* Glass front — three lit windows */
+            for (let i = -1; i <= 1; i++) {
+                scene.add.rectangle(x + i * 58, y - 12, 42, 34, C_GLASS).setStrokeStyle(4, C_INK);
+                scene.add.rectangle(x + i * 58 - 10, y - 12, 8, 34, 0xffffff, 0.35);
+            }
+
+            /* Doorway */
+            scene.add.rectangle(x, y + h / 2 - 22, 46, 42, 0x1b2138).setStrokeStyle(4, C_INK);
+            scene.add.rectangle(x, y + h / 2 - 42, 46, 8, C_BLUE).setStrokeStyle(3, C_INK);
+
+            /* Emblem above the door */
+            drawSpiderMark(scene, x, y + 22, 1.1);
+
+            scene.add.text(x, y - h / 2 - 34, title, {
+                fontFamily: '"Press Start 2P"',
+                fontSize: '12px',
+                fill: '#ffd93d',
+                stroke: '#14100f',
+                strokeThickness: 6
+            }).setOrigin(0.5);
+        }
+        /* ---------- HERO: the web-slinger ---------- */
+        function createSlinger(scene, x, y) {
+            const c = scene.add.container(x, y);
+
+            /* Legs (blue) + boots (red) */
+            c.legLeft   = scene.add.rectangle(-5, 8, 7, 12, C_BLUE);
+            c.legRight  = scene.add.rectangle(5, 8, 7, 12, C_BLUE);
+            c.legLeftShade  = scene.add.rectangle(-7, 8, 3, 12, C_INK, 0.35);
+            c.legRightShade = scene.add.rectangle(3, 8, 3, 12, C_INK, 0.35);
+            c.shoeLeft  = scene.add.rectangle(-5, 15, 9, 5, C_RED);
+            c.shoeRight = scene.add.rectangle(5, 15, 9, 5, C_RED);
+
+            /* Torso: red chest, blue flanks */
+            c.torso = scene.add.rectangle(0, -2, 16, 16, C_RED);
+            c.flankLeft  = scene.add.rectangle(-6, -2, 4, 16, C_BLUE);
+            c.flankRight = scene.add.rectangle(6, -2, 4, 16, C_BLUE);
+            c.emblem = scene.add.rectangle(0, -2, 4, 6, C_INK);
+            c.emblemArms = scene.add.rectangle(0, -3, 8, 1.5, C_INK);
+
+            /* Arms (blue sleeves) + gloves (red) */
+            c.armLeft  = scene.add.rectangle(-11, -2, 5, 13, C_BLUE);
+            c.armRight = scene.add.rectangle(11, -2, 5, 13, C_BLUE);
+            c.gloveLeft  = scene.add.rectangle(-11, 5, 6, 5, C_RED);
+            c.gloveRight = scene.add.rectangle(11, 5, 6, 5, C_RED);
+
+            /* Masked head */
+            c.head = scene.add.rectangle(0, -15, 16, 14, C_RED);
+            c.headShade = scene.add.rectangle(6, -15, 4, 14, C_INK, 0.22);
+
+            /* Web lines on the mask */
+            c.webV = scene.add.rectangle(0, -15, 1.2, 14, C_INK, 0.55);
+            c.webH = scene.add.rectangle(0, -15, 16, 1.2, C_INK, 0.55);
+
+            /* White lenses with ink outline — these carry the facing read */
+            c.lensLeft  = scene.add.rectangle(-4, -16, 6, 5, 0xffffff).setStrokeStyle(1.5, C_INK);
+            c.lensRight = scene.add.rectangle(4, -16, 6, 5, 0xffffff).setStrokeStyle(1.5, C_INK);
+
+            c.add([
+                c.legLeft, c.legRight, c.legLeftShade, c.legRightShade,
+                c.shoeLeft, c.shoeRight,
+                c.torso, c.flankLeft, c.flankRight, c.emblem, c.emblemArms,
+                c.armLeft, c.armRight, c.gloveLeft, c.gloveRight,
+                c.head, c.headShade, c.webV, c.webH, c.lensLeft, c.lensRight
+            ]);
+
+            c.setSize(18, 34);
+            c.facing = 'down';
+            c.walkTimer = 0;
+            return c;
+        }
+        /* Facing is expressed through the lenses instead of the old bag sprite */
+        function setSlingerFacing(s, dir) {
+            if (s.facing === dir) return;
+            s.facing = dir;
+
+            /* Reset to the front pose */
+            s.lensLeft.setVisible(true).setPosition(-4, -16).setScale(1, 1);
+            s.lensRight.setVisible(true).setPosition(4, -16).setScale(1, 1);
+            s.webV.setVisible(true);
+            s.webH.setVisible(true).setScale(1, 1);
+            s.armLeft.setVisible(true).setPosition(-11, -2);
+            s.armRight.setVisible(true).setPosition(11, -2);
+            s.gloveLeft.setVisible(true).setPosition(-11, 5);
+            s.gloveRight.setVisible(true).setPosition(11, 5);
+            s.emblem.setVisible(true);
+            s.emblemArms.setVisible(true);
+            s.headShade.setPosition(6, -15);
+
+            if (dir === 'up') {
+                /* Back of the mask: no lenses, denser webbing, big back-spider */
+                s.lensLeft.setVisible(false);
+                s.lensRight.setVisible(false);
+                s.webH.setScale(1, 2.2);
+                s.emblem.setVisible(true);
+                s.emblemArms.setVisible(true);
+            } else if (dir === 'left') {
+                /* Profile: one lens, near arm forward, far arm hidden */
+                s.lensRight.setVisible(false);
+                s.lensLeft.setPosition(-3, -16).setScale(0.8, 1);
+                s.armRight.setVisible(false);
+                s.gloveRight.setVisible(false);
+                s.armLeft.setPosition(-6, -2);
+                s.gloveLeft.setPosition(-6, 5);
+                s.emblem.setVisible(false);
+                s.emblemArms.setVisible(false);
+                s.headShade.setPosition(-6, -15);
+            } else if (dir === 'right') {
+                s.lensLeft.setVisible(false);
+                s.lensRight.setPosition(3, -16).setScale(0.8, 1);
+                s.armLeft.setVisible(false);
+                s.gloveLeft.setVisible(false);
+                s.armRight.setPosition(6, -2);
+                s.gloveRight.setPosition(6, 5);
+                s.emblem.setVisible(false);
+                s.emblemArms.setVisible(false);
+                s.headShade.setPosition(6, -15);
+            }
+        }
+        /* Two-frame pixel walk cycle: legs swap, arms counter-swing, body bobs */
+        function animateSlingerWalk(s, delta, moving) {
+            if (!moving) {
+                s.walkTimer = 0;
+                s.legLeft.y = 8;  s.legRight.y = 8;
+                s.shoeLeft.y = 15; s.shoeRight.y = 15;
+                s.legLeftShade.y = 8; s.legRightShade.y = 8;
+                s.head.y = -15; s.headShade.y = -15;
+                s.webV.y = -15;  s.webH.y = -15;
+                s.lensLeft.y = -16; s.lensRight.y = -16;
+                return;
+            }
+
+            s.walkTimer += delta;
+            const frame = Math.floor(s.walkTimer / 130) % 2;
+            const swing = frame === 0 ? 2 : -2;
+
+            s.legLeft.y = 8 + swing;
+            s.legRight.y = 8 - swing;
+            s.legLeftShade.y = s.legLeft.y;
+            s.legRightShade.y = s.legRight.y;
+            s.shoeLeft.y = 15 + swing;
+            s.shoeRight.y = 15 - swing;
+
+            s.armLeft.y = -2 - swing * 0.6;
+            s.armRight.y = -2 + swing * 0.6;
+            s.gloveLeft.y = 5 - swing * 0.6;
+            s.gloveRight.y = 5 + swing * 0.6;
+
+            /* Head bob keeps the whole mask group together */
+            const bob = frame === 0 ? -1 : 0;
+            s.head.y = -15 + bob;
+            s.headShade.y = -15 + bob;
+            s.webV.y = -15 + bob;
+            s.webH.y = -15 + bob;
+            s.lensLeft.y = -16 + bob;
+            s.lensRight.y = -16 + bob;
+        }
+        /* ---------- LOOP ---------- */
+        function update(time, delta) {
+            if (!player || !player.body) return;
+
+            if (isDialogueOpen) {
+                player.body.setVelocity(0, 0);
+                animateSlingerWalk(player, delta, false);
+                return;
+            }
+
+            let vx = 0, vy = 0;
+            if (activeKeys.left)  vx -= 1;
+            if (activeKeys.right) vx += 1;
+            if (activeKeys.up)    vy -= 1;
+            if (activeKeys.down)  vy += 1;
+
+            const speed = (vx !== 0 && vy !== 0) ? DIAG_SPEED : MOVE_SPEED;
+            player.body.setVelocity(vx * speed, vy * speed);
+
+            const moving = vx !== 0 || vy !== 0;
+            if (moving) {
+                if (vx < 0) setSlingerFacing(player, 'left');
+                else if (vx > 0) setSlingerFacing(player, 'right');
+                else if (vy < 0) setSlingerFacing(player, 'up');
+                else setSlingerFacing(player, 'down');
+            }
+            animateSlingerWalk(player, delta, moving);
+
+            /* Depth sort so the hero passes behind billboards above them */
+            player.setDepth(player.y);
+            if (playerShadow) {
+                playerShadow.setPosition(player.x, player.y + 18);
+                playerShadow.setDepth(player.y - 1);
+            }
+        }
+
+        /* ---------- TRIGGERS ---------- */
+        function createTrigger(scene, x, y, w, h, data) {
+            const zone = scene.add.zone(x, y, w, h);
+            scene.physics.add.existing(zone);
+            zone.body.setAllowGravity(false);
+            zone.body.moves = false;
+
+            scene.physics.add.overlap(player, zone, () => {
+                if (isDialogueOpen || triggerCooldown) return;
+                showDialogue(data.title, data.text);
+            });
+            return zone;
+        }
+        /* ---------- DIALOGUE (speech bubble + THWIP burst) ---------- */
+        let burstTimer = null;
+
+        function fireBurst() {
+            const burst = document.getElementById('sfx-burst');
+            if (!burst) return;
+            burst.classList.remove('show');
+            /* Force a reflow so the animation restarts on rapid re-triggers */
+            void burst.offsetWidth;
+            burst.classList.add('show');
+            clearTimeout(burstTimer);
+            burstTimer = setTimeout(() => burst.classList.remove('show'), 650);
+        }
+
         function showDialogue(title, text) {
             isDialogueOpen = true;
             activeKeys.up = false;
             activeKeys.down = false;
             activeKeys.left = false;
             activeKeys.right = false;
+
+            fireBurst();
             document.getElementById('dialogue-title').innerHTML = title;
             document.getElementById('dialogue-text').innerHTML = text;
             document.getElementById('dialogue-overlay').style.display = 'block';
         }
+
         function closeDialogue() {
             document.getElementById('dialogue-overlay').style.display = 'none';
             isDialogueOpen = false;
             triggerCooldown = true;
-            setTimeout(() => {
-                triggerCooldown = false;
-            }, 1000);
+            setTimeout(() => { triggerCooldown = false; }, 1000);
         }
+        /* ---------- TOUCH CONTROLS ---------- */
         function setupMobileControls() {
             if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
                 document.getElementById('mobile-controls').style.display = 'block';
-                document.getElementById('pc-instructions').style.display = 'none';
+                const pc = document.getElementById('pc-instructions');
+                if (pc) pc.style.display = 'none';
             }
+
             const setupBtn = (id, direction) => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
-                const press = (e) => {
-                    e.preventDefault();
-                    activeKeys[direction] = true;
-                };
-                const release = (e) => {
-                    e.preventDefault();
-                    activeKeys[direction] = false;
-                };
+                const press = (e) => { e.preventDefault(); activeKeys[direction] = true; };
+                const release = (e) => { e.preventDefault(); activeKeys[direction] = false; };
                 btn.addEventListener('touchstart', press, { passive: false });
                 btn.addEventListener('mousedown', press, { passive: false });
                 btn.addEventListener('touchend', release, { passive: false });
                 btn.addEventListener('mouseup', release, { passive: false });
                 btn.addEventListener('mouseleave', release, { passive: false });
             };
+
             setupBtn('btn-up', 'up');
             setupBtn('btn-down', 'down');
             setupBtn('btn-left', 'left');
