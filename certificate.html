@@ -4,241 +4,540 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jon Lewyn | Certifications</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <meta name="description" content="Seminars, technical trainings, and on-the-job training completed by Jon Lewyn Villaram Tanggaro, 2024 to 2026.">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
+        /* Same token system as the homepage. Dark is the default,
+           light is opt-in via [data-theme="light"]. */
         :root {
-            --bg-color: #1e1e2f;
-            --panel-bg: #2a2a40;
-            --text-main: #f8f8f2;
-            --text-muted: #a8a8b2;
-            --retro-green: #4ade80;
-            --retro-blue: #3b82f6;
-            --retro-purple: #bd93f9;
-            --retro-pink: #ff79c6;
-            --retro-gold: #facc15;
-            --border-dark: #000000;
+            --surface:      #000000;
+            --surface-alt:  #101012;
+            --ink:          #f5f5f7;
+            --ink-sub:      #86868b;
+            --accent:       #2997ff;
+            --accent-hover: #47a8ff;
+            --hairline:     rgba(255, 255, 255, 0.12);
+            --card:         #1c1c1e;
+            --chip:         rgba(255, 255, 255, 0.08);
+            --nav-bg:       rgba(0, 0, 0, 0.72);
+            --shadow-lift:  0 18px 44px rgba(0, 0, 0, 0.7);
+            --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+            --shell: 1100px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+        [data-theme="light"] {
+            --surface:      #ffffff;
+            --surface-alt:  #f5f5f7;
+            --ink:          #1d1d1f;
+            --ink-sub:      #6e6e73;
+            --accent:       #0071e3;
+            --accent-hover: #0077ed;
+            --hairline:     rgba(0, 0, 0, 0.10);
+            --card:         #ffffff;
+            --chip:         rgba(0, 0, 0, 0.05);
+            --nav-bg:       rgba(255, 255, 255, 0.72);
+            --shadow-lift:  0 18px 44px rgba(0, 0, 0, 0.10);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
         body {
-            font-family: 'Press Start 2P', cursive;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.8;
-            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
-            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
-            background-size: 30px 30px;
-            padding: 40px 20px;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                         "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 17px;
+            line-height: 1.47;
+            letter-spacing: -0.022em;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
         }
 
-        a, button { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+        h1, h2, h3 { font-weight: 600; line-height: 1.05; text-wrap: balance; }
+        h1 { font-size: clamp(2.5rem, 6.5vw, 4.5rem); letter-spacing: -0.015em; }
+        h3 { font-size: 20px; letter-spacing: -0.01em; }
 
-        /* --- BACK BUTTON --- */
-        .back-btn {
-            display: inline-block; position: absolute; top: 30px; left: 30px;
-            background: var(--panel-bg); color: var(--text-main);
-            padding: 15px 20px; text-decoration: none; font-size: 0.7rem;
-            border: 4px solid var(--border-dark);
-            box-shadow: 6px 6px 0px var(--border-dark);
-            transition: all 0.1s;
-        }
-        .back-btn:hover { background: var(--retro-blue); }
-        .back-btn:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
+        p { color: var(--ink-sub); }
 
-        /* --- PAGE HEADER --- */
-        .page-header { text-align: center; margin-bottom: 60px; margin-top: 50px; }
-        .page-header h1 { 
-            font-size: 1.8rem; color: var(--retro-gold); 
-            text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 15px; line-height: 1.5;
-        }
-        .page-header p { font-size: 0.65rem; color: var(--text-muted); max-width: 800px; margin: 0 auto; line-height: 2; }
-
-        /* --- GALLERY GRID --- */
-        .gallery-container {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; max-width: 1200px; margin: 0 auto;
+        .lead {
+            font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+            line-height: 1.35; letter-spacing: -0.01em;
+            font-weight: 400; color: var(--ink-sub);
         }
 
-        /* --- CERTIFICATE CARDS --- */
-        .cert-card {
-            background: var(--panel-bg);
-            border: 6px solid var(--border-dark);
-            padding: 20px;
-            width: 100%; max-width: 350px; 
-            box-shadow: 10px 10px 0px var(--border-dark);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            display: flex;
-            flex-direction: column;
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        img { display: block; max-width: 100%; }
+
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px; border-radius: 6px;
         }
 
-        .cert-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0px 0px 25px var(--retro-purple), 10px 10px 0px var(--border-dark);
-            border-color: var(--retro-purple);
+        .shell { width: 100%; max-width: var(--shell); margin: 0 auto; padding: 0 22px; }
+
+        /* ---------- Nav ---------- */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+            height: 48px; display: flex; align-items: center;
+            background: transparent; border-bottom: 1px solid transparent;
+            transition: background-color 0.4s var(--ease),
+                        backdrop-filter 0.4s var(--ease),
+                        border-color 0.4s var(--ease);
+        }
+        .nav.is-stuck {
+            background: var(--nav-bg);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-bottom-color: var(--hairline);
         }
 
-        .cert-image {
-            width: 100%;
-            height: auto;
-            border: 4px solid var(--border-dark);
-            display: block;
-            margin-bottom: 20px;
-            background: #000; 
+        .nav-inner {
+            width: 100%; max-width: var(--shell); margin: 0 auto; padding: 0 22px;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        }
+        .nav-back {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 12px; color: var(--ink);
+        }
+        .nav-back:hover { opacity: 0.62; text-decoration: none; }
+        .nav-back .chev { font-size: 13px; transition: transform 0.3s var(--ease); }
+        .nav-back:hover .chev { transform: translateX(-3px); }
+
+        .nav-here { font-size: 12px; color: var(--ink-sub); }
+
+        .icon-btn {
+            width: 32px; height: 32px; border: 0; border-radius: 50%;
+            background: none; color: var(--ink); font-size: 13px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: background-color 0.3s var(--ease);
+        }
+        .icon-btn:hover { background: var(--chip); }
+
+        /* ---------- Reveal ---------- */
+        [data-reveal] {
+            opacity: 0; transform: translateY(40px);
+            transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+        }
+        [data-reveal].is-in { opacity: 1; transform: none; }
+        [data-reveal][data-delay="1"] { transition-delay: 0.08s; }
+        [data-reveal][data-delay="2"] { transition-delay: 0.16s; }
+        [data-reveal][data-delay="3"] { transition-delay: 0.24s; }
+
+        /* ---------- Masthead ---------- */
+        .masthead {
+            padding: 150px 0 70px;
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .masthead::before {
+            content: ""; position: absolute; inset: -30% -10% auto -10%; height: 80%;
+            background:
+                radial-gradient(50% 55% at 30% 30%, rgba(41, 151, 255, 0.16), transparent 70%),
+                radial-gradient(45% 50% at 74% 18%, rgba(94, 92, 230, 0.14), transparent 70%);
+            pointer-events: none;
+        }
+        .masthead > * { position: relative; }
+
+        .eyebrow {
+            font-size: 19px; font-weight: 600; letter-spacing: -0.01em;
+            color: var(--accent); margin-bottom: 10px;
+        }
+        .masthead .lead { max-width: 640px; margin: 20px auto 0; }
+
+        .tally {
+            display: flex; flex-wrap: wrap; justify-content: center;
+            margin-top: 54px;
+        }
+        .tally div { padding: 0 32px; border-left: 1px solid var(--hairline); }
+        .tally div:first-child { border-left: 0; }
+        .tally strong {
+            display: block; font-size: 30px; font-weight: 600;
+            letter-spacing: -0.015em; color: var(--ink);
+        }
+        .tally span { font-size: 14px; color: var(--ink-sub); }
+
+        /* ---------- Gallery ---------- */
+        .gallery { padding: 40px 0 110px; }
+
+        .grid {
+            display: grid; gap: 22px;
+            grid-template-columns: repeat(3, 1fr);
         }
 
-        .cert-info { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .cert-info h3 { font-size: 0.65rem; color: var(--retro-green); margin-bottom: 12px; line-height: 1.5; }
+        .cert {
+            background: var(--card);
+            border: 1px solid var(--hairline);
+            border-radius: 20px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+        }
+        .cert:hover { transform: translateY(-6px); box-shadow: var(--shadow-lift); }
 
-        /* Intro blurb describing each seminar/event */
-        .cert-desc {
-            font-size: 0.5rem;
-            color: var(--text-main);
-            line-height: 1.9;
-            text-align: left;
-            margin-bottom: 16px;
-            opacity: 0.92;
+        /* The scan is the point of the card, so it leads and it is the link. */
+        .cert-shot {
+            display: block; background: var(--surface-alt);
+            border-bottom: 1px solid var(--hairline);
+            overflow: hidden;
+        }
+        .cert-shot img {
+            width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+            transition: transform 0.6s var(--ease);
+        }
+        .cert-shot:hover img { transform: scale(1.04); }
+
+        .cert-body {
+            padding: 24px 24px 22px;
+            display: flex; flex-direction: column; flex: 1;
         }
 
-        /* Institution + date meta line */
+        /* Kind is real information: what sort of credential this is. */
+        .cert-kind {
+            font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+            text-transform: uppercase; color: var(--accent);
+            margin-bottom: 9px;
+        }
+
+        .cert h3 { margin-bottom: 10px; }
+        .cert-desc { font-size: 14px; line-height: 1.5; margin-bottom: 18px; }
+
         .cert-meta {
-            font-size: 0.5rem;
-            color: var(--text-muted);
-            line-height: 1.7;
-            margin-bottom: 18px;
-            padding-top: 12px;
-            border-top: 2px solid rgba(189, 147, 249, 0.25);
+            margin-top: auto; padding-top: 16px;
+            border-top: 1px solid var(--hairline);
+            display: flex; flex-direction: column; gap: 4px;
+            font-size: 13px; color: var(--ink-sub);
+        }
+        .cert-meta .where { color: var(--ink); font-weight: 500; }
+
+        .link-more {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 14px; margin-top: 14px;
+        }
+        .link-more:hover { text-decoration: none; }
+        .link-more .chev { transition: transform 0.3s var(--ease); }
+        .link-more:hover .chev { transform: translateX(3px); }
+
+        /* ---------- Footer ---------- */
+        .foot {
+            border-top: 1px solid var(--hairline);
+            padding: 34px 0 46px; text-align: center;
+        }
+        .foot p { font-size: 12px; }
+        .foot .foot-links { margin-bottom: 10px; display: flex; gap: 22px; justify-content: center; }
+        .foot .foot-links a { font-size: 12px; }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .masthead { padding: 128px 0 56px; }
+            .tally div { padding: 0 22px; }
+        }
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+            .tally { gap: 26px; }
+            .tally div { border-left: 0; padding: 0; }
+            .cert-body { padding: 20px; }
         }
 
-        /* Pin icon */
-        .pin {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 30px; height: 30px; background: var(--retro-pink);
-            border: 4px solid var(--border-dark); border-radius: 50%;
-            box-shadow: 2px 2px 0px var(--border-dark); z-index: 2;
-        }
-
-        /* PDF Button */
-        .pdf-btn {
-            display: inline-block; background: var(--retro-blue); color: #fff;
-            padding: 12px; font-size: 0.6rem; text-decoration: none;
-            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
-            transition: all 0.1s; width: 100%; margin-top: auto;
-        }
-        .pdf-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-
-        @media (max-width: 768px) {
-            .back-btn { position: static; display: block; width: max-content; margin: 0 auto 30px auto; }
-            .page-header { margin-top: 0; }
-            .page-header h1 { font-size: 1.2rem; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 0.001s !important;
+                transition-duration: 0.001s !important;
+            }
+            [data-reveal] { opacity: 1; transform: none; }
         }
     </style>
 </head>
 <body>
+    <nav class="nav" id="nav">
+        <div class="nav-inner">
+            <a class="nav-back" href="index.html">
+                <span class="chev">&lsaquo;</span> Jon Lewyn
+            </a>
+            <span class="nav-here">Certifications</span>
+            <button class="icon-btn" id="theme-btn" type="button" title="Switch to light" aria-label="Toggle appearance">
+                <i class="fas fa-sun" id="theme-icon"></i>
+            </button>
+        </div>
+    </nav>
 
-    <a href="index.html" class="back-btn">◀ RETURN TO BASE</a>
-
-    <div class="page-header">
-        <h1><i class="fas fa-trophy"></i> ACHIEVEMENT ARCHIVE</h1>
-        <p>A collection of verified credentials, course completions, and official documentation.</p>
-    </div>
-
-    <div class="gallery-container">
-        
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert1.png" alt="RF Engineering Certificate" class="cert-image">
-            <div class="cert-info">
-                <h3>HARNESSING INVISIBLE WAVES: RF ENGINEERING</h3>
-                <p class="cert-desc">A seminar on how radio frequency engineering reaches beyond communications into therapeutic and medical innovation &mdash; covering RF fundamentals, wave behavior, and their real-world biomedical applications.</p>
-                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>March 14, 2026</p>
-                <a href="certificates/cert1.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
+    <header class="masthead">
+        <div class="shell">
+            <p class="eyebrow" data-reveal>Certifications</p>
+            <h1 data-reveal data-delay="1">Proof of the work.</h1>
+            <p class="lead" data-reveal data-delay="2">
+                Seminars, hands-on technical trainings, and 240 hours of on-the-job
+                training completed between 2024 and 2026. Every card opens the original
+                certificate.
+            </p>
+            <div class="tally" data-reveal data-delay="3">
+                <div><strong>8</strong><span>Credentials</span></div>
+                <div><strong>240</strong><span>OJT hours</span></div>
+                <div><strong>3</strong><span>Years running</span></div>
             </div>
         </div>
+    </header>
 
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert2.png" alt="Manufacturing Certificate" class="cert-image">
-            <div class="cert-info">
-                <h3>FUTURE-READY MANUFACTURING</h3>
-                <p class="cert-desc">A deep dive into the trends and technologies reshaping modern industry &mdash; from automation and smart factories to the innovations driving the next wave of industrial evolution.</p>
-                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>March 14, 2026</p>
-                <a href="certificates/cert2.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
+    <main class="gallery">
+        <div class="shell">
+            <div class="grid">
+                <article class="cert" data-reveal>
+                    <a class="cert-shot" href="certificates/cert1.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert1.png" alt="Certificate: Harnessing Invisible Waves, RF engineering seminar">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">Seminar</p>
+                        <h3>Harnessing Invisible Waves: RF Engineering</h3>
+                        <p class="cert-desc">
+                            How radio frequency engineering reaches past communications into
+                            therapeutic and medical innovation.
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">PUP Sto. Tomas Campus</span>
+                            <span>March 14, 2026</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert1.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="cert" data-reveal data-delay="1">
+                    <a class="cert-shot" href="certificates/cert2.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert2.png" alt="Certificate: Future-Ready Manufacturing seminar">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">Seminar</p>
+                        <h3>Future-Ready Manufacturing</h3>
+                        <p class="cert-desc">
+                            Trends and technologies reshaping industry, from automation to
+                            smart factories.
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">PUP Sto. Tomas Campus</span>
+                            <span>March 14, 2026</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert2.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="cert" data-reveal data-delay="2">
+                    <a class="cert-shot" href="certificates/cert3.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert3.png" alt="Certificate: ElectroNext, transceiver regulations and practice">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">Seminar</p>
+                        <h3>ElectroNext: Transceiver Regs &amp; Practice</h3>
+                        <p class="cert-desc">
+                            Radio transceiver regulations, permitting, and the professional
+                            practice around them.
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">PUP Sto. Tomas Campus</span>
+                            <span>May 24, 2024</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert3.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="cert" data-reveal>
+                    <a class="cert-shot" href="certificates/cert4.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert4.png" alt="Certificate: 2nd Batangas ECE Student Summit">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">Summit</p>
+                        <h3>2nd Batangas ECE Student Summit</h3>
+                        <p class="cert-desc">
+                            Themed &ldquo;Beyond BoundarECE: Harnessing Innovation and
+                            Unlocking Possibilities.&rdquo;
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">IECEP-BatESC &middot; Batangas State University, Alangilan</span>
+                            <span>March 8, 2025</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert4.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="cert" data-reveal data-delay="1">
+                    <a class="cert-shot" href="certificates/cert5.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert5.png" alt="Certificate: The Future of Connectivity seminar">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">Seminar</p>
+                        <h3>The Future of Connectivity</h3>
+                        <p class="cert-desc">
+                            Fiber optic networks, 5G, and where high-speed connectivity is
+                            heading next.
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">PUP Sto. Tomas Campus</span>
+                            <span>April 18, 2026</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert5.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="cert" data-reveal data-delay="2">
+                    <a class="cert-shot" href="certificates/cert6.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert6.png" alt="Certificate: Basic Fiber Optics Training">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">Technical training</p>
+                        <h3>Basic Fiber Optics Training</h3>
+                        <p class="cert-desc">
+                            Hands-on with cable types, splicing, termination, and testing.
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">G-Connect Systems &amp; Trading Corp., Malvar, Batangas</span>
+                            <span>July 20, 2026</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert6.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="cert" data-reveal>
+                    <a class="cert-shot" href="certificates/cert7.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert7.png" alt="Certificate: Data Center, FTTH and Networking Training">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">Technical training</p>
+                        <h3>Data Center, FTTH &amp; Networking</h3>
+                        <p class="cert-desc">
+                            Data center operations, fiber-to-the-home deployment, and core
+                            networking.
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">G-Connect Systems &amp; Trading Corp., Malvar, Batangas</span>
+                            <span>August 16, 2026</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert7.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="cert" data-reveal data-delay="1">
+                    <a class="cert-shot" href="certificates/cert8.pdf" target="_blank" rel="noopener">
+                        <img src="certificates/cert8.png" alt="Certificate: On-the-job training, 240 hours">
+                    </a>
+                    <div class="cert-body">
+                        <p class="cert-kind">On-the-job training</p>
+                        <h3>On-the-Job Training &mdash; 240 hours</h3>
+                        <p class="cert-desc">
+                            A full 240-hour placement putting the fiber optics and networking
+                            training to work on live jobs.
+                        </p>
+                        <div class="cert-meta">
+                            <span class="where">G-Connect Systems &amp; Trading Corp., Malvar, Batangas</span>
+                            <span>July 6 &ndash; August 21, 2026</span>
+                        </div>
+                        <a class="link-more" href="certificates/cert8.pdf" target="_blank" rel="noopener">
+                            View certificate <span class="chev">&rsaquo;</span>
+                        </a>
+                    </div>
+                </article>
             </div>
         </div>
+    </main>
 
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert3.png" alt="Electronext Certificate" class="cert-image">
-            <div class="cert-info">
-                <h3>ELECTRONEXT: TRANSCEIVER REGS & PRACTICE</h3>
-                <p class="cert-desc">A comprehensive guide to radio transceiver regulations, permitting, and professional practice in Electronics Engineering &mdash; essential groundwork for licensure and real-world compliance.</p>
-                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>May 24, 2024</p>
-                <a href="certificates/cert3.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
+    <footer class="foot">
+        <div class="shell">
+            <div class="foot-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="resume.html">Resume</a>
             </div>
+            <p>Jon Lewyn Villaram Tanggaro &middot; Electronics Engineering, PUP Sto. Tomas</p>
         </div>
+    </footer>
 
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert4.png" alt="Batangas ECE Student Summit" class="cert-image">
-            <div class="cert-info">
-                <h3>2ND BATANGAS ECE STUDENT SUMMIT</h3>
-                <p class="cert-desc">A regional gathering of ECE students under the theme "Beyond BoundarECE: Harnessing Innovation and Unlocking Possibilities" &mdash; a day of industry talks, networking, and professional development.</p>
-                <p class="cert-meta">IECEP-BatESC &middot; Batangas State University, Alangilan<br>March 8, 2025</p>
-                <a href="certificates/cert4.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
-            </div>
-        </div>
+    <script>
+    (function () {
+        'use strict';
 
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert5.png" alt="The Future of Connectivity Certificate" class="cert-image">
-            <div class="cert-info">
-                <h3>THE FUTURE OF CONNECTIVITY</h3>
-                <p class="cert-desc">A seminar on how fiber optic networks power emerging technologies &mdash; the backbone behind high-speed connectivity, 5G, and an increasingly data-driven world.</p>
-                <p class="cert-meta">Polytechnic University of the Philippines - Sto. Tomas Campus<br>April 18, 2026</p>
-                <a href="certificates/cert5.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
-            </div>
-        </div>
+        const root      = document.documentElement;
+        const nav       = document.getElementById('nav');
+        const themeBtn  = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
 
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert6.png" alt="Basic Fiber Optics Training Certificate" class="cert-image">
-            <div class="cert-info">
-                <h3>BASIC FIBER OPTICS TRAINING</h3>
-                <p class="cert-desc">Hands-on training in the fundamentals of fiber optics &mdash; cable types, splicing, termination, and testing &mdash; completed through G-Connect's technical program.</p>
-                <p class="cert-meta">G-Connect Systems & Trading Corp. - Malvar, Batangas<br>July 20, 2026</p>
-                <a href="certificates/cert6.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
-            </div>
-        </div>
+        /* ---------- Appearance ----------
+           Dark is the default. Light is opt-in and remembered under the same
+           key the homepage uses, so the choice carries between pages. */
+        function paintThemeIcon() {
+            const light = root.getAttribute('data-theme') === 'light';
+            themeIcon.className = light ? 'fas fa-moon' : 'fas fa-sun';
+            themeBtn.setAttribute('title', light ? 'Switch to dark' : 'Switch to light');
+        }
 
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert7.png" alt="Data Center, FTTH & Networking Training Certificate" class="cert-image">
-            <div class="cert-info">
-                <h3>DATA CENTER, FTTH & NETWORKING TRAINING</h3>
-                <p class="cert-desc">Practical training in data center operations, Fiber-to-the-Home (FTTH) deployment, and core networking &mdash; building real-world skills in modern connectivity infrastructure.</p>
-                <p class="cert-meta">G-Connect Systems & Trading Corp. - Malvar, Batangas<br>August 16, 2026</p>
-                <a href="certificates/cert7.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
-            </div>
-        </div>
+        if (localStorage.getItem('arcade-theme') === 'light') {
+            root.setAttribute('data-theme', 'light');
+        }
+        paintThemeIcon();
 
-        <div class="cert-card">
-            <div class="pin"></div>
-            <img src="certificates/cert8.png" alt="On-the-Job Training Completion Certificate" class="cert-image">
-            <div class="cert-info">
-                <h3>ON-THE-JOB TRAINING (240 HRS)</h3>
-                <p class="cert-desc">Completion of a 240-hour on-the-job training program at G-Connect Systems & Trading Corp., applying fiber optics and networking skills in a live industry setting.</p>
-                <p class="cert-meta">G-Connect Systems & Trading Corp. - Malvar, Batangas<br>July 6 &ndash; August 21, 2026</p>
-                <a href="certificates/cert8.pdf" target="_blank" class="pdf-btn"><i class="fas fa-file-pdf"></i> VIEW PDF</a>
-            </div>
-        </div>
+        themeBtn.addEventListener('click', function () {
+            const light = root.getAttribute('data-theme') === 'light';
+            if (light) {
+                root.removeAttribute('data-theme');
+                localStorage.setItem('arcade-theme', 'dark');
+            } else {
+                root.setAttribute('data-theme', 'light');
+                localStorage.setItem('arcade-theme', 'light');
+            }
+            paintThemeIcon();
+        });
 
-    </div>
+        /* ---------- Scroll reveal ---------- */
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const revealables  = document.querySelectorAll('[data-reveal]');
 
+        if (reduceMotion || !('IntersectionObserver' in window)) {
+            revealables.forEach(function (el) { el.classList.add('is-in'); });
+        } else {
+            const io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('is-in');
+                    io.unobserve(entry.target);
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+            revealables.forEach(function (el) { io.observe(el); });
+        }
+
+        /* ---------- Nav blur-in ----------
+           One rAF-throttled handler, same pattern as the homepage. */
+        let ticking = false;
+        function onScrollFrame() {
+            nav.classList.toggle('is-stuck', (window.scrollY || window.pageYOffset) > 12);
+            ticking = false;
+        }
+        function requestScrollFrame() {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(onScrollFrame);
+        }
+        window.addEventListener('scroll', requestScrollFrame, { passive: true });
+        onScrollFrame();
+    })();
+    </script>
 </body>
 </html>
