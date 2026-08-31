@@ -3,370 +3,603 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume | Jon Lewyn Tanggaro</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <title>Jon Lewyn Tanggaro | Resume</title>
+    <meta name="description" content="Resume of Jon Lewyn Villaram Tanggaro — Electronics Engineering student at PUP Sto. Tomas, with experience in automation, fiber optics, and web development.">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
-        /* Retro Arcade Theme */
+        /* Same token system as the homepage and certificates page.
+           Dark is the default, light is opt-in via [data-theme="light"]. */
         :root {
-            --bg-color: #1e1e2f;
-            --panel-bg: #2a2a40;
-            --text-main: #f8f8f2;
-            --text-muted: #a8a8b2;
-            --retro-green: #4ade80;
-            --retro-blue: #3b82f6;
-            --retro-purple: #bd93f9;
-            --retro-pink: #ff79c6;
-            --retro-gold: #facc15;
-            --border-dark: #000000;
+            --surface:      #000000;
+            --surface-alt:  #101012;
+            --ink:          #f5f5f7;
+            --ink-sub:      #86868b;
+            --accent:       #2997ff;
+            --accent-hover: #47a8ff;
+            --hairline:     rgba(255, 255, 255, 0.12);
+            --card:         #1c1c1e;
+            --chip:         rgba(255, 255, 255, 0.08);
+            --nav-bg:       rgba(0, 0, 0, 0.72);
+            --shadow-lift:  0 18px 44px rgba(0, 0, 0, 0.7);
+            --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+            --shell: 980px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        [data-theme="light"] {
+            --surface:      #ffffff;
+            --surface-alt:  #f5f5f7;
+            --ink:          #1d1d1f;
+            --ink-sub:      #6e6e73;
+            --accent:       #0071e3;
+            --accent-hover: #0077ed;
+            --hairline:     rgba(0, 0, 0, 0.10);
+            --card:         #ffffff;
+            --chip:         rgba(0, 0, 0, 0.05);
+            --nav-bg:       rgba(255, 255, 255, 0.72);
+            --shadow-lift:  0 18px 44px rgba(0, 0, 0, 0.10);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'VT323', monospace; /* Highly readable retro font for body */
-            font-size: 1.2rem;
-            line-height: 1.6;
-            cursor: url('https://labs.phaser.io/assets/sprites/hand.png'), auto;
-            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
-            background-size: 30px 30px;
-            padding: 40px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                         "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 17px;
+            line-height: 1.47;
+            letter-spacing: -0.022em;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
         }
 
-        a, button { cursor: url('https://labs.phaser.io/assets/sprites/cursor.png'), pointer !important; }
+        h1, h2, h3 { font-weight: 600; line-height: 1.05; text-wrap: balance; }
+        h1 { font-size: clamp(2.4rem, 6vw, 4rem); letter-spacing: -0.015em; }
+        h2 { font-size: clamp(1.6rem, 3.4vw, 2.4rem); letter-spacing: -0.012em; }
+        h3 { font-size: 19px; letter-spacing: -0.01em; }
 
-        .back-btn {
-            display: inline-block; margin-bottom: 30px;
-            background: var(--panel-bg); color: var(--text-main);
-            padding: 12px 16px; text-decoration: none; 
-            font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
-            border: 4px solid var(--border-dark);
-            box-shadow: 4px 4px 0px var(--border-dark);
-            transition: all 0.1s;
-        }
-        .back-btn:hover { background: var(--retro-blue); }
-        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        p { color: var(--ink-sub); }
 
-        .resume-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: var(--panel-bg);
-            border: 6px solid var(--border-dark);
-            box-shadow: 15px 15px 0px var(--border-dark);
-            position: relative;
+        .lead {
+            font-size: clamp(1.05rem, 2.1vw, 1.4rem);
+            line-height: 1.38; letter-spacing: -0.01em;
+            font-weight: 400; color: var(--ink-sub);
         }
 
-        /* Top Header */
-        .header {
-            padding: 40px;
-            border-bottom: 6px dashed var(--border-dark);
-            background: #1e1e2f;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            position: relative;
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        img { display: block; max-width: 100%; }
+
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px; border-radius: 6px;
         }
 
-        .header-pic {
-            width: 140px; height: 140px; object-fit: cover;
-            border: 4px solid var(--border-dark);
-            box-shadow: 6px 6px 0px var(--retro-blue);
-            image-rendering: pixelated;
-            background: #000;
+        .shell { width: 100%; max-width: var(--shell); margin: 0 auto; padding: 0 22px; }
+
+        /* ---------- Nav ---------- */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+            height: 48px; display: flex; align-items: center;
+            background: transparent; border-bottom: 1px solid transparent;
+            transition: background-color 0.4s var(--ease),
+                        backdrop-filter 0.4s var(--ease),
+                        border-color 0.4s var(--ease);
+        }
+        .nav.is-stuck {
+            background: var(--nav-bg);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-bottom-color: var(--hairline);
+        }
+        .nav-inner {
+            width: 100%; max-width: var(--shell); margin: 0 auto; padding: 0 22px;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        }
+        .nav-back {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 12px; color: var(--ink);
+        }
+        .nav-back:hover { opacity: 0.62; text-decoration: none; }
+        .nav-back .chev { font-size: 13px; transition: transform 0.3s var(--ease); }
+        .nav-back:hover .chev { transform: translateX(-3px); }
+        .nav-here { font-size: 12px; color: var(--ink-sub); }
+
+        .icon-btn {
+            width: 32px; height: 32px; border: 0; border-radius: 50%;
+            background: none; color: var(--ink); font-size: 13px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: background-color 0.3s var(--ease);
+        }
+        .icon-btn:hover { background: var(--chip); }
+
+        /* ---------- Reveal ---------- */
+        [data-reveal] {
+            opacity: 0; transform: translateY(36px);
+            transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+        }
+        [data-reveal].is-in { opacity: 1; transform: none; }
+        [data-reveal][data-delay="1"] { transition-delay: 0.08s; }
+        [data-reveal][data-delay="2"] { transition-delay: 0.16s; }
+        [data-reveal][data-delay="3"] { transition-delay: 0.24s; }
+
+        /* ---------- Masthead ---------- */
+        .masthead {
+            padding: 140px 0 64px;
+            position: relative; overflow: hidden; text-align: center;
+        }
+        .masthead::before {
+            content: ""; position: absolute; inset: -30% -10% auto -10%; height: 82%;
+            background:
+                radial-gradient(50% 55% at 30% 28%, rgba(41, 151, 255, 0.16), transparent 70%),
+                radial-gradient(45% 50% at 74% 16%, rgba(94, 92, 230, 0.14), transparent 70%);
+            pointer-events: none;
+        }
+        .masthead > * { position: relative; }
+
+        .portrait {
+            width: 116px; height: 116px; border-radius: 50%;
+            object-fit: cover; margin: 0 auto 26px;
+            border: 1px solid var(--hairline);
+            box-shadow: var(--shadow-lift);
+        }
+        .role {
+            font-size: 19px; font-weight: 600; letter-spacing: -0.01em;
+            color: var(--accent); margin-top: 16px;
+        }
+        .masthead .lead { max-width: 640px; margin: 16px auto 0; }
+
+        /* Contact row: quiet chips, one line on desktop. */
+        .contact {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+            margin-top: 30px;
+        }
+        .contact a, .contact span {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: var(--chip); border-radius: 980px;
+            padding: 9px 16px; font-size: 14px; color: var(--ink);
+            transition: background-color 0.3s var(--ease);
+        }
+        .contact a:hover { background: var(--accent); color: #fff; text-decoration: none; }
+        .contact i { color: var(--accent); font-size: 13px; }
+        .contact a:hover i { color: #fff; }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--accent); color: #fff;
+            border-radius: 980px; padding: 13px 26px;
+            font-size: 16px; font-weight: 400; margin-top: 30px;
+            transition: background-color 0.3s var(--ease), transform 0.3s var(--ease);
+        }
+        .btn:hover { background: var(--accent-hover); transform: scale(1.02); text-decoration: none; }
+
+        /* ---------- Sections ---------- */
+        .section { padding: 90px 0; }
+        .section--alt { background: var(--surface-alt); }
+        .section-head { margin-bottom: 44px; }
+        .section-head p { margin-top: 10px; font-size: 16px; }
+
+        /* Entries are a two-column split: dates left, substance right.
+           The date column is the timeline, so no decorative rail is needed. */
+        .entry {
+            display: grid; grid-template-columns: 190px 1fr; gap: 30px;
+            padding: 30px 0; border-top: 1px solid var(--hairline);
+        }
+        .entry:last-child { border-bottom: 1px solid var(--hairline); }
+        .entry-when { font-size: 14px; color: var(--ink-sub); padding-top: 3px; }
+        .entry-where { font-size: 15px; color: var(--ink-sub); margin-top: 6px; }
+        .entry h3 + .entry-where { margin-top: 5px; }
+        .entry-body { margin-top: 14px; font-size: 15px; line-height: 1.55; color: var(--ink-sub); }
+        .entry-body p + p { margin-top: 10px; }
+
+        .note {
+            font-size: 13px; font-weight: 600; letter-spacing: 0.03em;
+            text-transform: uppercase; color: var(--accent);
+            margin-top: 18px; margin-bottom: 8px;
+        }
+        .honor { color: var(--ink); font-weight: 500; }
+
+        /* ---------- Skills ---------- */
+        .tools { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tool {
+            background: var(--chip); border-radius: 980px;
+            padding: 9px 17px; font-size: 14px; color: var(--ink);
+        }
+        .groups {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 22px; margin-bottom: 34px;
+        }
+        .group {
+            background: var(--card); border: 1px solid var(--hairline);
+            border-radius: 18px; padding: 26px;
+            transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+        }
+        .group:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+        .group h3 { margin-bottom: 10px; }
+        .group p { font-size: 14px; line-height: 1.55; }
+
+        .link-more {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 16px; margin-top: 26px;
+        }
+        .link-more:hover { text-decoration: none; }
+        .link-more .chev { transition: transform 0.3s var(--ease); }
+        .link-more:hover .chev { transform: translateX(3px); }
+
+        /* ---------- Footer ---------- */
+        .foot {
+            border-top: 1px solid var(--hairline);
+            padding: 34px 0 46px; text-align: center;
+        }
+        .foot p { font-size: 12px; }
+        .foot-links {
+            margin-bottom: 10px; display: flex; gap: 22px; justify-content: center;
+            flex-wrap: wrap;
+        }
+        .foot-links a { font-size: 12px; }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 760px) {
+            .section { padding: 66px 0; }
+            .masthead { padding: 120px 0 52px; }
+            .entry { grid-template-columns: 1fr; gap: 8px; }
+            .entry-when { order: -1; }
+            .groups { grid-template-columns: 1fr; }
         }
 
-        .header-content { flex: 1; }
-
-        h1 {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 1.3rem; color: var(--retro-gold);
-            text-shadow: 3px 3px 0px var(--border-dark);
-            margin: 0 0 15px 0; line-height: 1.4;
-        }
-
-        .title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.7rem; color: var(--retro-green);
-            margin-bottom: 20px;
-        }
-
-        .contact-info {
-            display: flex; flex-wrap: wrap; gap: 15px;
-            font-size: 1.1rem; color: var(--text-main);
-        }
-
-        .contact-info a, .contact-info span {
-            color: var(--text-main); text-decoration: none;
-            display: flex; align-items: center; gap: 8px;
-            transition: color 0.2s;
-        }
-        .contact-info i { color: var(--retro-pink); }
-        .contact-info a:hover { color: var(--retro-blue); }
-
-        /* PDF Download Button */
-        .download-btn {
-            position: absolute; top: 30px; right: 30px;
-            background: var(--retro-purple); color: #fff;
-            padding: 15px; border: 4px solid var(--border-dark);
-            box-shadow: 6px 6px 0px var(--border-dark);
-            text-decoration: none; font-family: 'Press Start 2P', cursive;
-            font-size: 0.6rem; display: flex; align-items: center; gap: 8px;
-            transition: all 0.1s;
-        }
-        .download-btn:hover { background: var(--retro-pink); }
-        .download-btn:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
-
-        /* Layout Grid */
-        .content {
-            display: grid; grid-template-columns: 2fr 1fr;
-            gap: 40px; padding: 40px;
-        }
-
-        /* Sections */
-        .section-title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 1rem; color: var(--retro-blue);
-            margin-bottom: 30px; display: flex; align-items: center; gap: 15px;
-            border-bottom: 4px solid var(--border-dark);
-            padding-bottom: 15px; text-shadow: 2px 2px 0px var(--border-dark);
-        }
-        .section-title i { color: var(--retro-gold); }
-
-        /* Items */
-        .item { margin-bottom: 40px; }
-        .item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;}
-        
-        .item-title { 
-            font-family: 'Press Start 2P', cursive; 
-            font-size: 0.7rem; color: var(--retro-green); 
-            line-height: 1.4;
-        }
-        .item-subtitle { color: #fff; font-weight: bold; font-size: 1.3rem; margin-top: 5px; }
-        .item-date { color: var(--retro-pink); font-family: 'Press Start 2P', cursive; font-size: 0.55rem; }
-        
-        .item-desc { color: var(--text-muted); font-size: 1.1rem; margin-top: 10px; }
-        .item-desc ul { list-style: none; padding: 0; margin-top: 10px; }
-        .item-desc li { position: relative; padding-left: 20px; margin-bottom: 8px; }
-        .item-desc li::before {
-            content: "►"; position: absolute; left: 0; top: 2px;
-            color: var(--retro-purple); font-size: 0.9rem;
-        }
-
-        /* Sidebar Elements */
-        .sidebar-section { margin-bottom: 50px; }
-        
-        .skills-list { list-style: none; padding: 0; margin: 0; }
-        .skills-list li {
-            position: relative; padding-left: 25px; margin-bottom: 15px;
-            font-size: 1.1rem; color: var(--text-main);
-        }
-        .skills-list li::before {
-            content: "■"; position: absolute; left: 0; top: 2px;
-            color: var(--retro-gold); font-size: 0.8rem;
-        }
-
-        .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
-        .tag {
-            background: #000; border: 2px solid var(--retro-blue);
-            color: var(--retro-cyan); font-family: 'Press Start 2P', cursive;
-            font-size: 0.55rem; padding: 10px;
-            box-shadow: 3px 3px 0px var(--border-dark);
-            transition: all 0.2s;
-        }
-        .tag:hover { background: var(--retro-blue); color: #fff; transform: translateY(-2px); }
-
-        @media (max-width: 900px) {
-            .content { grid-template-columns: 1fr; gap: 20px; padding: 20px;}
-            .header { flex-direction: column; text-align: center; padding: 30px 20px; }
-            .contact-info { justify-content: center; }
-            .download-btn { position: relative; top: 0; right: 0; display: inline-flex; margin-top: 20px; justify-content: center; width: 100%;}
-            .item-header { flex-direction: column; }
-            h1 { font-size: 1rem; line-height: 1.6;}
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 0.001s !important;
+                transition-duration: 0.001s !important;
+            }
+            [data-reveal] { opacity: 1; transform: none; }
         }
     </style>
 </head>
 <body>
-
-    <a href="index.html" class="back-btn">
-        ◀ RETURN TO MAIN INTERFACE
-    </a>
-
-    <div class="resume-container">
-        
-        <header class="header">
-            <img src="me.jpg" alt="Jon Lewyn Tanggaro" class="header-pic">
-            
-            <div class="header-content">
-                <h1>JON LEWYN V. TANGGARO</h1>
-                <div class="title">&gt; ECE STUDENT & FULL-STACK DEVELOPER</div>
-                
-                <div class="contact-info">
-                    <span><i class="fas fa-map-marker-alt"></i> Talaga, Tanauan City</span>
-                    <a href="mailto:lewynvllram@gmail.com"><i class="fas fa-envelope"></i> lewynvllram@gmail.com</a>
-                    <a href="tel:+639707210609"><i class="fas fa-phone"></i> +63 970 721 0609</a>
-                    <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                    <a href="https://lewynski.github.io" target="_blank"><i class="fas fa-globe"></i> Portfolio</a>
-                </div>
-            </div>
-
-            <a href="Tanggaro_Resume.pdf" target="_blank" class="download-btn">
-                <i class="fas fa-download"></i> PRINT PDF
+    <nav class="nav" id="nav">
+        <div class="nav-inner">
+            <a class="nav-back" href="index.html">
+                <span class="chev">&lsaquo;</span> Jon Lewyn
             </a>
-        </header>
-
-        <div class="content">
-            
-            <div class="main-column">
-                
-                <section>
-                    <h2 class="section-title"><i class="fas fa-briefcase"></i> EXPERIENCE</h2>
-                    
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">Electronics Engineering Intern (OJT)</span>
-                            <span class="item-date">JUL 2025 – AUG 2025</span>
-                        </div>
-                        <div class="item-subtitle">Bandai Wireharness Philippines INC.</div>
-                        <div class="item-desc">
-                            <ul>
-                                <li>Developed and implemented an automated company system using macro programming, successfully reducing production time and manual workload.</li>
-                                <li>Monitored the production line to understand manufacturing workflows and assisted supervisors in documenting daily production metrics.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">Secondary Education Work Immersion</span>
-                            <span class="item-date">APR 2023 – MAY 2023</span>
-                        </div>
-                        <div class="item-subtitle">Negros Occidental Electric Cooperative (NOCECO)</div>
-                        <div class="item-desc">
-                            <ul>
-                                <li>Assisted company supervisors in their daily tasks and gained hands-on experience in industry related operations. And also created an automation system with the help of Macro Programming Language.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
-                <section>
-                    <h2 class="section-title"><i class="fas fa-graduation-cap"></i> EDUCATION</h2>
-                    
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">B.S. Electronics Engineering</span>
-                            <span class="item-date">2023 – PRESENT</span>
-                        </div>
-                        <div class="item-subtitle">Polytechnic University of the Philippines</div>
-                        <div class="item-desc">
-                            <p style="margin-top: 10px; color: var(--retro-gold); font-weight: bold;">[ AFFILIATIONS ]</p>
-                            <ul>
-                                <li>Organization of Electronics Engineering Students (OECES) of PUP - Sto. Tomas Campus.</li>
-                                <li>Special Project Officer for OECES at PUP Sto. Tomas Campus.</li>
-                                <li>Institute of Electronics Engineers of the Philippines - Batangas Student Chapter.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">Senior High School (STEM)</span>
-                            <span class="item-date">2021 – 2023</span>
-                        </div>
-                        <div class="item-subtitle">Fellowship Baptist College</div>
-                        <div class="item-desc">
-                            <ul>
-                                <li style="color: var(--retro-green);">Graduated With High Honor</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">Junior High School</span>
-                            <span class="item-date">2017 – 2021</span>
-                        </div>
-                        <div class="item-subtitle">Fellowship Baptist College</div>
-                        <div class="item-desc">
-                            <ul>
-                                <li style="color: var(--retro-green);">Graduated With Honor</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="item">
-                        <div class="item-header">
-                            <span class="item-title">Primary Education</span>
-                            <span class="item-date">2011 – 2017</span>
-                        </div>
-                        <div class="item-subtitle">Jose G. Peralta Memorial School</div>
-                        <div class="item-desc">
-                            <ul>
-                                <li style="color: var(--retro-gold); text-shadow: 1px 1px 0px #000;">Graduated Valedictorian</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
-            </div>
-
-            <div class="side-column">
-                
-                <div class="sidebar-section">
-                    <h2 class="section-title"><i class="fas fa-microchip"></i> TECH SPECS</h2>
-                    <div class="tags">
-                        <span class="tag">Arduino Uno</span>
-                        <span class="tag">AutoCAD</span>
-                        <span class="tag">Python</span>
-                        <span class="tag">JavaScript</span>
-                        <span class="tag">CSS / HTML</span>
-                        <span class="tag">NI Multisim</span>
-                        <span class="tag">Quartus (FPGA)</span>
-                        <span class="tag">Canva</span>
-                        <span class="tag">Livewire</span>
-                        <span class="tag">Everycircuit</span>
-                        <span class="tag">Falstad</span>
-                        <span class="tag">MS Office</span>
-                        <span class="tag">Replit</span>
-                        <span class="tag">Render</span>
-                        <span class="tag">Railway</span>
-                        <span class="tag">MongoDB</span>
-                    </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <h2 class="section-title"><i class="fas fa-clipboard-list"></i> PASSIVES</h2>
-                    <ul class="skills-list">
-                        <li>Ability to adapt and be flexible in dynamic circumstances.</li>
-                        <li>Diligent and capable of working independently with minimal supervision.</li>
-                        <li>Motivated by enthusiasm and a strong sense of curiosity.</li>
-                        <li>Proficient in <strong style="color: var(--retro-pink);">Python</strong> and <strong style="color: var(--retro-pink);">JavaScript</strong>, with practical experience in HTML and CSS for web development.</li>
-                        <li>Familiar with utilizing Google Workspace (Docs, Sheets, Forms).</li>
-                        <li>Proficient in Microsoft Office Suite.</li>
-                        <li>Skilled in graphic design and capable of creating visual content using Canva.</li>
-                    </ul>
-                </div>
-
-                <div class="sidebar-section">
-                    <h2 class="section-title"><i class="fas fa-certificate"></i> QUEST LOG</h2>
-                    <ul class="skills-list">
-                        <li><strong>ELECTRONEXT:</strong> Guide to Radio Transceiver Regulations & Professional Practice.</li>
-                        <li><strong>1st Batangas ECE Summit:</strong> Role of Electronics in Building a Sustainable Future.</li>
-                        <li><strong>1st Batangas ECE Summit:</strong> Innovation Topic Seminar.</li>
-                        <li><strong>2nd Batangas ECE Summit:</strong> Shaping a Sustainable Future Seminar.</li>
-                        <li><<strong></strong>THE FUTURE OF CONNECTIVITY : How Fiber Networks Power Emerging Technologies.</li>
-                    </ul>
-                </div>
-
-            </div>
-            
+            <span class="nav-here">Resume</span>
+            <button class="icon-btn" id="theme-btn" type="button" title="Switch to light" aria-label="Toggle appearance">
+                <i class="fas fa-sun" id="theme-icon"></i>
+            </button>
         </div>
-    </div>
+    </nav>
 
+    <header class="masthead">
+        <div class="shell">
+            <img class="portrait" src="me.jpg" alt="Jon Lewyn Villaram Tanggaro" data-reveal>
+            <h1 data-reveal data-delay="1">Jon Lewyn V. Tanggaro</h1>
+            <p class="role" data-reveal data-delay="1">Electronics Engineering student &middot; developer</p>
+            <p class="lead" data-reveal data-delay="2">
+                I build things that sit on both sides of the line &mdash; circuits and
+                firmware on one, web apps and automation on the other.
+            </p>
+            <div class="contact" data-reveal data-delay="2">
+                <span><i class="fas fa-location-dot"></i> Talaga, Tanauan City</span>
+                <a href="mailto:lewynvllram@gmail.com"><i class="fas fa-envelope"></i> lewynvllram@gmail.com</a>
+                <a href="tel:+639707210609"><i class="fas fa-phone"></i> +63 970 721 0609</a>
+                <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                <a href="index.html"><i class="fas fa-globe"></i> Portfolio</a>
+            </div>
+            <a class="btn" href="Tanggaro_Resume.pdf" target="_blank" rel="noopener" data-reveal data-delay="3">
+                <i class="fas fa-arrow-down"></i> Download PDF
+            </a>
+        </div>
+    </header>
+
+    <section class="section section--alt">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <h2>Experience</h2>
+                <p>Three placements, each one ending in something that shipped.</p>
+            </div>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">Jul 6 &ndash; Aug 21, 2026</div>
+                <div>
+                    <h3>On-the-job training &mdash; fiber optics &amp; networking</h3>
+                    <p class="entry-where">G-Connect Systems &amp; Trading Corp., Malvar, Batangas</p>
+                    <div class="entry-body">
+                        <p>
+                            240 hours applying fiber optics and networking training on live work:
+                            splicing and termination, FTTH deployment, and data center operations.
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">Jul &ndash; Aug 2025</div>
+                <div>
+                    <h3>Electronics Engineering Intern</h3>
+                    <p class="entry-where">Bandai Wireharness Philippines Inc.</p>
+                    <div class="entry-body">
+                        <p>
+                            Built an automated internal system with macro programming that cut
+                            production time and manual workload.
+                        </p>
+                        <p>
+                            Monitored the production line to learn the manufacturing workflow, and
+                            helped supervisors document daily production metrics.
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">Apr &ndash; May 2023</div>
+                <div>
+                    <h3>Work immersion</h3>
+                    <p class="entry-where">Negros Occidental Electric Cooperative (NOCECO)</p>
+                    <div class="entry-body">
+                        <p>
+                            Supported supervisors on daily operations and wrote a macro-based
+                            automation to take a recurring manual task off their hands. First time
+                            I saw a script save someone real hours.
+                        </p>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <h2>Education</h2>
+            </div>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">2023 &ndash; present</div>
+                <div>
+                    <h3>B.S. Electronics Engineering</h3>
+                    <p class="entry-where">Polytechnic University of the Philippines &mdash; Sto. Tomas Campus</p>
+                    <div class="entry-body">
+                        <p class="note">Affiliations</p>
+                        <p>
+                            Organization of Electronics Engineering Students (OECES), PUP Sto. Tomas
+                            Campus &mdash; serving as Special Project Officer. Also a member of the
+                            Institute of Electronics Engineers of the Philippines, Batangas Student
+                            Chapter.
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">2021 &ndash; 2023</div>
+                <div>
+                    <h3>Senior High School, STEM</h3>
+                    <p class="entry-where">Fellowship Baptist College</p>
+                    <div class="entry-body"><p class="honor">Graduated with High Honor</p></div>
+                </div>
+            </article>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">2017 &ndash; 2021</div>
+                <div>
+                    <h3>Junior High School</h3>
+                    <p class="entry-where">Fellowship Baptist College</p>
+                    <div class="entry-body"><p class="honor">Graduated with Honor</p></div>
+                </div>
+            </article>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">2011 &ndash; 2017</div>
+                <div>
+                    <h3>Primary Education</h3>
+                    <p class="entry-where">Jose G. Peralta Memorial School</p>
+                    <div class="entry-body"><p class="honor">Valedictorian</p></div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <h2>What I work with</h2>
+                <p>Grouped by what the work actually is, not by logo count.</p>
+            </div>
+
+            <div class="groups">
+                <div class="group" data-reveal>
+                    <h3>Hardware &amp; embedded</h3>
+                    <p>Arduino Uno, FPGA work in Quartus, and circuit design on paper before it ever hits a board.</p>
+                </div>
+                <div class="group" data-reveal data-delay="1">
+                    <h3>Simulation &amp; design</h3>
+                    <p>NI Multisim, Falstad, EveryCircuit, Livewire for verifying a circuit, AutoCAD for drawing it.</p>
+                </div>
+                <div class="group" data-reveal data-delay="2">
+                    <h3>Code</h3>
+                    <p>Python and JavaScript day to day, with HTML and CSS for the front end of everything I ship.</p>
+                </div>
+                <div class="group" data-reveal data-delay="3">
+                    <h3>Deploy &amp; data</h3>
+                    <p>MongoDB behind the app; Vercel, Render, Railway, and Replit to get it online.</p>
+                </div>
+            </div>
+
+            <div class="tools" data-reveal>
+                <span class="tool">Python</span>
+                <span class="tool">JavaScript</span>
+                <span class="tool">HTML &amp; CSS</span>
+                <span class="tool">Arduino Uno</span>
+                <span class="tool">Quartus (FPGA)</span>
+                <span class="tool">NI Multisim</span>
+                <span class="tool">AutoCAD</span>
+                <span class="tool">Livewire</span>
+                <span class="tool">EveryCircuit</span>
+                <span class="tool">Falstad</span>
+                <span class="tool">MongoDB</span>
+                <span class="tool">Vercel</span>
+                <span class="tool">Render</span>
+                <span class="tool">Railway</span>
+                <span class="tool">Replit</span>
+                <span class="tool">Canva</span>
+                <span class="tool">MS Office</span>
+                <span class="tool">Google Workspace</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <h2>How I work</h2>
+            </div>
+            <div class="groups">
+                <div class="group" data-reveal>
+                    <h3>Independent</h3>
+                    <p>Comfortable running with a problem on minimal supervision and coming back with something finished.</p>
+                </div>
+                <div class="group" data-reveal data-delay="1">
+                    <h3>Adaptable</h3>
+                    <p>Requirements move. I would rather adjust the plan early than defend the old one.</p>
+                </div>
+                <div class="group" data-reveal data-delay="2">
+                    <h3>Curious by default</h3>
+                    <p>Most of what I know outside class came from taking something apart to see why it worked.</p>
+                </div>
+                <div class="group" data-reveal data-delay="3">
+                    <h3>Visual communicator</h3>
+                    <p>I design my own diagrams, posters, and slides in Canva rather than waiting on someone else.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <h2>Certifications</h2>
+                <p>Eight credentials from 2024 to 2026, including 240 hours of OJT.</p>
+            </div>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">2026</div>
+                <div>
+                    <h3>Fiber optics, data center &amp; FTTH training</h3>
+                    <p class="entry-where">G-Connect Systems &amp; Trading Corp.</p>
+                    <div class="entry-body">
+                        <p>Two hands-on trainings covering splicing, termination, testing, FTTH deployment, and data center operations.</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="entry" data-reveal>
+                <div class="entry-when">2024 &ndash; 2026</div>
+                <div>
+                    <h3>Seminars &amp; summits</h3>
+                    <p class="entry-where">PUP Sto. Tomas Campus &middot; IECEP Batangas Student Chapter</p>
+                    <div class="entry-body">
+                        <p>
+                            RF engineering beyond communications, future-ready manufacturing,
+                            radio transceiver regulations and professional practice, the future of
+                            fiber connectivity, and the 2nd Batangas ECE Student Summit.
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <a class="link-more" href="certificate.html" data-reveal>
+                See all certificates <span class="chev">&rsaquo;</span>
+            </a>
+        </div>
+    </section>
+
+    <footer class="foot">
+        <div class="shell">
+            <div class="foot-links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="certificate.html">Certificates</a>
+                <a href="mailto:lewynvllram@gmail.com">Email</a>
+            </div>
+            <p>Jon Lewyn Villaram Tanggaro &middot; Electronics Engineering, PUP Sto. Tomas</p>
+        </div>
+    </footer>
+
+    <script>
+    (function () {
+        'use strict';
+
+        const root      = document.documentElement;
+        const nav       = document.getElementById('nav');
+        const themeBtn  = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
+
+        /* ---------- Appearance ----------
+           Dark is the default. Light is opt-in and stored under the same key
+           the homepage and certificates page use, so it carries across. */
+        function paintThemeIcon() {
+            const light = root.getAttribute('data-theme') === 'light';
+            themeIcon.className = light ? 'fas fa-moon' : 'fas fa-sun';
+            themeBtn.setAttribute('title', light ? 'Switch to dark' : 'Switch to light');
+        }
+
+        if (localStorage.getItem('arcade-theme') === 'light') {
+            root.setAttribute('data-theme', 'light');
+        }
+        paintThemeIcon();
+
+        themeBtn.addEventListener('click', function () {
+            const light = root.getAttribute('data-theme') === 'light';
+            if (light) {
+                root.removeAttribute('data-theme');
+                localStorage.setItem('arcade-theme', 'dark');
+            } else {
+                root.setAttribute('data-theme', 'light');
+                localStorage.setItem('arcade-theme', 'light');
+            }
+            paintThemeIcon();
+        });
+
+        /* ---------- Scroll reveal ---------- */
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const revealables  = document.querySelectorAll('[data-reveal]');
+
+        if (reduceMotion || !('IntersectionObserver' in window)) {
+            revealables.forEach(function (el) { el.classList.add('is-in'); });
+        } else {
+            const io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('is-in');
+                    io.unobserve(entry.target);
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+            revealables.forEach(function (el) { io.observe(el); });
+        }
+
+        /* ---------- Nav blur-in ---------- */
+        let ticking = false;
+        function onScrollFrame() {
+            nav.classList.toggle('is-stuck', (window.scrollY || window.pageYOffset) > 12);
+            ticking = false;
+        }
+        function requestScrollFrame() {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(onScrollFrame);
+        }
+        window.addEventListener('scroll', requestScrollFrame, { passive: true });
+        onScrollFrame();
+    })();
+    </script>
 </body>
 </html>
