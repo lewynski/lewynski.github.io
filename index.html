@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jon Lewyn | Unfiltered</title>
     <meta name="description" content="Jon Lewyn Villaram Tanggaro - Electronics Engineering student building computational tools, embedded systems, and web applications.">
-
+    <!-- Dark first, so scrollbars and form controls match and there is no
+         white flash before the stylesheet applies. -->
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#000000">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,17 +16,46 @@
 
     <style>
         /* ============================================================
-           Design tokens. Apple's own system: near-white and #f5f5f7
+           Design tokens. Dark is the default: black and #101012
            alternating surfaces, two ink weights, one blue accent.
-           No third colour, no gradients on text, no borders.
+           Light is opt-in via [data-theme="light"].
            ============================================================ */
         :root {
+            --surface:      #000000;
+            --surface-alt:  #101012;
+            --surface-dark: #000000;
+            --ink:          #f5f5f7;
+            --ink-sub:      #86868b;
+            --ink-on-dark:  #f5f5f7;
+            --accent:       #2997ff;
+            --accent-hover: #47a8ff;
+            --hairline:     rgba(255, 255, 255, 0.12);
+            --card:         #1c1c1e;
+            --chip:         rgba(255, 255, 255, 0.08);
+            --nav-bg:       rgba(0, 0, 0, 0.72);
+
+            /* Lift on dark comes from a light rim, not a black drop shadow. */
+            --shadow-soft:  0 12px 36px rgba(0, 0, 0, 0.6);
+            --shadow-lift:  0 18px 44px rgba(0, 0, 0, 0.7);
+            --shadow-panel: 0 20px 50px rgba(0, 0, 0, 0.55);
+
+            /* Warning and error tints, tuned for the dark surface. */
+            --warn-bg:  rgba(255, 159, 10, 0.18);
+            --warn-ink: #ffb340;
+            --bad-bg:   rgba(255, 69, 58, 0.18);
+            --bad-ink:  #ff6961;
+
+            /* Apple's easing curve, used for every transition on the page. */
+            --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+            --shell: 980px;
+        }
+
+        [data-theme="light"] {
             --surface:      #ffffff;
             --surface-alt:  #f5f5f7;
             --surface-dark: #000000;
             --ink:          #1d1d1f;
             --ink-sub:      #6e6e73;
-            --ink-on-dark:  #f5f5f7;
             --accent:       #0071e3;
             --accent-hover: #0077ed;
             --hairline:     rgba(0, 0, 0, 0.10);
@@ -31,23 +63,14 @@
             --chip:         rgba(0, 0, 0, 0.05);
             --nav-bg:       rgba(255, 255, 255, 0.72);
 
-            /* Apple's easing curve, used for every transition on the page. */
-            --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
-            --shell: 980px;
-        }
+            --shadow-soft:  0 12px 36px rgba(0, 0, 0, 0.14);
+            --shadow-lift:  0 18px 44px rgba(0, 0, 0, 0.10);
+            --shadow-panel: 0 20px 50px rgba(0, 0, 0, 0.08);
 
-        [data-theme="dark"] {
-            --surface:      #000000;
-            --surface-alt:  #101012;
-            --surface-dark: #000000;
-            --ink:          #f5f5f7;
-            --ink-sub:      #86868b;
-            --accent:       #2997ff;
-            --accent-hover: #47a8ff;
-            --hairline:     rgba(255, 255, 255, 0.12);
-            --card:         #1c1c1e;
-            --chip:         rgba(255, 255, 255, 0.08);
-            --nav-bg:       rgba(0, 0, 0, 0.72);
+            --warn-bg:  rgba(255, 159, 10, 0.16);
+            --warn-ink: #b25e00;
+            --bad-bg:   rgba(255, 69, 58, 0.14);
+            --bad-ink:  #c0271c;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -244,14 +267,14 @@
             overflow: hidden;
         }
 
-        /* A very soft wash behind the hero so the white does not read as
+        /* A very soft wash behind the hero so the black does not read as
            empty. Two low-opacity blue fields, no hard edges. */
         .hero::before {
             content: ""; position: absolute; inset: -20% -10% auto -10%;
             height: 70%;
             background:
-                radial-gradient(50% 55% at 28% 35%, rgba(0, 113, 227, 0.10), transparent 70%),
-                radial-gradient(45% 50% at 76% 20%, rgba(88, 86, 214, 0.09), transparent 70%);
+                radial-gradient(50% 55% at 28% 35%, rgba(41, 151, 255, 0.16), transparent 70%),
+                radial-gradient(45% 50% at 76% 20%, rgba(94, 92, 230, 0.14), transparent 70%);
             pointer-events: none;
         }
 
@@ -261,7 +284,7 @@
         .portrait {
             width: 116px; height: 116px; margin: 0 auto 34px;
             border-radius: 50%; overflow: hidden;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14);
+            box-shadow: var(--shadow-soft);
             will-change: transform;
         }
         .portrait img { width: 100%; height: 100%; object-fit: cover; }
@@ -396,7 +419,7 @@
         }
         .card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.10);
+            box-shadow: var(--shadow-lift);
         }
 
         .card .glyph {
@@ -424,7 +447,7 @@
             border: 1px solid var(--hairline);
             border-radius: 22px;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-panel);
         }
 
         .crt-bezel-top {
@@ -465,10 +488,8 @@
             padding: 4px 10px; border-radius: 980px;
             transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
         }
-        .term-readout span.warn { background: rgba(255, 159, 10, 0.16); color: #b25e00; }
-        .term-readout span.bad  { background: rgba(255, 69, 58, 0.14);  color: #c0271c; }
-        [data-theme="dark"] .term-readout span.warn { color: #ffb340; }
-        [data-theme="dark"] .term-readout span.bad  { color: #ff6961; }
+        .term-readout span.warn { background: var(--warn-bg); color: var(--warn-ink); }
+        .term-readout span.bad  { background: var(--bad-bg);  color: var(--bad-ink); }
 
         .term-log {
             height: 360px; overflow-y: auto;
@@ -514,11 +535,10 @@
 
         .term-line.err {
             max-width: 100%; align-self: stretch;
-            background: rgba(255, 69, 58, 0.10);
-            color: #c0271c; border-radius: 14px;
+            background: var(--bad-bg);
+            color: var(--bad-ink); border-radius: 14px;
             font-size: 13px;
         }
-        [data-theme="dark"] .term-line.err { color: #ff6961; }
         .term-line.err .tag { opacity: 0.85; }
 
         .term-work {
@@ -768,7 +788,7 @@
 
             <div class="nav-tools">
                 <button id="theme-btn" class="icon-btn" aria-label="Switch appearance">
-                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
                 </button>
                 <button id="mobile-menu-btn" class="icon-btn nav-burger" aria-label="Menu" aria-expanded="false">
                     <i class="fas fa-bars"></i>
@@ -1046,30 +1066,32 @@
         /* Everything motion-related checks this first. */
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        /* ---------- Appearance ---------- */
+        /* ---------- Appearance ----------
+           Dark is the default. Light is opt-in and remembered, so the only
+           stored value that changes anything is 'light'. */
         const themeBtn  = document.getElementById('theme-btn');
         const themeIcon = themeBtn.querySelector('i');
         const root      = document.documentElement;
 
         function paintThemeIcon() {
-            const dark = root.getAttribute('data-theme') === 'dark';
-            themeIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
-            themeBtn.setAttribute('title', dark ? 'Switch to light' : 'Switch to dark');
+            const light = root.getAttribute('data-theme') === 'light';
+            themeIcon.className = light ? 'fas fa-moon' : 'fas fa-sun';
+            themeBtn.setAttribute('title', light ? 'Switch to dark' : 'Switch to light');
         }
 
-        if (localStorage.getItem('arcade-theme') === 'dark') {
-            root.setAttribute('data-theme', 'dark');
+        if (localStorage.getItem('arcade-theme') === 'light') {
+            root.setAttribute('data-theme', 'light');
         }
         paintThemeIcon();
 
         themeBtn.addEventListener('click', () => {
-            const dark = root.getAttribute('data-theme') === 'dark';
-            if (dark) {
+            const light = root.getAttribute('data-theme') === 'light';
+            if (light) {
                 root.removeAttribute('data-theme');
-                localStorage.setItem('arcade-theme', 'light');
-            } else {
-                root.setAttribute('data-theme', 'dark');
                 localStorage.setItem('arcade-theme', 'dark');
+            } else {
+                root.setAttribute('data-theme', 'light');
+                localStorage.setItem('arcade-theme', 'light');
             }
             paintThemeIcon();
         });
