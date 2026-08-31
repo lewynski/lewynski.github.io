@@ -977,7 +977,8 @@
                 if (res.status === 404 && !data) {
                     linkOnline = false;
                     setReadout('bad', 'OFFLINE');
-                    termLine('err', 'no backend at /api/chat (404). this console only runs on the Vercel deployment, not on GitHub Pages.', 'sys>');
+                    termLine('err', 'backend not found (404). the AI needs a serverless host -- try the Vercel deployment of this site.', 'sys>');
+                    termLine('boot', 'static hosts like GitHub Pages cannot run /api/chat.');
                     setBusy(false);
                     setCaret();
                     return;
