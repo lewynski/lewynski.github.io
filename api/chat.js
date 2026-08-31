@@ -35,7 +35,10 @@ function originAllowed(req) {
     .includes(origin.replace(/\/$/, ''));
 }
 
-/* The persona lives here, not in the browser, so it cannot be edited client-side. */
+/* The personas live here, not in the browser, so they cannot be edited client-side.
+   The client picks one by name via { persona: 'capy' }; anything unrecognised
+   falls back to 'eiji'. Adding a persona here is the only way to add one, which
+   is the point -- a page can choose a prompt but cannot write one. */
 const SYSTEM_PROMPT = `You are Eiji AI, the personal AI assistant for Jon Lewyn Villaram Tanggaro.
 You are embedded on his developer portfolio website. Keep answers concise, friendly, and slightly retro/cyberpunk in tone.
 Information about Jon Lewyn:
@@ -47,6 +50,22 @@ Information about Jon Lewyn:
 - Affiliations: OECES Special Project Officer, IECEP Batangas Student Chapter.
 If the user asks about Jon Lewyn, answer accurately from this data. If they just want to chat, be conversational and polite.
 Never output code formatting or markdown in your responses.`;
+
+/* CapySave's advisor. The page sends a plain-text spending summary as the user
+   turn; this prompt decides what to do with it. Peso amounts, short answers. */
+const CAPY_PROMPT = `You are Capy, the AI financial advisor built into CapySave, a Philippine peso budget tracker.
+You are a calm, encouraging capybara. You are never harsh about money mistakes.
+The user will send you a summary of their budget, balances, spending by category, and savings goal.
+Respond with:
+1. One sentence on how they are actually doing.
+2. One specific, concrete thing to change, naming the category or platform involved.
+3. One short "What if" projection -- what happens by month end if the current pace continues.
+Rules: keep the whole reply under 4 sentences. Use peso amounts written like P1,250.00. Never use markdown, asterisks, bullet points, or headings. Never invent numbers that were not given to you. If the budget is zero or there are no transactions, say so plainly and tell them what to enter first.`;
+
+const PERSONAS = {
+  eiji: SYSTEM_PROMPT,
+  capy: CAPY_PROMPT
+};
 
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -99,6 +118,11 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No usable user or assistant messages found.' });
   }
 
+  /* Pick the persona by name. Unknown or missing -> the portfolio assistant,
+     so index.html keeps working without sending a persona at all. */
+  const personaKey = typeof (body && body.persona) === 'string' ? body.persona : 'eiji';
+  const systemPrompt = PERSONAS[personaKey] || PERSONAS.eiji;
+
   try {
     const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -108,7 +132,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: MODEL,
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }].concat(history),
+        messages: [{ role: 'system', content: systemPrompt }].concat(history),
         temperature: 0.7,
         max_tokens: MAX_TOKENS
       })
