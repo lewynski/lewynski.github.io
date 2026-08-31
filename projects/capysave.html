@@ -1,512 +1,1420 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapySave | Personal Finance Terminal</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        :root {
-            --bg-color: #1e1e2f; --panel-bg: #2a2a40; --text-main: #f8f8f2;
-            --text-muted: #a8a8b2; --retro-green: #4ade80; --retro-blue: #3b82f6;
-            --retro-purple: #bd93f9; --retro-pink: #ff79c6; --retro-gold: #facc15;
-            --retro-red: #ff5555; --border-dark: #000000;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapySave — Budget tracker</title>
+<meta name="description" content="A peso budget tracker with live balances, spending breakdown, savings goal, and an AI advisor.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ============================================================
+   CapySave — Apple-inspired build.
+   Dark is the default; light is opt-in via [data-theme="light"],
+   matching every other page on the site. Theme choice is shared
+   through the localStorage key "arcade-theme".
+   ============================================================ */
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --bg: #000000;
+    --surface: #0b0b0d;
+    --surface-alt: #141416;
+    --card: #16161a;
+    --chip: #1f1f24;
+    --hairline: rgba(255, 255, 255, 0.11);
+    --ink: #f5f5f7;
+    --ink-sub: #a1a1a6;
+    --ink-mute: #6e6e73;
+    --accent: #2997ff;
+    --accent-soft: rgba(41, 151, 255, 0.14);
+    --good: #30d158;
+    --warn: #ffd60a;
+    --bad: #ff453a;
+    --nav-bg: rgba(10, 10, 12, 0.72);
+    --shadow-lift: 0 18px 44px rgba(0, 0, 0, 0.55);
+    --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+    --shell: 1100px;
+}
 
-        body {
-            font-family: 'VT323', monospace; background-color: var(--bg-color);
-            color: var(--text-main); font-size: 1.3rem; line-height: 1.6;
-            padding: 20px; background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
-            background-size: 30px 30px; min-height: 100vh;
-        }
+[data-theme="light"] {
+    --bg: #ffffff;
+    --surface: #fbfbfd;
+    --surface-alt: #f5f5f7;
+    --card: #ffffff;
+    --chip: #f0f0f2;
+    --hairline: rgba(0, 0, 0, 0.11);
+    --ink: #1d1d1f;
+    --ink-sub: #6e6e73;
+    --ink-mute: #86868b;
+    --accent: #0071e3;
+    --accent-soft: rgba(0, 113, 227, 0.10);
+    --good: #1d9e42;
+    --warn: #b8860b;
+    --bad: #d70015;
+    --nav-bg: rgba(251, 251, 253, 0.78);
+    --shadow-lift: 0 18px 44px rgba(0, 0, 0, 0.12);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        a, button { cursor: pointer; }
+html { scroll-behavior: smooth; }
 
-        .back-btn {
-            display: inline-block; margin-bottom: 20px; background: var(--panel-bg); color: var(--text-main);
-            padding: 10px 15px; text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: 0.6rem;
-            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
-        }
-        .back-btn:hover { background: var(--retro-blue); }
-        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                 "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.022em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.5s var(--ease), color 0.5s var(--ease);
+}
 
-        .app-container {
-            max-width: 1100px; margin: 0 auto; background: var(--panel-bg); border: 6px solid var(--border-dark);
-            box-shadow: 12px 12px 0px var(--border-dark); padding: 30px;
-        }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-        header { text-align: center; border-bottom: 4px dashed var(--border-dark); padding-bottom: 20px; margin-bottom: 30px; }
-        h1 { font-family: 'Press Start 2P', cursive; font-size: 1.8rem; color: var(--retro-gold); text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 10px; }
-        .subtitle { color: var(--retro-green); font-size: 1.2rem; }
+/* ---------- Nav ---------- */
+.nav {
+    position: fixed; inset: 0 0 auto 0; height: 48px; z-index: 90;
+    display: flex; align-items: center;
+    background: transparent;
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+    border-bottom: 1px solid transparent;
+}
+.nav.is-stuck {
+    background: var(--nav-bg);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom-color: var(--hairline);
+}
+.nav-inner {
+    width: 100%; max-width: var(--shell); margin: 0 auto;
+    padding: 0 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.nav-back, .nav-here { font-size: 12px; letter-spacing: -0.01em; }
+.nav-back { color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+.nav-back:hover { text-decoration: none; color: var(--accent); }
+.nav-back .chev {
+    display: inline-block;
+    transition: transform 0.3s var(--ease);
+}
+.nav-back:hover .chev { transform: translateX(-3px); }
+.nav-here { color: var(--ink-sub); }
+#theme-btn {
+    background: var(--chip); border: none; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 50%;
+    color: var(--ink); font-size: 12px;
+    display: grid; place-items: center;
+    transition: background-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+#theme-btn:hover { background: var(--accent); color: #fff; transform: scale(1.08); }
 
-        /* --- DASHBOARDS --- */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        
-        .stat-card {
-            background: #1e1e2f; border: 4px solid var(--border-dark); padding: 15px;
-            text-align: center; box-shadow: 6px 6px 0px var(--border-dark); position: relative;
-        }
-        .stat-card.primary { border-color: var(--retro-purple); }
-        .stat-card.warning { border-color: var(--retro-red); }
-        .stat-card.good { border-color: var(--retro-green); }
-        
-        .stat-card h3 { font-family: 'Press Start 2P', cursive; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;}
-        .stat-card .val { font-size: 2rem; font-weight: bold; color: #fff; }
-        .stat-card .sub-val { font-size: 1rem; color: var(--retro-gold); margin-top: 5px;}
+/* ---------- Shell ---------- */
+.wrap { max-width: var(--shell); margin: 0 auto; padding: 0 22px; }
 
-        /* --- USER SETTINGS --- */
-        .settings-bar {
-            background: rgba(0,0,0,0.3); border: 4px solid var(--border-dark); padding: 15px; margin-bottom: 30px;
-            display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end;
-        }
-        .setting-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 5px; }
-        .setting-group label { font-family: 'Press Start 2P', cursive; font-size: 0.55rem; color: var(--retro-blue); }
-        .setting-group input { 
-            padding: 8px; font-family: 'VT323', monospace; font-size: 1.2rem; background: #000; color: var(--retro-green);
-            border: 2px solid var(--border-dark); outline: none; width: 100%;
-        }
-        .setting-group input:focus { border-color: var(--retro-pink); }
-        .btn-update {
-            background: var(--retro-blue); color: #fff; border: 4px solid var(--border-dark); padding: 10px 15px;
-            font-family: 'Press Start 2P', cursive; font-size: 0.6rem; cursor: pointer; box-shadow: 4px 4px 0px var(--border-dark);
-        }
-        .btn-update:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+.masthead { padding: 128px 0 34px; position: relative; overflow: hidden; }
+.masthead::before {
+    content: ""; position: absolute; inset: -50% -20% auto -20%; height: 420px;
+    background: radial-gradient(52% 60% at 50% 40%,
+        rgba(41, 151, 255, 0.16), transparent 70%);
+    pointer-events: none;
+}
+.masthead > * { position: relative; }
+.eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.03em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+}
+.masthead h1 {
+    font-size: clamp(38px, 6vw, 60px); font-weight: 600;
+    line-height: 1.06; letter-spacing: -0.015em;
+}
+.lead {
+    margin-top: 14px; max-width: 620px;
+    font-size: 19px; color: var(--ink-sub); line-height: 1.5;
+}
 
-        /* --- LAYOUT --- */
-        .main-content { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; margin-bottom: 30px;}
-        .bottom-content { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; }
-        @media (max-width: 850px) { .main-content, .bottom-content { grid-template-columns: 1fr; } }
+/* ---------- Reveal ---------- */
+[data-reveal] {
+    opacity: 0; transform: translateY(22px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+[data-reveal].is-in { opacity: 1; transform: none; }
+[data-delay="1"] { transition-delay: 0.08s; }
+[data-delay="2"] { transition-delay: 0.16s; }
+[data-delay="3"] { transition-delay: 0.24s; }
+[data-delay="4"] { transition-delay: 0.32s; }
+/* ============================================================
+   The capybara. Inline SVG so it themes with CSS custom
+   properties and every part can be animated independently.
+   Mood is a single class on #capy-stage; everything below
+   keys off that, so the JS only ever sets one string.
+   ============================================================ */
+.capy-panel {
+    display: grid; grid-template-columns: 210px 1fr; gap: 26px;
+    align-items: center;
+    background: var(--card); border: 1px solid var(--hairline);
+    border-radius: 22px; padding: 22px 26px; margin-bottom: 18px;
+}
+.capy-stage {
+    --capy-fur: #a9784f;
+    --capy-fur-dark: #8a5f3c;
+    --capy-snout: #c99a6d;
+    --capy-ink: #2b1d12;
+    position: relative; width: 190px; height: 190px;
+    cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.4s var(--ease);
+}
+.capy-stage:active { transform: scale(0.96); }
+.capy-stage svg { width: 100%; height: 100%; overflow: visible; }
 
-        /* --- FORMS --- */
-        .panel { background: rgba(0,0,0,0.2); border: 4px solid var(--border-dark); padding: 20px; display: flex; flex-direction: column;}
-        .panel h2 { font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--retro-pink); margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px;}
-        
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: 0.55rem; color: var(--retro-gold); margin-bottom: 8px; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px; font-family: 'VT323', monospace; font-size: 1.3rem; background: var(--bg-color);
-            color: var(--text-main); border: 4px solid var(--border-dark); outline: none;
-        }
-        .form-group input:focus, .form-group select:focus { border-color: var(--retro-pink); }
-        .btn-submit {
-            width: 100%; background: var(--retro-pink); color: #fff; padding: 15px; border: 4px solid var(--border-dark); 
-            box-shadow: 4px 4px 0px var(--border-dark); font-family: 'Press Start 2P', cursive; font-size: 0.7rem; 
-            margin-top: 10px; transition: all 0.1s; cursor: pointer;
-        }
-        .btn-submit:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+/* transform-box keeps SVG rotations centred on each shape, not the viewBox. */
+.capy-stage [class^="capy-"] { transform-box: fill-box; transform-origin: center; }
 
-        /* --- LOGS --- */
-        #transaction-list { list-style: none; height: 350px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px;}
-        #transaction-list::-webkit-scrollbar { width: 8px; }
-        #transaction-list::-webkit-scrollbar-thumb { background: var(--border-dark); }
+.capy-shadow { fill: rgba(0, 0, 0, 0.28); animation: capyShadow 3.4s var(--ease) infinite; }
+[data-theme="light"] .capy-shadow { fill: rgba(0, 0, 0, 0.13); }
 
-        .tx-item {
-            background: var(--panel-bg); border: 2px solid var(--border-dark); padding: 12px; margin-bottom: 10px; 
-            display: flex; justify-content: space-between; align-items: center; position: relative;
-        }
-        .tx-info { flex-grow: 1; }
-        .tx-info h4 { font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: #fff; margin-bottom: 5px; line-height: 1.4;}
-        .tx-info p { font-size: 0.95rem; color: var(--text-muted); }
-        .tx-amount { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; text-align: right; margin-right: 15px;}
-        .tx-amount.income { color: var(--retro-green); }
-        .tx-amount.expense { color: var(--retro-pink); }
-        
-        .badge { display: inline-block; padding: 2px 6px; font-size: 0.8rem; border: 1px solid var(--border-dark); margin-right: 8px; }
-        .bg-gcash { background: var(--retro-blue); color: #fff; }
-        .bg-maya { background: var(--retro-green); color: #000; }
-        .bg-bank { background: var(--retro-gold); color: #000; }
+.capy-whole { animation: capyBreathe 3.4s var(--ease) infinite; }
+.capy-head-grp { animation: capyNod 3.4s var(--ease) infinite; }
+.capy-eye { fill: var(--capy-ink); animation: capyBlink 5.2s steps(1, end) infinite; }
+.capy-glint { fill: #fff; opacity: 0.9; }
+.capy-arm-l { animation: capyArm 3.4s var(--ease) infinite; }
+.capy-arm-r { animation: capyArm 3.4s var(--ease) 0.4s infinite; }
+@keyframes capyBreathe {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    50%      { transform: translateY(-3px) scaleY(1.02); }
+}
+@keyframes capyShadow {
+    0%, 100% { transform: scaleX(1); opacity: 1; }
+    50%      { transform: scaleX(0.94); opacity: 0.8; }
+}
+@keyframes capyNod {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-2px) rotate(-1.4deg); }
+}
+/* Eyes are open almost all the time; the squash is one quick frame. */
+@keyframes capyBlink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    94%, 97%      { transform: scaleY(0.12); }
+}
+@keyframes capyArm {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(7deg); }
+}
 
-        /* INDIVIDUAL DELETE BUTTON [X] */
-        .btn-del {
-            background: var(--retro-red); color: #fff; border: 2px solid var(--border-dark); width: 30px; height: 30px;
-            font-family: 'Press Start 2P', cursive; font-size: 0.6rem; cursor: pointer; transition: transform 0.1s;
-            display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px var(--border-dark);
-        }
-        .btn-del:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--border-dark); }
+/* ---- Moods ---- */
+/* Happy: a small hop, faster tail-less wiggle, arms up. */
+.capy-stage.is-happy .capy-whole { animation: capyHop 0.62s var(--ease) 2; }
+.capy-stage.is-happy .capy-arm-l,
+.capy-stage.is-happy .capy-arm-r { animation: capyCheerArm 0.31s var(--ease) 4; }
+@keyframes capyHop {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    28%      { transform: translateY(-16px) scaleY(1.05); }
+    62%      { transform: translateY(0) scaleY(0.94); }
+}
+@keyframes capyCheerArm {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(-34deg); }
+}
 
-        /* --- AI & VISUALS --- */
-        .ai-section { background: #000; border: 4px solid var(--retro-green); padding: 20px; box-shadow: inset 0 0 15px rgba(74, 222, 128, 0.2), 6px 6px 0px var(--border-dark); display: flex; flex-direction: column; }
-        .ai-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 2px dashed var(--retro-green); padding-bottom: 10px; margin-bottom: 15px; }
-        .ai-header h2 { font-family: 'Press Start 2P', cursive; font-size: 0.7rem; color: var(--retro-green); margin: 0;}
-        .btn-analyze { background: var(--retro-green); color: #000; border: 2px solid var(--retro-green); padding: 8px 12px; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; cursor: pointer; }
-        .btn-analyze:active { transform: translateY(2px); }
-        .ai-terminal { flex-grow: 1; color: var(--retro-green); font-size: 1.2rem; line-height: 1.5; text-shadow: 0 0 5px rgba(74, 222, 128, 0.5); overflow-y: auto; max-height: 300px; }
-        .cursor { display: inline-block; width: 10px; height: 15px; background: var(--retro-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;}
-        
-        .chart-container { position: relative; width: 100%; max-width: 250px; height: 250px; margin: 0 auto; }
-        .empty-state { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.5rem;}
-    </style>
+/* Worried: leans back, small shiver, brow drops (see .capy-brow). */
+.capy-stage.is-worried .capy-whole { animation: capyShiver 0.42s var(--ease) 4; }
+.capy-stage.is-worried .capy-brow { opacity: 1; }
+@keyframes capyShiver {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25%      { transform: translateX(-3px) rotate(-2deg); }
+    75%      { transform: translateX(3px) rotate(2deg); }
+}
+/* Poked: one squash, triggered by tapping him. */
+.capy-stage.is-poked .capy-head-grp { animation: capyPoke 0.5s var(--ease) 1; }
+@keyframes capyPoke {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    30%      { transform: scale(1.08, 0.9) rotate(4deg); }
+    65%      { transform: scale(0.96, 1.04) rotate(-3deg); }
+}
+
+/* Asleep: no data yet. Slower breathing, closed eyes, drifting Zs. */
+.capy-stage.is-asleep .capy-whole { animation-duration: 5.4s; }
+.capy-stage.is-asleep .capy-head-grp { animation-duration: 5.4s; }
+.capy-stage.is-asleep .capy-eye { animation: none; transform: scaleY(0.12); }
+.capy-stage.is-asleep .capy-zzz { opacity: 1; }
+
+.capy-brow { opacity: 0; transition: opacity 0.4s var(--ease); }
+.capy-zzz { opacity: 0; transition: opacity 0.5s var(--ease); }
+.capy-zzz text { animation: capyZ 2.6s linear infinite; }
+.capy-zzz text:nth-child(2) { animation-delay: 0.9s; }
+.capy-zzz text:nth-child(3) { animation-delay: 1.8s; }
+@keyframes capyZ {
+    0%   { opacity: 0; transform: translate(0, 0) scale(0.7); }
+    30%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(14px, -30px) scale(1.2); }
+}
+
+/* The coin only appears when he is pleased about money. */
+.capy-coin { opacity: 0; }
+.capy-stage.is-happy .capy-coin { animation: capyCoin 1s var(--ease) 1; }
+@keyframes capyCoin {
+    0%   { opacity: 0; transform: translateY(6px) scale(0.4) rotate(0deg); }
+    35%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-46px) scale(1.1) rotate(180deg); }
+}
+
+/* ---- Speech bubble ---- */
+.capy-talk { min-width: 0; }
+.capy-name {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+}
+.capy-bubble {
+    position: relative;
+    background: var(--surface-alt); border: 1px solid var(--hairline);
+    border-radius: 18px; padding: 15px 18px;
+    font-size: 16px; line-height: 1.45; color: var(--ink);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+/* Tail points back at the capybara, left side, vertically centred. */
+.capy-bubble::before {
+    content: ""; position: absolute; left: -7px; top: 50%;
+    width: 13px; height: 13px; margin-top: -6px;
+    background: var(--surface-alt);
+    border-left: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    transform: rotate(45deg); border-radius: 0 0 0 3px;
+}
+.capy-bubble.is-swap { opacity: 0; transform: translateX(-6px); }
+.capy-hint { margin-top: 10px; font-size: 13px; color: var(--ink-mute); }
+
+/* ---------- Cards & grid ---------- */
+.board {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 18px;
+}
+.stat {
+    background: var(--card); border: 1px solid var(--hairline);
+    border-radius: 20px; padding: 20px;
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease),
+                border-color 0.5s var(--ease);
+}
+.stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+.stat-label {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.03em;
+    text-transform: uppercase; color: var(--ink-mute); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 7px;
+}
+.stat-label i { color: var(--accent); font-size: 11px; }
+.stat-value {
+    font-size: clamp(22px, 3vw, 30px); font-weight: 600;
+    letter-spacing: -0.02em; line-height: 1.1;
+}
+.stat-sub { margin-top: 8px; font-size: 13px; color: var(--ink-sub); }
+/* Numbers pulse once when they change, so a logged transaction is visible
+   even if the card is far from the form. JS adds .is-tick then removes it. */
+.stat-value.is-tick { animation: tick 0.5s var(--ease) 1; }
+@keyframes tick {
+    0%, 100% { transform: scale(1); }
+    40%      { transform: scale(1.07); color: var(--accent); }
+}
+
+.plat-rows { display: flex; flex-direction: column; gap: 7px; }
+.plat-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; font-size: 14px;
+}
+.plat-row span:first-child { color: var(--ink-sub); }
+.plat-row span:last-child { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+.goal-bar {
+    height: 7px; border-radius: 980px; background: var(--chip);
+    overflow: hidden; margin-top: 12px;
+}
+.goal-fill {
+    height: 100%; width: 0%; border-radius: 980px;
+    background: linear-gradient(90deg, var(--accent), var(--good));
+    transition: width 0.9s var(--ease);
+}
+
+/* ---------- Panels ---------- */
+.cols {
+    display: grid; grid-template-columns: 1.1fr 1fr;
+    gap: 18px; align-items: start;
+}
+.panel {
+    background: var(--card); border: 1px solid var(--hairline);
+    border-radius: 22px; padding: 24px 26px;
+    margin-bottom: 18px;
+}
+.panel h2 {
+    font-size: 21px; font-weight: 600; letter-spacing: -0.01em;
+    margin-bottom: 4px;
+}
+.panel-note { font-size: 14px; color: var(--ink-sub); margin-bottom: 20px; }
+/* ---------- Fields ---------- */
+.field { margin-bottom: 16px; }
+.field label {
+    display: block; font-size: 13px; color: var(--ink-sub); margin-bottom: 7px;
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+input, select, textarea {
+    width: 100%; font: inherit; font-size: 16px;
+    color: var(--ink); background: var(--surface-alt);
+    border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 12px 14px;
+    transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease),
+                background-color 0.3s var(--ease);
+    -webkit-appearance: none; appearance: none;
+}
+select {
+    /* Chevron drawn inline so no image asset is needed and it recolours
+       with the theme via currentColor in the data URI. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 11px;
+    padding-right: 36px;
+}
+input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+}
+input::placeholder { color: var(--ink-mute); }
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--accent); color: #fff; border: none; cursor: pointer;
+    font: inherit; font-size: 16px; font-weight: 500;
+    border-radius: 980px; padding: 12px 24px;
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease),
+                background-color 0.3s var(--ease);
+}
+.btn:hover { transform: scale(1.03); text-decoration: none; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+.btn--full { width: 100%; }
+.btn--quiet {
+    background: var(--chip); color: var(--ink);
+}
+.btn--quiet:hover { background: var(--hairline); }
+.btn--danger { background: transparent; color: var(--bad); border: 1px solid var(--hairline); }
+.btn--danger:hover { background: var(--bad); color: #fff; border-color: var(--bad); }
+
+/* ---------- Transaction list ---------- */
+.tx-list { display: flex; flex-direction: column; }
+.tx {
+    display: grid; grid-template-columns: 34px 1fr auto 28px;
+    gap: 13px; align-items: center;
+    padding: 14px 0; border-top: 1px solid var(--hairline);
+    animation: txIn 0.45s var(--ease) 1;
+}
+.tx:first-child { border-top: none; }
+@keyframes txIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: none; }
+}
+.tx-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 13px;
+    background: var(--chip);
+}
+.tx-icon.is-expense { color: var(--bad); }
+.tx-icon.is-income  { color: var(--good); }
+.tx-icon.is-savings { color: var(--accent); }
+.tx-main { min-width: 0; }
+.tx-cat { font-size: 16px; font-weight: 500; }
+.tx-meta {
+    font-size: 13px; color: var(--ink-sub); margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tx-amt { font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.tx-amt.is-expense { color: var(--bad); }
+.tx-amt.is-income  { color: var(--good); }
+.tx-amt.is-savings { color: var(--accent); }
+.tx-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-mute); font-size: 13px; padding: 6px;
+    border-radius: 50%;
+    transition: color 0.3s var(--ease), background-color 0.3s var(--ease);
+}
+.tx-del:hover { color: var(--bad); background: var(--chip); }
+.empty {
+    padding: 34px 0; text-align: center;
+    font-size: 15px; color: var(--ink-mute);
+}
+.empty i { display: block; font-size: 26px; margin-bottom: 12px; opacity: 0.5; }
+
+/* ---------- Chart ---------- */
+.chart-box { position: relative; height: 260px; margin-top: 6px; }
+.leak {
+    margin-top: 18px; padding: 14px 16px;
+    background: var(--surface-alt); border: 1px solid var(--hairline);
+    border-radius: 14px; font-size: 14px; color: var(--ink-sub);
+    display: flex; gap: 10px; align-items: flex-start;
+}
+.leak i { color: var(--warn); margin-top: 3px; }
+.leak strong { color: var(--ink); font-weight: 600; }
+/* display:flex would otherwise beat the [hidden] attribute. */
+.leak[hidden] { display: none; }
+
+/* ---------- AI advisor ---------- */
+.ai-out {
+    background: var(--surface-alt); border: 1px solid var(--hairline);
+    border-radius: 16px; padding: 18px 20px;
+    min-height: 118px; font-size: 16px; line-height: 1.5;
+    color: var(--ink); white-space: pre-wrap;
+}
+.ai-out.is-idle { color: var(--ink-mute); }
+.ai-out.is-error { color: var(--bad); }
+/* Blinking caret while the reply types itself in. */
+.ai-out.is-typing::after {
+    content: ""; display: inline-block;
+    width: 2px; height: 1em; margin-left: 2px;
+    background: var(--accent); vertical-align: -0.15em;
+    animation: caret 1s steps(1, end) infinite;
+}
+@keyframes caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+.dots { display: inline-flex; gap: 5px; align-items: center; }
+.dots span {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--ink-mute);
+    animation: dot 1.3s var(--ease) infinite;
+}
+.dots span:nth-child(2) { animation-delay: 0.16s; }
+.dots span:nth-child(3) { animation-delay: 0.32s; }
+@keyframes dot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30%           { opacity: 1; transform: translateY(-4px); }
+}
+/* ---------- Footer ---------- */
+.foot {
+    border-top: 1px solid var(--hairline);
+    margin-top: 46px; padding: 30px 0 54px;
+    font-size: 13px; color: var(--ink-mute);
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    align-items: center; justify-content: space-between;
+}
+.foot a { color: var(--ink-sub); }
+.foot a:hover { color: var(--accent); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+    .board { grid-template-columns: repeat(2, 1fr); }
+    .cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+    .capy-panel { grid-template-columns: 1fr; gap: 14px; justify-items: center; text-align: center; }
+    .capy-stage { width: 158px; height: 158px; }
+    /* With the capybara above the bubble, the tail has to point up instead. */
+    .capy-bubble::before {
+        left: 50%; top: -7px; margin: 0 0 0 -6px;
+        border-left: 1px solid var(--hairline);
+        border-bottom: none;
+        border-top: 1px solid var(--hairline);
+        border-radius: 3px 0 0 0;
+    }
+    .masthead { padding-top: 104px; }
+    .panel { padding: 20px 18px; }
+    .field-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 460px) {
+    .board { grid-template-columns: 1fr; }
+    .tx { grid-template-columns: 30px 1fr auto; }
+    .tx-del { grid-column: 3; justify-self: end; }
+}
+
+/* Motion is decorative here; the numbers carry the meaning. */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0.001s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001s !important;
+    }
+    [data-reveal] { opacity: 1; transform: none; }
+    .capy-zzz text { animation: none; }
+}
+</style>
 </head>
 <body>
 
-    <a href="../index.html" class="back-btn">◀ RETURN TO PORTFOLIO</a>
+<nav class="nav" id="nav">
+    <div class="nav-inner">
+        <a class="nav-back" href="../projects.html"><span class="chev">&lsaquo;</span> Projects</a>
+        <span class="nav-here">CapySave</span>
+        <button id="theme-btn" aria-label="Switch colour theme"><i class="fas fa-sun"></i></button>
+    </div>
+</nav>
 
-    <div class="app-container">
-        <header>
-            <h1><i class="fas fa-wallet"></i> CAPYSAVE</h1>
-            <div class="subtitle">Personal Finance Hub v4.2</div>
-        </header>
+<header class="masthead">
+    <div class="wrap">
+        <p class="eyebrow">CapySave</p>
+        <h1>Money, minus<br>the guesswork.</h1>
+        <p class="lead">
+            Track what comes in, what goes out, and what you keep — across GCash, Maya and
+            your bank. Everything stays on your device. Capy watches the numbers and tells
+            you the truth about them.
+        </p>
+    </div>
+</header>
 
-        <div class="settings-bar">
-            <div class="setting-group">
-                <label>BUDGET LIMIT (₱)</label>
-                <input type="number" id="set-budget" min="0" step="500" placeholder="0">
-            </div>
-            <div class="setting-group">
-                <label>SAVINGS GOAL NAME</label>
-                <input type="text" id="set-goal-name" placeholder="Name your goal...">
-            </div>
-            <div class="setting-group">
-                <label>GOAL TARGET (₱)</label>
-                <input type="number" id="set-goal-target" min="0" step="1000" placeholder="0">
-            </div>
-            <button class="btn-update" id="btn-update-settings">SAVE CONFIG</button>
+<main class="wrap">
+
+    <!-- The capybara sits above the numbers because it reacts to them. -->
+    <section class="capy-panel" data-reveal>
+        <div class="capy-stage is-asleep" id="capy-stage" role="button" tabindex="0"
+             aria-label="Poke Capy for a tip">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+                <ellipse class="capy-shadow" cx="100" cy="184" rx="54" ry="8"/>
+
+                <g class="capy-whole">
+                    <!-- Body first, head on top: chibi proportions, big head. -->
+                    <ellipse cx="76" cy="174" rx="15" ry="8" fill="var(--capy-fur-dark)"/>
+                    <ellipse cx="124" cy="174" rx="15" ry="8" fill="var(--capy-fur-dark)"/>
+                    <ellipse cx="100" cy="146" rx="47" ry="33" fill="var(--capy-fur)"/>
+                    <ellipse cx="100" cy="152" rx="30" ry="22" fill="var(--capy-snout)" opacity="0.35"/>
+                    <ellipse class="capy-arm-l" cx="57" cy="150" rx="11" ry="17" fill="var(--capy-fur-dark)"/>
+                    <ellipse class="capy-arm-r" cx="143" cy="150" rx="11" ry="17" fill="var(--capy-fur-dark)"/>
+
+                    <g class="capy-head-grp">
+                        <!-- Ears -->
+                        <ellipse cx="57" cy="55" rx="13" ry="12" fill="var(--capy-fur-dark)"/>
+                        <ellipse cx="57" cy="56" rx="6" ry="5.5" fill="var(--capy-ink)" opacity="0.35"/>
+                        <ellipse cx="143" cy="55" rx="13" ry="12" fill="var(--capy-fur-dark)"/>
+                        <ellipse cx="143" cy="56" rx="6" ry="5.5" fill="var(--capy-ink)" opacity="0.35"/>
+
+                        <!-- Head -->
+                        <ellipse cx="100" cy="86" rx="54" ry="46" fill="var(--capy-fur)"/>
+
+                        <!-- Brow, only visible in the worried mood -->
+                        <g class="capy-brow" stroke="var(--capy-ink)" stroke-width="3" stroke-linecap="round">
+                            <line x1="71" y1="68" x2="88" y2="74"/>
+                            <line x1="129" y1="68" x2="112" y2="74"/>
+                        </g>
+
+                        <!-- Eyes -->
+                        <ellipse class="capy-eye" cx="81" cy="86" rx="7" ry="8"/>
+                        <ellipse class="capy-eye" cx="119" cy="86" rx="7" ry="8"/>
+                        <circle class="capy-glint" cx="83.5" cy="83" r="2.4"/>
+                        <circle class="capy-glint" cx="121.5" cy="83" r="2.4"/>
+
+                        <!-- Blush -->
+                        <ellipse cx="62" cy="99" rx="8" ry="4.5" fill="#e08a7a" opacity="0.55"/>
+                        <ellipse cx="138" cy="99" rx="8" ry="4.5" fill="#e08a7a" opacity="0.55"/>
+
+                        <!-- Muzzle -->
+                        <ellipse cx="100" cy="108" rx="23" ry="16" fill="var(--capy-snout)"/>
+                        <ellipse cx="100" cy="102" rx="6.5" ry="4.5" fill="var(--capy-ink)"/>
+                        <path d="M100 107 v5 M100 112 q-7 5 -12 0 M100 112 q7 5 12 0"
+                              fill="none" stroke="var(--capy-ink)" stroke-width="2.4"
+                              stroke-linecap="round"/>
+                    </g>
+                </g>
+
+                <!-- Coin: happy moods only -->
+                <g class="capy-coin">
+                    <circle cx="152" cy="96" r="13" fill="#f5c542"/>
+                    <circle cx="152" cy="96" r="9" fill="none" stroke="#c79a1e" stroke-width="2"/>
+                    <text x="152" y="101" text-anchor="middle" font-size="12"
+                          font-weight="700" fill="#8a6a10">&#8369;</text>
+                </g>
+
+                <!-- Zs: asleep only -->
+                <g class="capy-zzz" fill="var(--ink-sub)" font-weight="700">
+                    <text x="150" y="52" font-size="14">z</text>
+                    <text x="158" y="42" font-size="17">z</text>
+                    <text x="166" y="32" font-size="20">z</text>
+                </g>
+            </svg>
+
+        </div>
+        <div class="capy-talk">
+            <p class="capy-name">Capy</p>
+            <div class="capy-bubble" id="capy-bubble">Nothing logged yet. Set a budget and I will wake up.</div>
+            <p class="capy-hint">Tap Capy for a nudge.</p>
+        </div>
+    </section>
+
+    <section class="board">
+        <div class="stat" data-reveal>
+            <p class="stat-label"><i class="fas fa-wallet"></i> Net worth</p>
+            <p class="stat-value" id="val-networth">&#8369;0.00</p>
+            <p class="stat-sub">Cash on hand plus savings</p>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="stat-card primary">
-                <h3>NET WORTH</h3>
-                <div class="val" id="val-networth">₱0</div>
-                <div class="sub-val" id="val-platforms">G: ₱0 | M: ₱0 | B: ₱0</div>
-            </div>
-            <div class="stat-card warning" id="card-allowance">
-                <h3>BUDGET REMAINING</h3>
-                <div class="val" id="val-budget">₱0</div>
-                <div class="sub-val" id="val-health">Health Grade: -</div>
-            </div>
-            <div class="stat-card good">
-                <h3 id="val-goal-title">SAVINGS GOAL</h3>
-                <div class="val" id="val-goal-prog">0%</div>
-                <div class="sub-val" id="val-goal-amt">₱0 / ₱0</div>
-            </div>
+        <div class="stat" data-reveal data-delay="1">
+            <p class="stat-label"><i class="fas fa-layer-group"></i> Where it sits</p>
+            <div class="plat-rows" id="val-platforms"></div>
         </div>
 
-        <div class="main-content">
-            <div class="panel">
-                <h2><i class="fas fa-plus-square"></i> LOG TRANSACTION</h2>
+        <div class="stat" id="card-allowance" data-reveal data-delay="2">
+            <p class="stat-label"><i class="fas fa-gauge-high"></i> Budget left</p>
+            <p class="stat-value" id="val-budget">&#8369;0.00</p>
+            <p class="stat-sub" id="val-health">No budget set</p>
+        </div>
+
+        <div class="stat" data-reveal data-delay="3">
+            <p class="stat-label"><i class="fas fa-bullseye"></i> <span id="val-goal-title">Savings goal</span></p>
+            <p class="stat-value" id="val-goal-amt">&#8369;0.00</p>
+            <div class="goal-bar"><div class="goal-fill" id="goal-fill"></div></div>
+            <p class="stat-sub" id="val-goal-prog">No goal yet</p>
+        </div>
+    </section>
+    <div class="cols">
+        <div>
+            <section class="panel" data-reveal>
+                <h2>Log something</h2>
+                <p class="panel-note">Money in, money out, or money moved into savings.</p>
                 <form id="tx-form">
-                    <div class="form-group">
-                        <label>TYPE</label>
-                        <select id="tx-type">
-                            <option value="expense">EXPENSE (-)</option>
-                            <option value="income">INCOME (+)</option>
-                            <option value="savings">TRANSFER TO SAVINGS</option>
-                        </select>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="tx-type">Type</label>
+                            <select id="tx-type">
+                                <option value="expense">Expense</option>
+                                <option value="income">Income</option>
+                                <option value="savings">Move to savings</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="tx-platform">Platform</label>
+                            <select id="tx-platform">
+                                <option value="GCash">GCash</option>
+                                <option value="Maya">Maya</option>
+                                <option value="Bank">Bank</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>PLATFORM / ACCOUNT</label>
-                        <select id="tx-platform">
-                            <option value="GCash">GCash</option>
-                            <option value="Maya">Maya</option>
-                            <option value="Bank">Bank Account</option>
-                        </select>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="tx-category">Category</label>
+                            <select id="tx-category">
+                                <option>Food &amp; Dining</option>
+                                <option>Groceries</option>
+                                <option>Bills &amp; Utilities</option>
+                                <option>Transportation</option>
+                                <option>Healthcare</option>
+                                <option>Shopping &amp; Retail</option>
+                                <option>Entertainment</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="tx-amount">Amount</label>
+                            <input type="number" id="tx-amount" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>CATEGORY</label>
-                        <select id="tx-category">
-                            <option value="Food">Food & Dining</option>
-                            <option value="Groceries">Groceries</option>
-                            <option value="Utilities">Bills & Utilities</option>
-                            <option value="Transport">Transportation</option>
-                            <option value="Healthcare">Healthcare</option>
-                            <option value="Shopping">Shopping & Retail</option>
-                            <option value="Entertainment">Entertainment</option>
-                            <option value="Other">Other</option>
-                        </select>
+                    <div class="field">
+                        <label for="tx-note">Note <span style="color: var(--ink-mute)">(optional)</span></label>
+                        <input type="text" id="tx-note" maxlength="80" placeholder="Lunch at the campus canteen">
                     </div>
-                    <div class="form-group">
-                        <label>AMOUNT (₱)</label>
-                        <input type="number" id="tx-amount" min="1" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label>NOTE (Optional)</label>
-                        <input type="text" id="tx-note" placeholder="Specific details..." autocomplete="off">
-                    </div>
-                    <button type="submit" class="btn-submit">EXECUTE LOG</button>
+                    <button type="submit" class="btn btn--full">Add transaction</button>
                 </form>
-            </div>
-
-            <div class="panel">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--border-dark); margin-bottom: 20px; padding-bottom: 10px;">
-                    <h2 style="border: none; padding: 0; margin: 0;"><i class="fas fa-list-alt"></i> SYSTEM LOGS</h2>
-                    <button id="btn-reset" style="background: transparent; color: var(--retro-red); border: none; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; cursor: pointer; text-decoration: underline;">PURGE ALL DATA</button>
-                </div>
-                
-                <ul id="transaction-list"></ul>
-            </div>
+            </section>
+            <section class="panel" data-reveal>
+                <h2>History</h2>
+                <p class="panel-note">Newest first. Everything is stored locally in this browser.</p>
+                <div class="tx-list" id="transaction-list"></div>
+            </section>
         </div>
 
-        <div class="bottom-content">
-            <div class="ai-section">
-                <div class="ai-header">
-                    <h2><i class="fas fa-robot"></i> CAPY-AI ADVISOR</h2>
-                    <button class="btn-analyze" id="btn-analyze">ANALYZE HABITS</button>
+        <div>
+            <section class="panel" data-reveal>
+                <h2>Setup</h2>
+                <p class="panel-note">Your monthly budget and what you are saving toward.</p>
+                <div class="field">
+                    <label for="set-budget">Monthly budget</label>
+                    <input type="number" id="set-budget" step="0.01" min="0" placeholder="0.00">
                 </div>
-                <div class="ai-terminal">
-                    <span id="ai-output">> System initialized. Start logging data to generate financial diagnostics...</span><span class="cursor"></span>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="set-goal-name">Goal name</label>
+                        <input type="text" id="set-goal-name" maxlength="40" placeholder="New laptop">
+                    </div>
+                    <div class="field">
+                        <label for="set-goal-target">Goal target</label>
+                        <input type="number" id="set-goal-target" step="0.01" min="0" placeholder="0.00">
+                    </div>
                 </div>
-            </div>
+                <button class="btn btn--full" id="btn-update-settings">Save setup</button>
+            </section>
 
-            <div class="panel">
-                <h2><i class="fas fa-chart-pie"></i> EXPENSE RADAR</h2>
-                <div class="chart-container"><canvas id="expenseChart"></canvas></div>
-                <div style="text-align: center; margin-top: 15px; color: var(--retro-pink); font-size: 0.9rem;" id="leak-warning"></div>
-            </div>
+            <section class="panel" data-reveal>
+                <h2>Where it goes</h2>
+                <p class="panel-note">Expenses by category.</p>
+                <div class="chart-box"><canvas id="expenseChart"></canvas></div>
+                <div class="leak" id="leak-warning" hidden></div>
+            </section>
+
+            <section class="panel" data-reveal>
+                <h2>Ask Capy</h2>
+                <p class="panel-note">
+                    Sends a summary of your totals to the AI advisor. The API key lives on the
+                    server, never in this page.
+                </p>
+                <div class="ai-out is-idle" id="ai-output">Log a few transactions, then ask Capy what he makes of them.</div>
+                <button class="btn btn--full" id="btn-analyze" style="margin-top: 16px;">
+                    <i class="fas fa-wand-magic-sparkles"></i> Analyze my money
+                </button>
+                <button class="btn btn--quiet btn--full btn--danger" id="btn-reset" style="margin-top: 10px;">
+                    Reset everything
+                </button>
+            </section>
         </div>
     </div>
 
-    <script>
-        // ⚠️ INSERT YOUR API KEY HERE ⚠️
-        const GROQ_API_KEY = "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"; 
+    <footer class="foot">
+        <span>Built by Jon Lewyn Tanggaro. Data stays in your browser.</span>
+        <span><a href="../index.html">Portfolio</a> &nbsp;·&nbsp; <a href="../projects.html">All projects</a></span>
+    </footer>
 
-        // --- STATE MANAGEMENT ---
-        // Clean slate default starting at zero
-        let transactions = JSON.parse(localStorage.getItem('capysave-tx-gen')) || [];
-        let config = JSON.parse(localStorage.getItem('capysave-cfg-gen')) || { budget: 0, goalName: '', goalTarget: 0 };
+</main>
 
-        // DOM Elements
-        const form = document.getElementById('tx-form');
-        const list = document.getElementById('transaction-list');
-        const aiOutput = document.getElementById('ai-output');
-        const btnAnalyze = document.getElementById('btn-analyze');
-        const btnReset = document.getElementById('btn-reset');
-        let typeWriterTimeout;
+<script>
+/* ============================================================
+   CapySave logic.
+   Storage keys and the transaction shape are unchanged from the
+   previous build, so existing saved data still loads.
+   ============================================================ */
+(function () {
+    'use strict';
 
-        // Init Form Settings
-        document.getElementById('set-budget').value = config.budget > 0 ? config.budget : '';
-        document.getElementById('set-goal-name').value = config.goalName;
-        document.getElementById('set-goal-target').value = config.goalTarget > 0 ? config.goalTarget : '';
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        const formatMoney = (amt) => '₱' + amt.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    /* ---------- Theme (shared with the rest of the site) ---------- */
+    const THEME_KEY = 'arcade-theme';
+    const themeBtn = document.getElementById('theme-btn');
 
-        // --- UPDATE DASHBOARD ---
-        function updateDashboard() {
-            let gcash = 0, maya = 0, bank = 0, expenses = 0, saved = 0;
-            const categoryTotals = {};
+    function applyTheme(mode) {
+        /* Dark is the default, so only 'light' sets an attribute. */
+        if (mode === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+    }
 
-            transactions.forEach(tx => {
-                const amt = parseFloat(tx.amount);
-                
-                if (tx.type === 'savings') {
-                    saved += amt;
-                    if(tx.platform === 'GCash') gcash -= amt;
-                    else if(tx.platform === 'Maya') maya -= amt;
-                    else bank -= amt;
-                } else if (tx.type === 'income') {
-                    if(tx.platform === 'GCash') gcash += amt;
-                    else if(tx.platform === 'Maya') maya += amt;
-                    else bank += amt;
-                } else if (tx.type === 'expense') {
-                    expenses += amt;
-                    if(tx.platform === 'GCash') gcash -= amt;
-                    else if(tx.platform === 'Maya') maya -= amt;
-                    else bank -= amt;
-                    categoryTotals[tx.category] = (categoryTotals[tx.category] || 0) + amt;
-                }
+    applyTheme(localStorage.getItem(THEME_KEY));
+
+    themeBtn.addEventListener('click', function () {
+        const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        localStorage.setItem(THEME_KEY, next);
+        applyTheme(next);
+        if (chart) restyleChart();
+    });
+
+    /* ---------- Nav ---------- */
+    const nav = document.getElementById('nav');
+    let ticking = false;
+
+    function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+            nav.classList.toggle('is-stuck', window.scrollY > 10);
+            ticking = false;
+        });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    /* ---------- Scroll reveal ---------- */
+    const reveals = document.querySelectorAll('[data-reveal]');
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+        reveals.forEach(function (el) { el.classList.add('is-in'); });
+    } else {
+        const io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-in');
+                io.unobserve(entry.target);
             });
+        }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+        reveals.forEach(function (el) { io.observe(el); });
+    }
 
-            // Net Worth
-            const netWorth = Math.max(0, gcash) + Math.max(0, maya) + Math.max(0, bank) + saved;
-            document.getElementById('val-networth').textContent = formatMoney(netWorth);
-            document.getElementById('val-platforms').textContent = `G: ${formatMoney(Math.max(0, gcash))} | M: ${formatMoney(Math.max(0, maya))} | B: ${formatMoney(Math.max(0, bank))}`;
+    /* ---------- State ---------- */
+    const TX_KEY = 'capysave-tx-gen';
+    const CFG_KEY = 'capysave-cfg-gen';
 
-            // Budget & Health Score
-            const budgetLeft = config.budget - expenses;
-            document.getElementById('val-budget').textContent = formatMoney(budgetLeft);
-            
-            let healthGrade = 'S (Optimal)'; let color = 'var(--retro-green)';
-            if (config.budget === 0) {
-                healthGrade = 'No Budget Set'; color = 'var(--text-muted)';
-            } else {
-                const spentPct = (expenses / config.budget) * 100;
-                if(expenses === 0) { healthGrade = 'Perfect'; color = 'var(--retro-green)'; }
-                else if(spentPct > 100) { healthGrade = 'F (Deficit)'; color = 'var(--retro-red)'; }
-                else if(spentPct > 85) { healthGrade = 'C (Warning)'; color = 'var(--retro-gold)'; }
-                else if(spentPct > 50) { healthGrade = 'B (Stable)'; color = 'var(--retro-blue)'; }
+    let transactions = [];
+    let config = { budget: 0, goalName: '', goalTarget: 0 };
+
+    try {
+        transactions = JSON.parse(localStorage.getItem(TX_KEY)) || [];
+        config = JSON.parse(localStorage.getItem(CFG_KEY)) || config;
+    } catch (err) {
+        /* Corrupt storage should not take the whole page down. */
+        console.warn('Could not read saved CapySave data:', err);
+    }
+
+    const formatMoney = function (amt) {
+        return '₱' + Number(amt || 0).toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    };
+
+    const el = function (id) { return document.getElementById(id); };
+
+    /* Cached because updateDashboard touches all of them on every change. */
+    const ui = {
+        networth: el('val-networth'),
+        platforms: el('val-platforms'),
+        allowanceCard: el('card-allowance'),
+        budget: el('val-budget'),
+        health: el('val-health'),
+        goalTitle: el('val-goal-title'),
+        goalAmt: el('val-goal-amt'),
+        goalProg: el('val-goal-prog'),
+        goalFill: el('goal-fill'),
+        list: el('transaction-list'),
+        leak: el('leak-warning'),
+        aiOut: el('ai-output')
+    };
+    /* ---------- Totals ----------
+       One pass over the transactions, shared by the dashboard, the capybara
+       and the AI summary, so the three can never disagree with each other. */
+    function computeTotals() {
+        const balances = { GCash: 0, Maya: 0, Bank: 0 };
+        const categoryTotals = {};
+        let expenses = 0;
+        let income = 0;
+        let saved = 0;
+
+        transactions.forEach(function (t) {
+            const amt = Number(t.amount) || 0;
+            const plat = balances.hasOwnProperty(t.platform) ? t.platform : 'Bank';
+
+            if (t.type === 'income') {
+                balances[plat] += amt;
+                income += amt;
+            } else if (t.type === 'expense') {
+                balances[plat] -= amt;
+                expenses += amt;
+                categoryTotals[t.category] = (categoryTotals[t.category] || 0) + amt;
+            } else if (t.type === 'savings') {
+                /* A transfer, not a cost: it leaves the platform and lands in savings. */
+                balances[plat] -= amt;
+                saved += amt;
             }
-            
-            document.getElementById('val-health').textContent = `Health Grade: ${healthGrade}`;
-            document.getElementById('val-health').style.color = color;
-            document.getElementById('card-allowance').style.borderColor = color;
-
-            // Goal Progress
-            const goalPct = config.goalTarget > 0 ? Math.min(100, (saved / config.goalTarget) * 100) : 0;
-            document.getElementById('val-goal-title').textContent = config.goalName ? config.goalName.toUpperCase() : 'NO GOAL SET';
-            document.getElementById('val-goal-prog').textContent = `${goalPct.toFixed(1)}%`;
-            document.getElementById('val-goal-amt').textContent = `${formatMoney(saved)} / ${formatMoney(config.goalTarget)}`;
-
-            // Leak Warning
-            if(Object.keys(categoryTotals).length > 0) {
-                const highestCat = Object.keys(categoryTotals).reduce((a, b) => categoryTotals[a] > categoryTotals[b] ? a : b);
-                document.getElementById('leak-warning').textContent = `! Highest Drain: ${highestCat} (${formatMoney(categoryTotals[highestCat])})`;
-            } else {
-                document.getElementById('leak-warning').textContent = "";
-            }
-        }
-
-        // --- RENDER LIST & THE [X] DELETE BUTTON ---
-        function renderList() {
-            list.innerHTML = '';
-            if (transactions.length === 0) { list.innerHTML = '<div class="empty-state">No logs.</div>'; return; }
-
-            [...transactions].reverse().forEach(tx => {
-                const li = document.createElement('li'); li.className = 'tx-item';
-                let badge = 'bg-gcash';
-                if(tx.platform === 'Maya') badge = 'bg-maya';
-                if(tx.platform === 'Bank') badge = 'bg-bank';
-
-                let sign = '-', colorClass = 'expense';
-                if(tx.type === 'income') { sign = '+'; colorClass = 'income'; }
-                if(tx.type === 'savings') { sign = '▲'; colorClass = 'income'; }
-
-                li.innerHTML = `
-                    <div class="tx-info">
-                        <h4>${tx.category} ${tx.note ? `(${tx.note})` : ''}</h4>
-                        <p><span class="badge ${badge}">${tx.platform}</span> ${tx.date}</p>
-                    </div>
-                    <div class="tx-amount ${colorClass}">${sign}${formatMoney(parseFloat(tx.amount))}</div>
-                    <button class="btn-del" onclick="deleteTx(${tx.id})" title="Delete Transaction"><i class="fas fa-times"></i></button>
-                `;
-                list.appendChild(li);
-            });
-        }
-
-        // Individual Delete Feature
-        window.deleteTx = function(id) {
-            transactions = transactions.filter(t => t.id !== id);
-            saveData(); 
-            updateAll();
-            typeWriter("> Log purged from database. Numbers recalculated.");
-        }
-
-        // --- CHART JS ---
-        Chart.defaults.font.family = "'Press Start 2P', cursive"; Chart.defaults.color = "#a8a8b2";
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        let expenseChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: ['No Data'], datasets: [{ data: [1], backgroundColor: ['#2a2a40'], borderColor: '#000000', borderWidth: 2 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e1e2f', titleFont: { size: 10 }, bodyFont: { size: 14, family: "'VT323', monospace" } } } }
         });
 
-        function updateChart() {
-            const expData = {}; let hasExp = false;
-            transactions.forEach(tx => {
-                if (tx.type === 'expense') { hasExp = true; expData[tx.category] = (expData[tx.category] || 0) + parseFloat(tx.amount); }
-            });
+        const netWorth = Math.max(0, balances.GCash) + Math.max(0, balances.Maya) +
+                         Math.max(0, balances.Bank) + saved;
 
-            if (!hasExp) {
-                expenseChart.data.labels = ['No Data']; expenseChart.data.datasets[0].data = [1];
-                expenseChart.data.datasets[0].backgroundColor = ['#2a2a40']; expenseChart.update(); return;
-            }
+        const budget = Number(config.budget) || 0;
+        const target = Number(config.goalTarget) || 0;
 
-            expenseChart.data.labels = Object.keys(expData);
-            expenseChart.data.datasets[0].data = Object.values(expData);
-            expenseChart.data.datasets[0].backgroundColor = ['#ff79c6', '#bd93f9', '#3b82f6', '#4ade80', '#facc15', '#ff5555', '#ffffff', '#8be9fd'];
-            expenseChart.update();
+        return {
+            balances: balances,
+            categoryTotals: categoryTotals,
+            expenses: expenses,
+            income: income,
+            saved: saved,
+            netWorth: netWorth,
+            budget: budget,
+            remaining: budget - expenses,
+            spentPct: budget > 0 ? (expenses / budget) * 100 : 0,
+            goalTarget: target,
+            goalPct: target > 0 ? Math.min(100, (saved / target) * 100) : 0
+        };
+    }
+    /* Grades are unchanged from the previous build; only the colours are now
+       Apple system colours instead of the old palette. */
+    function healthGrade(t) {
+        if (t.budget <= 0) return { text: 'No budget set', tone: 'var(--ink-mute)', mood: 'asleep' };
+        if (t.expenses === 0) return { text: 'Perfect — nothing spent yet', tone: 'var(--good)', mood: 'happy' };
+        if (t.spentPct > 100) return { text: 'F — over budget', tone: 'var(--bad)', mood: 'worried' };
+        if (t.spentPct > 85) return { text: 'C — cutting it close', tone: 'var(--warn)', mood: 'worried' };
+        if (t.spentPct > 50) return { text: 'B — stable', tone: 'var(--accent)', mood: 'idle' };
+        return { text: 'S — optimal', tone: 'var(--good)', mood: 'happy' };
+    }
+
+    /* ---------- The capybara ---------- */
+    const capy = el('capy-stage');
+    const bubble = el('capy-bubble');
+    let moodTimer = null;
+    let bubbleTimer = null;
+
+    const POKE_LINES = [
+        'I am a capybara. I am extremely calm about your spending.',
+        'Every peso you log is a peso you understand.',
+        'Savings are just money you told to sit still.',
+        'Small leaks sink big budgets. Check your top category.',
+        'You do not need to spend less on everything. Just one thing.',
+        'I would like a snack. You would like a surplus. We both wait.',
+        'Future you is reading this history. Be kind to them.'
+    ];
+
+    function say(text) {
+        if (!text || bubble.textContent === text) return;
+        clearTimeout(bubbleTimer);
+        bubble.classList.add('is-swap');
+        bubbleTimer = setTimeout(function () {
+            bubble.textContent = text;
+            bubble.classList.remove('is-swap');
+        }, reduceMotion ? 0 : 200);
+    }
+
+    /* Moods are transient except 'idle' and 'asleep', which are resting states. */
+    function setMood(mood, holdMs) {
+        clearTimeout(moodTimer);
+        capy.classList.remove('is-happy', 'is-worried', 'is-poked', 'is-asleep');
+        if (mood && mood !== 'idle') capy.classList.add('is-' + mood);
+        if (holdMs) {
+            moodTimer = setTimeout(function () {
+                capy.classList.remove('is-happy', 'is-worried', 'is-poked');
+                restMood();
+            }, holdMs);
         }
+    }
+    /* The resting pose reflects the actual numbers: asleep with no data,
+       worried when the budget is strained, otherwise idle. */
+    function restMood() {
+        const t = computeTotals();
+        capy.classList.remove('is-happy', 'is-worried', 'is-asleep');
+        if (transactions.length === 0 && t.budget <= 0) {
+            capy.classList.add('is-asleep');
+        } else if (t.budget > 0 && t.spentPct > 85) {
+            capy.classList.add('is-worried');
+        }
+    }
 
-        // --- FORM HANDLING ---
-        document.getElementById('btn-update-settings').addEventListener('click', () => {
-            config.budget = parseFloat(document.getElementById('set-budget').value) || 0;
-            config.goalName = document.getElementById('set-goal-name').value || '';
-            config.goalTarget = parseFloat(document.getElementById('set-goal-target').value) || 0;
-            localStorage.setItem('capysave-cfg-gen', JSON.stringify(config));
-            updateAll(); typeWriter("> Configuration saved. Dashboards updated.");
-        });
+    function capyComment(t) {
+        if (transactions.length === 0 && t.budget <= 0) {
+            return 'Nothing logged yet. Set a budget and I will wake up.';
+        }
+        if (t.budget <= 0) {
+            return 'You are tracking, but with no budget I have nothing to compare against. Set one in Setup.';
+        }
+        if (t.spentPct > 100) {
+            return 'You are ' + formatMoney(Math.abs(t.remaining)) + ' past your budget. Not a disaster, but stop the biggest category first.';
+        }
+        if (t.spentPct > 85) {
+            return 'Only ' + formatMoney(t.remaining) + ' left of your budget. Coast from here.';
+        }
+        if (t.goalTarget > 0 && t.goalPct >= 100) {
+            return 'You hit ' + (config.goalName || 'your goal') + '. Set a bigger one.';
+        }
+        if (t.goalTarget > 0) {
+            return formatMoney(t.saved) + ' saved — that is ' + Math.round(t.goalPct) +
+                   '% of ' + (config.goalName || 'your goal') + '. Keep going.';
+        }
+        return formatMoney(t.remaining) + ' of your budget is still yours. Comfortable.';
+    }
 
-        form.addEventListener('submit', e => {
+    capy.addEventListener('click', function () {
+        setMood('poked', 700);
+        say(POKE_LINES[Math.floor(Math.random() * POKE_LINES.length)]);
+    });
+    capy.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            const newTx = {
-                id: Date.now(), type: document.getElementById('tx-type').value, platform: document.getElementById('tx-platform').value,
-                category: document.getElementById('tx-type').value === 'savings' ? 'Savings' : document.getElementById('tx-category').value,
-                amount: document.getElementById('tx-amount').value, note: document.getElementById('tx-note').value,
-                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-            };
-            transactions.push(newTx); saveData(); updateAll();
-            document.getElementById('tx-amount').value = ''; document.getElementById('tx-note').value = '';
-            typeWriter("> Log accepted. Data sync complete.");
-        });
-
-        // The TRUE Factory Reset
-        btnReset.addEventListener('click', function() {
-            const confirmPurge = confirm("CRITICAL WARNING: This will permanently wipe all financial records AND your settings. Are you sure you want to proceed?");
-            if (confirmPurge) {
-                transactions = [];
-                config = { budget: 0, goalName: '', goalTarget: 0 };
-                
-                localStorage.removeItem('capysave-tx-gen');
-                localStorage.removeItem('capysave-cfg-gen');
-                
-                // Clear the visual input boxes
-                document.getElementById('set-budget').value = '';
-                document.getElementById('set-goal-name').value = '';
-                document.getElementById('set-goal-target').value = '';
-
-                updateAll();
-                typeWriter("> Memory wiped. System restored to absolute zero.");
-            }
-        });
-
-        function saveData() { localStorage.setItem('capysave-tx-gen', JSON.stringify(transactions)); }
-        function updateAll() { updateDashboard(); renderList(); updateChart(); }
-
-        // --- AI LOGIC ---
-        function typeWriter(text) {
-            clearTimeout(typeWriterTimeout); aiOutput.textContent = ""; let i = 0;
-            function type() { if (i < text.length) { aiOutput.textContent += text.charAt(i); i++; typeWriterTimeout = setTimeout(type, 20); } }
-            type();
+            capy.click();
         }
+    });
+    /* ---------- Dashboard ---------- */
+    function tick(node) {
+        if (reduceMotion || !node) return;
+        node.classList.remove('is-tick');
+        /* Force a reflow so the animation restarts on repeat changes. */
+        void node.offsetWidth;
+        node.classList.add('is-tick');
+    }
 
-        async function runAIAnalysis() {
-            btnAnalyze.disabled = true; btnAnalyze.style.opacity = '0.5';
+    function updateDashboard() {
+        const t = computeTotals();
 
-            if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
-                typeWriter("> ERROR: Groq API Key missing. Neural connection offline.");
-                btnAnalyze.disabled = false; btnAnalyze.style.opacity = '1'; return;
-            }
+        ui.networth.textContent = formatMoney(t.netWorth);
 
-            typeWriter("> Booting Capy-AI... Analyzing financial vectors...");
+        ui.platforms.innerHTML = ['GCash', 'Maya', 'Bank'].map(function (p) {
+            return '<div class="plat-row"><span>' + p + '</span><span>' +
+                   formatMoney(Math.max(0, t.balances[p])) + '</span></div>';
+        }).join('') +
+        '<div class="plat-row"><span>Savings</span><span>' + formatMoney(t.saved) + '</span></div>';
 
-            let expTotal = 0; let savedTotal = 0; const cats = {};
-            transactions.forEach(t => { 
-                const amt = parseFloat(t.amount);
-                if(t.type === 'expense') { expTotal += amt; cats[t.category] = (cats[t.category] || 0) + amt; }
-                if(t.type === 'savings') savedTotal += amt;
+        const grade = healthGrade(t);
+        ui.budget.textContent = t.budget > 0 ? formatMoney(t.remaining) : formatMoney(0);
+        ui.health.textContent = grade.text;
+        ui.health.style.color = grade.tone;
+        /* The card border carries the grade too, so it reads at a glance. */
+        ui.allowanceCard.style.borderColor = t.budget > 0 ? grade.tone : '';
+
+        ui.goalTitle.textContent = config.goalName ? config.goalName : 'Savings goal';
+        ui.goalAmt.textContent = formatMoney(t.saved);
+        ui.goalFill.style.width = t.goalPct + '%';
+        ui.goalProg.textContent = t.goalTarget > 0
+            ? Math.round(t.goalPct) + '% of ' + formatMoney(t.goalTarget)
+            : 'No goal yet';
+
+        /* Biggest expense category, if there is one. */
+        const cats = Object.keys(t.categoryTotals);
+        if (cats.length > 0) {
+            const worst = cats.reduce(function (a, b) {
+                return t.categoryTotals[a] > t.categoryTotals[b] ? a : b;
             });
-            let topCat = Object.keys(cats).length > 0 ? Object.keys(cats).reduce((a,b)=>cats[a]>cats[b]?a:b) : 'None';
-
-            const sysPrompt = `You are Capy-AI, a cyberpunk personal financial advisor.
-            Your job is to give short, highly specific advice based on the user's spending data. Generate a "What-If" prediction for wealth growth.
-            Keep response under 4 sentences. NO markdown formatting. NO bullet points. Be analytical and direct.`;
-
-            const usrPrompt = `User Data: Budget Limit: ₱${config.budget}. Goal: ${config.goalName} (Target: ₱${config.goalTarget}, Current: ₱${savedTotal}). 
-            Expenses: ₱${expTotal}. Highest spending category: ${topCat} (₱${cats[topCat] || 0}). 
-            Give me a specific health evaluation and a "What if" scenario to help me reach my goal faster based on my highest expense.`;
-
-            try {
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST", headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{ role: "system", content: sysPrompt }, { role: "user", content: usrPrompt }], temperature: 0.7, max_tokens: 150 })
-                });
-                if (!response.ok) throw new Error("API Failed");
-                const data = await response.json();
-                typeWriter("> " + data.choices[0].message.content); 
-            } catch (err) { typeWriter("> ERROR: Groq API Link Failed."); }
-
-            btnAnalyze.disabled = false; btnAnalyze.style.opacity = '1';
+            ui.leak.hidden = false;
+            ui.leak.innerHTML = '<i class="fas fa-triangle-exclamation"></i><span>Your biggest ' +
+                'outflow is <strong>' + worst + '</strong> at ' +
+                formatMoney(t.categoryTotals[worst]) + '.</span>';
+        } else {
+            ui.leak.hidden = true;
+            ui.leak.innerHTML = '';
         }
 
-        btnAnalyze.addEventListener('click', runAIAnalysis);
+        say(capyComment(t));
+        return t;
+    }
+    /* ---------- History list ---------- */
+    /* Notes are user text going into innerHTML, so escape them. */
+    function esc(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
 
-        // Run on start
+    const TX_ICON = { expense: 'fa-arrow-up', income: 'fa-arrow-down', savings: 'fa-piggy-bank' };
+    const TX_SIGN = { expense: '-', income: '+', savings: '→' };
+
+    function renderList() {
+        if (transactions.length === 0) {
+            ui.list.innerHTML =
+                '<div class="empty"><i class="fas fa-receipt"></i>' +
+                'No transactions yet. Add one on the left.</div>';
+            return;
+        }
+
+        /* Newest first, without mutating the stored order. */
+        const rows = transactions.slice().reverse();
+
+        ui.list.innerHTML = rows.map(function (t) {
+            const type = t.type === 'income' || t.type === 'savings' ? t.type : 'expense';
+            return '' +
+                '<div class="tx">' +
+                    '<div class="tx-icon is-' + type + '"><i class="fas ' + TX_ICON[type] + '"></i></div>' +
+                    '<div class="tx-main">' +
+                        '<div class="tx-cat">' + esc(t.category) + '</div>' +
+                        '<div class="tx-meta">' + esc(t.platform) + ' · ' + esc(t.date) +
+                            (t.note ? ' · ' + esc(t.note) : '') +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="tx-amt is-' + type + '">' + TX_SIGN[type] + ' ' +
+                        formatMoney(t.amount) +
+                    '</div>' +
+                    '<button class="tx-del" onclick="deleteTx(' + Number(t.id) + ')" ' +
+                        'aria-label="Delete transaction"><i class="fas fa-xmark"></i></button>' +
+                '</div>';
+        }).join('');
+    }
+
+    /* Called from the inline onclick above, so it has to be global. */
+    window.deleteTx = function (id) {
+        transactions = transactions.filter(function (t) { return t.id !== id; });
+        saveData();
         updateAll();
-    </script>
+    };
+    /* ---------- Chart ---------- */
+    /* Apple system colours instead of the old neon palette. */
+    const CHART_COLORS = ['#2997ff', '#30d158', '#ff9f0a', '#bf5af2',
+                          '#ff375f', '#64d2ff', '#ffd60a', '#5e5ce6'];
+    let chart = null;
+
+    function chartInk() {
+        return getComputedStyle(document.documentElement)
+            .getPropertyValue('--ink-sub').trim() || '#a1a1a6';
+    }
+    function chartBorder() {
+        return getComputedStyle(document.documentElement)
+            .getPropertyValue('--card').trim() || '#16161a';
+    }
+
+    function restyleChart() {
+        if (!chart) return;
+        chart.options.plugins.legend.labels.color = chartInk();
+        chart.data.datasets[0].borderColor = chartBorder();
+        chart.update();
+    }
+
+    function updateChart() {
+        const t = computeTotals();
+        const cats = Object.keys(t.categoryTotals);
+        const hasData = cats.length > 0;
+
+        const labels = hasData ? cats : ['No data'];
+        const values = hasData ? cats.map(function (c) { return t.categoryTotals[c]; }) : [1];
+        const colors = hasData ? CHART_COLORS.slice(0, cats.length) : [chartBorder()];
+
+        if (chart) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = values;
+            chart.data.datasets[0].backgroundColor = colors;
+            chart.data.datasets[0].borderColor = chartBorder();
+            chart.update();
+            return;
+        }
+
+        const canvas = el('expenseChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        chart = new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: chartBorder(),
+                    borderWidth: 3,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '62%',
+                animation: reduceMotion ? false : { duration: 700, easing: 'easeOutQuart' },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: chartInk(),
+                            boxWidth: 9,
+                            boxHeight: 9,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 14,
+                            font: { size: 12, family: 'Inter, -apple-system, sans-serif' }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                return ' ' + ctx.label + ': ' + formatMoney(ctx.parsed);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* ---------- Persistence ---------- */
+    function saveData() {
+        try {
+            localStorage.setItem(TX_KEY, JSON.stringify(transactions));
+            localStorage.setItem(CFG_KEY, JSON.stringify(config));
+        } catch (err) {
+            console.warn('Could not save CapySave data:', err);
+        }
+    }
+
+    function updateAll() {
+        updateDashboard();
+        renderList();
+        updateChart();
+        restMood();
+    }
+    /* ---------- Setup form ---------- */
+    el('btn-update-settings').addEventListener('click', function () {
+        config.budget = parseFloat(el('set-budget').value) || 0;
+        config.goalName = el('set-goal-name').value.trim();
+        config.goalTarget = parseFloat(el('set-goal-target').value) || 0;
+        saveData();
+        updateAll();
+        tick(ui.budget);
+        setMood('happy', 1400);
+        say('Budget set to ' + formatMoney(config.budget) + '. Now I have something to measure.');
+    });
+
+    /* ---------- Add transaction ---------- */
+    el('tx-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const amount = parseFloat(el('tx-amount').value);
+        if (!amount || amount <= 0) return;
+
+        const type = el('tx-type').value;
+        const before = computeTotals();
+
+        transactions.push({
+            id: Date.now(),
+            type: type,
+            platform: el('tx-platform').value,
+            /* A savings transfer has no spending category. */
+            category: type === 'savings' ? 'Savings' : el('tx-category').value,
+            amount: amount,
+            note: el('tx-note').value.trim(),
+            date: new Date().toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric'
+            })
+        });
+
+        saveData();
+        const after = updateDashboard();
+        renderList();
+        updateChart();
+
+        tick(ui.networth);
+        el('tx-amount').value = '';
+        el('tx-note').value = '';
+
+        /* React to what actually happened, not just to the click. */
+        if (after.goalTarget > 0 && before.goalPct < 100 && after.goalPct >= 100) {
+            setMood('happy', 2200);
+            say('You reached ' + (config.goalName || 'your goal') + '. That is the whole point of me.');
+        } else if (type === 'savings' || type === 'income') {
+            setMood('happy', 1500);
+        } else if (after.budget > 0 && after.spentPct > 85) {
+            setMood('worried', 1800);
+        } else {
+            setMood('poked', 700);
+        }
+    });
+    /* ---------- Reset ---------- */
+    el('btn-reset').addEventListener('click', function () {
+        if (!confirm('Delete every transaction and your setup? This cannot be undone.')) return;
+        transactions = [];
+        config = { budget: 0, goalName: '', goalTarget: 0 };
+        localStorage.removeItem(TX_KEY);
+        localStorage.removeItem(CFG_KEY);
+        el('set-budget').value = '';
+        el('set-goal-name').value = '';
+        el('set-goal-target').value = '';
+        ui.aiOut.className = 'ai-out is-idle';
+        ui.aiOut.textContent = 'Log a few transactions, then ask Capy what he makes of them.';
+        updateAll();
+        say('Cleared. Blank slate.');
+    });
+
+    /* ---------- AI advisor ----------
+       The Groq key lives in a Vercel environment variable and the request goes
+       through /api/chat, which injects the Capy persona server-side. Nothing
+       secret is in this file. Note: /api/chat only exists on the Vercel
+       deployment -- on GitHub Pages there is no serverless runtime, so this
+       button will report the endpoint as unavailable there. */
+    const CHAT_ENDPOINT = '/api/chat';
+    const analyzeBtn = el('btn-analyze');
+    let typeWriterTimeout = null;
+
+    function typeWriter(text) {
+        clearTimeout(typeWriterTimeout);
+        ui.aiOut.className = 'ai-out';
+        if (reduceMotion) {
+            ui.aiOut.textContent = text;
+            return;
+        }
+        ui.aiOut.textContent = '';
+        ui.aiOut.classList.add('is-typing');
+        let i = 0;
+        (function step() {
+            if (i >= text.length) {
+                ui.aiOut.classList.remove('is-typing');
+                return;
+            }
+            ui.aiOut.textContent += text.charAt(i);
+            i += 1;
+            typeWriterTimeout = setTimeout(step, 20);
+        })();
+    }
+    /* Plain-text summary, not raw JSON: the model reads it more reliably and
+       nothing beyond these numbers ever leaves the browser. */
+    function buildSummary(t) {
+        const lines = [
+            'Monthly budget: ' + formatMoney(t.budget),
+            'Total spent this period: ' + formatMoney(t.expenses) +
+                (t.budget > 0 ? ' (' + Math.round(t.spentPct) + '% of budget)' : ''),
+            'Total income logged: ' + formatMoney(t.income),
+            'Moved to savings: ' + formatMoney(t.saved),
+            'Net worth: ' + formatMoney(t.netWorth),
+            'Balances: GCash ' + formatMoney(Math.max(0, t.balances.GCash)) +
+                ', Maya ' + formatMoney(Math.max(0, t.balances.Maya)) +
+                ', Bank ' + formatMoney(Math.max(0, t.balances.Bank)),
+            'Transactions recorded: ' + transactions.length
+        ];
+
+        const cats = Object.keys(t.categoryTotals);
+        if (cats.length > 0) {
+            lines.push('Spending by category: ' + cats.map(function (c) {
+                return c + ' ' + formatMoney(t.categoryTotals[c]);
+            }).join(', '));
+        }
+
+        if (t.goalTarget > 0) {
+            lines.push('Savings goal: ' + (config.goalName || 'unnamed') + ' — ' +
+                       formatMoney(t.saved) + ' of ' + formatMoney(t.goalTarget) +
+                       ' (' + Math.round(t.goalPct) + '%)');
+        }
+
+        return 'Here is my current financial picture. Give me your read.\n' + lines.join('\n');
+    }
+
+    async function runAIAnalysis() {
+        const t = computeTotals();
+
+        analyzeBtn.disabled = true;
+        ui.aiOut.className = 'ai-out is-idle';
+        ui.aiOut.innerHTML = 'Capy is thinking <span class="dots"><span></span><span></span><span></span></span>';
+        setMood('poked', 900);
+
+        try {
+            const res = await fetch(CHAT_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    persona: 'capy',
+                    messages: [{ role: 'user', content: buildSummary(t) }]
+                })
+            });
+            /* A 404 here almost always means the page is being served somewhere
+               without serverless functions, e.g. GitHub Pages or file://. */
+            if (res.status === 404) {
+                throw new Error('The advisor endpoint is not available on this host. ' +
+                                'Open the Vercel deployment to use it.');
+            }
+
+            const data = await res.json().catch(function () { return null; });
+
+            if (!res.ok) {
+                throw new Error((data && data.error) || 'The advisor service returned an error.');
+            }
+
+            const reply = data && data.reply ? String(data.reply).trim() : '';
+            if (!reply) throw new Error('The advisor returned an empty reply.');
+
+            typeWriter(reply);
+            setMood(t.budget > 0 && t.spentPct > 85 ? 'worried' : 'happy', 1600);
+        } catch (err) {
+            ui.aiOut.className = 'ai-out is-error';
+            ui.aiOut.textContent = err.message || 'Could not reach the advisor.';
+            setMood('worried', 1400);
+        } finally {
+            analyzeBtn.disabled = false;
+        }
+    }
+
+    analyzeBtn.addEventListener('click', runAIAnalysis);
+
+    /* ---------- Init ---------- */
+    el('set-budget').value = config.budget > 0 ? config.budget : '';
+    el('set-goal-name').value = config.goalName || '';
+    el('set-goal-target').value = config.goalTarget > 0 ? config.goalTarget : '';
+
+    /* A savings transfer has a fixed category, so the picker is pointless then. */
+    el('tx-type').addEventListener('change', function () {
+        const isSavings = this.value === 'savings';
+        el('tx-category').disabled = isSavings;
+        el('tx-category').style.opacity = isSavings ? '0.45' : '';
+    });
+
+    updateAll();
+})();
+
+</script>
+
 </body>
 </html>
