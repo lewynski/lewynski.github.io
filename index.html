@@ -718,6 +718,9 @@
            RESPONSIVE
            ============================================================ */
         @media (max-width: 833px) {
+            /* Eight nav items is tight at this width, so the links tuck in
+               before the burger takes over at 734px. */
+            .nav-links a { padding: 6px 7px; }
             .cards { grid-template-columns: 1fr; }
             .section { padding: 84px 0; }
             .hero-stats div { padding: 0 22px; }
@@ -779,6 +782,7 @@
             <div class="nav-links" id="nav-center-menu">
                 <a href="index.html" aria-current="page">Home</a>
                 <a href="#work">Work</a>
+                <a href="projects.html">Projects</a>
                 <a href="#skills">Skills</a>
                 <a href="#ai-chat">AI</a>
                 <a href="resume.html">Resume</a>
