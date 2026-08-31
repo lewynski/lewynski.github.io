@@ -3,971 +3,1208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jon Lewyn | Unfiltered Website</title>
+    <title>Jon Lewyn | Unfiltered</title>
+    <meta name="description" content="Jon Lewyn Villaram Tanggaro - Electronics Engineering student building computational tools, embedded systems, and web applications.">
 
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* ============================================================
+           Design tokens. Apple's own system: near-white and #f5f5f7
+           alternating surfaces, two ink weights, one blue accent.
+           No third colour, no gradients on text, no borders.
+           ============================================================ */
         :root {
-            /* Web-slinger palette: suit red, deep navy, web white */
-            --bg-color: #0b1024;
-            --panel-bg: #151d38;
-            --panel-bg-2: #1d284a;
-            --text-main: #eef2ff;
-            --text-muted: #9aa6cc;
-            --retro-green: #4ade80;
-            --retro-blue: #2f5fe0;
-            --retro-purple: #8b9bff;
-            --retro-pink: #e01b26;
-            --retro-gold: #ffd93d;
-            --retro-red: #e01b26;
-            --suit-red: #d0202b;
-            --suit-red-dark: #8f1219;
-            --suit-blue: #1c3fb8;
-            --web-white: #eef2ff;
-            --border-dark: #05070f;
-            --grid-color: rgba(238, 242, 255, 0.05);
-            --hero-glow-1: rgba(208, 32, 43, 0.16);
-            --hero-glow-2: rgba(28, 63, 184, 0.16);
-            --hero-glow-3: rgba(238, 242, 255, 0.05);
+            --surface:      #ffffff;
+            --surface-alt:  #f5f5f7;
+            --surface-dark: #000000;
+            --ink:          #1d1d1f;
+            --ink-sub:      #6e6e73;
+            --ink-on-dark:  #f5f5f7;
+            --accent:       #0071e3;
+            --accent-hover: #0077ed;
+            --hairline:     rgba(0, 0, 0, 0.10);
+            --card:         #ffffff;
+            --chip:         rgba(0, 0, 0, 0.05);
+            --nav-bg:       rgba(255, 255, 255, 0.72);
+
+            /* Apple's easing curve, used for every transition on the page. */
+            --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+            --shell: 980px;
         }
 
-        [data-theme="light"] {
-            --bg-color: #eceef7;
-            --panel-bg: #ffffff;
-            --panel-bg-2: #dfe4f4;
-            --text-main: #10142a;
-            --text-muted: #46507a;
-            --retro-purple: #3b47c9;
-            --border-dark: #05070f;
-            --grid-color: rgba(28, 63, 184, 0.10);
-            --hero-glow-1: rgba(208, 32, 43, 0.14);
-            --hero-glow-2: rgba(28, 63, 184, 0.14);
-            --hero-glow-3: rgba(28, 63, 184, 0.06);
+        [data-theme="dark"] {
+            --surface:      #000000;
+            --surface-alt:  #101012;
+            --surface-dark: #000000;
+            --ink:          #f5f5f7;
+            --ink-sub:      #86868b;
+            --accent:       #2997ff;
+            --accent-hover: #47a8ff;
+            --hairline:     rgba(255, 255, 255, 0.12);
+            --card:         #1c1c1e;
+            --chip:         rgba(255, 255, 255, 0.08);
+            --nav-bg:       rgba(0, 0, 0, 0.72);
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
         body {
-            font-family: 'Press Start 2P', cursive;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.8;
-            /* Web lattice: verticals/horizontals plus both diagonals so the
-               background reads as strung webbing rather than graph paper. */
-            background-image:
-                linear-gradient(var(--grid-color) 2px, transparent 2px),
-                linear-gradient(90deg, var(--grid-color) 2px, transparent 2px),
-                linear-gradient(45deg, transparent 48%, var(--grid-color) 48%, var(--grid-color) 52%, transparent 52%),
-                linear-gradient(-45deg, transparent 48%, var(--grid-color) 48%, var(--grid-color) 52%, transparent 52%);
-            background-size: 60px 60px, 60px 60px, 60px 60px, 60px 60px;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                         "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 17px;
+            line-height: 1.47;
+            letter-spacing: -0.022em;
+            -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
-            position: relative;
+            transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
         }
 
-        body::before,
-        body::after {
-            content: "";
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            filter: blur(90px);
-            z-index: -1;
-            animation: blobFloat 12s ease-in-out infinite;
+        /* Type scale. Headlines are large, semibold, and tightly tracked --
+           the tighter the tracking gets, the bigger the size. */
+        h1, h2, h3 { font-weight: 600; line-height: 1.05; text-wrap: balance; }
+
+        h1 { font-size: clamp(2.75rem, 7vw, 5rem); letter-spacing: -0.015em; }
+        h2 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -0.015em; }
+        h3 { font-size: clamp(1.25rem, 2.4vw, 1.75rem); letter-spacing: -0.01em; }
+
+        .lead {
+            font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+            line-height: 1.35;
+            letter-spacing: -0.01em;
+            font-weight: 400;
+            color: var(--ink-sub);
+        }
+
+        p { color: var(--ink-sub); }
+
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        img { display: block; max-width: 100%; }
+
+        /* Keyboard focus stays visible everywhere. */
+        a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        /* ============================================================
+           NAV -- 48px tall, 12px type, invisible until you scroll,
+           then a saturated blur panel slides its background in.
+           ============================================================ */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+            height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            background: transparent;
+            border-bottom: 1px solid transparent;
+            transition: background-color 0.4s var(--ease),
+                        backdrop-filter 0.4s var(--ease),
+                        border-color 0.4s var(--ease);
+        }
+
+        .nav.is-stuck {
+            background: var(--nav-bg);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-bottom-color: var(--hairline);
+        }
+
+        .nav-inner {
+            width: 100%; max-width: var(--shell);
+            padding: 0 22px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
+        }
+
+        .nav-mark {
+            font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+            color: var(--ink); background: none; border: 0;
+            font-family: inherit; cursor: pointer;
+            transition: opacity 0.3s var(--ease);
+        }
+        .nav-mark:hover { opacity: 0.6; }
+
+        .nav-links { display: flex; align-items: center; gap: 4px; }
+
+        .nav-links a {
+            font-size: 12px; font-weight: 400; letter-spacing: -0.01em;
+            color: var(--ink); padding: 6px 11px; border-radius: 980px;
+            transition: opacity 0.3s var(--ease), background-color 0.3s var(--ease);
+        }
+        .nav-links a:hover { opacity: 0.62; text-decoration: none; }
+        .nav-links a[aria-current="page"] { background: var(--chip); }
+
+        .nav-tools { display: flex; align-items: center; gap: 2px; }
+
+        .icon-btn {
+            width: 32px; height: 32px; border: 0; border-radius: 50%;
+            background: none; color: var(--ink); font-size: 13px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s var(--ease), opacity 0.3s var(--ease);
+        }
+        .icon-btn:hover { background: var(--chip); }
+
+        .nav-burger { display: none; }
+
+        /* ============================================================
+           BUTTONS -- one filled pill, one text link with a chevron.
+           ============================================================ */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 17px; font-weight: 400; letter-spacing: -0.01em;
+            padding: 12px 23px; border-radius: 980px;
+            background: var(--accent); color: #fff; border: 0;
+            font-family: inherit; cursor: pointer;
+            transition: background-color 0.3s var(--ease), transform 0.3s var(--ease);
+        }
+        .btn:hover { background: var(--accent-hover); text-decoration: none; }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-ghost {
+            background: transparent; color: var(--accent);
+            border: 1px solid var(--accent); padding: 11px 22px;
+        }
+        .btn-ghost:hover { background: var(--accent); color: #fff; }
+
+        /* A text link that nudges its chevron on hover -- Apple's "Learn more ›" */
+        .link-more {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 17px; letter-spacing: -0.01em; color: var(--accent);
+        }
+        .link-more:hover { text-decoration: underline; }
+        .link-more .chev {
+            font-size: 13px;
+            transition: transform 0.3s var(--ease);
+        }
+        .link-more:hover .chev { transform: translateX(3px); }
+
+        .btn-row {
+            display: flex; flex-wrap: wrap; gap: 14px 26px;
+            align-items: center; justify-content: center;
+        }
+
+        /* ============================================================
+           SECTION SHELL -- full-bleed background, constrained content.
+           Alternating white / #f5f5f7 is the whole rhythm of the page.
+           ============================================================ */
+        .section { padding: 110px 0; }
+        .section--alt { background: var(--surface-alt); }
+        .section--dark { background: var(--surface-dark); color: var(--ink-on-dark); }
+        .section--dark h2 { color: var(--ink-on-dark); }
+        .section--dark .lead { color: #a1a1a6; }
+
+        .shell { width: 100%; max-width: var(--shell); margin: 0 auto; padding: 0 22px; }
+
+        .head { text-align: center; margin-bottom: 60px; }
+        .head .lead { margin: 16px auto 0; max-width: 640px; }
+
+        .eyebrow {
+            font-size: 19px; font-weight: 600; letter-spacing: -0.01em;
+            color: var(--accent); margin-bottom: 8px;
+        }
+
+        /* ============================================================
+           SCROLL REVEAL -- the signature Apple motion. Elements start
+           40px low and fully transparent, then settle into place once
+           they cross into view. Set by IntersectionObserver, once each.
+           ============================================================ */
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+        }
+        [data-reveal].is-in { opacity: 1; transform: none; }
+
+        /* Staggered children so a grid arrives as a wave, not a block. */
+        [data-reveal][data-delay="1"] { transition-delay: 0.09s; }
+        [data-reveal][data-delay="2"] { transition-delay: 0.18s; }
+        [data-reveal][data-delay="3"] { transition-delay: 0.27s; }
+        [data-reveal][data-delay="4"] { transition-delay: 0.36s; }
+
+        /* ============================================================
+           HERO
+           ============================================================ */
+        .hero {
+            min-height: 100svh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 120px 22px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* A very soft wash behind the hero so the white does not read as
+           empty. Two low-opacity blue fields, no hard edges. */
+        .hero::before {
+            content: ""; position: absolute; inset: -20% -10% auto -10%;
+            height: 70%;
+            background:
+                radial-gradient(50% 55% at 28% 35%, rgba(0, 113, 227, 0.10), transparent 70%),
+                radial-gradient(45% 50% at 76% 20%, rgba(88, 86, 214, 0.09), transparent 70%);
             pointer-events: none;
         }
 
-        body::before { top: -120px; left: -100px; background: var(--hero-glow-1); }
-        body::after { bottom: -140px; right: -120px; background: var(--hero-glow-2); animation-delay: 3s; }
+        .hero-inner { position: relative; max-width: 860px; }
 
-        @keyframes blobFloat { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px, 30px) scale(1.08); } }
-
-        .scanlines { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; z-index: 9999; pointer-events: none; }
-
-        /* Strung webbing in the top corners of the viewport. Inline SVG so there
-           are no extra image requests, and it scales with the corner box. */
-        .web-corners { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5; }
-        .web-corners span {
-            position: absolute; top: 0; width: 260px; height: 260px;
-            background-repeat: no-repeat; background-size: 100% 100%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23eef2ff' stroke-width='0.7' opacity='0.55'%3E%3Cpath d='M0 0 L100 100 M0 0 L100 55 M0 0 L55 100 M0 0 L100 20 M0 0 L20 100'/%3E%3Cpath d='M22 0 Q14 14 0 22 M45 0 Q30 30 0 45 M70 0 Q46 46 0 70 M95 0 Q62 62 0 95'/%3E%3C/g%3E%3C/svg%3E");
+        /* Portrait. Parallax and scale are driven from JS via --hero-p. */
+        .portrait {
+            width: 116px; height: 116px; margin: 0 auto 34px;
+            border-radius: 50%; overflow: hidden;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14);
+            will-change: transform;
         }
-        .web-corners span.left { left: 0; }
-        .web-corners span.right { right: 0; transform: scaleX(-1); }
-        @media (max-width: 640px) { .web-corners span { width: 150px; height: 150px; } }
+        .portrait img { width: 100%; height: 100%; object-fit: cover; }
 
-        a, button { cursor: pointer; }
+        .hero h1 { margin-bottom: 20px; }
+        .hero .lead { max-width: 620px; margin: 0 auto 34px; }
 
-        h1 { font-size: 1.6rem; line-height: 1.6; margin-bottom: 12px; }
-        h2 { font-size: 1.2rem; margin-bottom: 10px; color: var(--retro-pink); text-shadow: 2px 2px 0px var(--border-dark); }
-        h3 { font-size: 0.8rem; margin-bottom: 10px; color: var(--retro-blue); }
-        p { font-size: 0.65rem; color: var(--text-muted); line-height: 2; }
+        /* Page-load sequence: the hero arrives in order rather than at once. */
+        .hero-inner > * {
+            opacity: 0; transform: translateY(24px);
+            animation: riseIn 1s var(--ease) forwards;
+        }
+        .hero-inner > *:nth-child(1) { animation-delay: 0.10s; }
+        .hero-inner > *:nth-child(2) { animation-delay: 0.22s; }
+        .hero-inner > *:nth-child(3) { animation-delay: 0.34s; }
+        .hero-inner > *:nth-child(4) { animation-delay: 0.46s; }
+        .hero-inner > *:nth-child(5) { animation-delay: 0.58s; }
 
-        nav {
-            position: absolute;
-            top: 20px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 1200px;
-            background: rgba(15, 22, 46, 0.95);
-            border: 4px solid var(--border-dark);
-            border-top: 4px solid var(--suit-red);
-            box-shadow: 8px 8px 0px var(--border-dark);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 20px; z-index: 1000;
-            backdrop-filter: blur(4px);
+        @keyframes riseIn { to { opacity: 1; transform: none; } }
+
+        .hero-stats {
+            display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 0; margin-top: 66px;
+        }
+        .hero-stats div {
+            padding: 0 34px;
+            border-left: 1px solid var(--hairline);
+        }
+        .hero-stats div:first-child { border-left: 0; }
+        .hero-stats strong {
+            display: block; font-size: 30px; font-weight: 600;
+            letter-spacing: -0.015em; color: var(--ink);
+        }
+        .hero-stats span { font-size: 14px; color: var(--ink-sub); }
+
+        .scroll-cue {
+            position: absolute; bottom: 34px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px; color: var(--ink-sub);
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            animation: cueBob 2.4s var(--ease) infinite;
+        }
+        @keyframes cueBob {
+            0%, 100% { transform: translate(-50%, 0); opacity: 0.75; }
+            50%      { transform: translate(-50%, 7px); opacity: 1; }
         }
 
-        [data-theme="light"] nav { background: rgba(255, 255, 255, 0.95); }
+        /* ============================================================
+           PROJECTS -- the scroll-scrubbed section. The track is tall;
+           the stage inside it sticks to the viewport while you scroll
+           through, and each panel is swapped in as scroll progresses.
+           ============================================================ */
+        .scrub-track { position: relative; background: var(--surface-dark); }
 
-        .nav-left { display: flex; align-items: center; gap: 15px; }
-
-        .jl-badge {
-            background: var(--suit-red); color: #fff; width: 45px; height: 45px;
+        .scrub-stage {
+            position: sticky; top: 0;
+            height: 100svh;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; border: 3px solid var(--border-dark);
-            box-shadow: inset -3px -3px 0 rgba(0,0,0,0.35); text-shadow: 2px 2px 0 #000;
-            cursor: pointer; transition: transform 0.1s, filter 0.2s;
-            /* faint web stitching over the badge */
-            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 7px),
-                              repeating-linear-gradient(-45deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 7px);
-        }
-        .jl-badge:hover { filter: brightness(1.2); transform: scale(1.05); }
-        .jl-badge:active { transform: scale(0.95); }
-
-        .nav-brand-text { display: flex; flex-direction: column; justify-content: center; }
-        .nav-brand-text .name { color: var(--text-main); font-size: 0.8rem; text-shadow: 2px 2px 0 var(--border-dark); margin-bottom: 4px;}
-        .nav-brand-text .title { font-family: 'VT323', monospace; color: var(--suit-red); font-size: 1rem; line-height: 1;}
-
-        .nav-center { display: flex; align-items: center; gap: 5px; }
-        .nav-center a {
-            color: var(--text-main); text-decoration: none; font-size: 0.6rem; padding: 10px 15px;
-            background: transparent; border: 2px solid transparent; font-family: inherit; text-transform: uppercase; transition: 0.2s;
-        }
-        .nav-center a.active { background: var(--panel-bg-2); border-color: var(--suit-red); color: var(--web-white); box-shadow: 2px 2px 0 var(--border-dark); }
-        .nav-center a:hover { color: var(--suit-red); background: rgba(0,0,0,0.25);}
-
-        .nav-right { display: flex; align-items: center; gap: 15px; }
-        .btn-talk {
-            background: var(--suit-red); color: #fff; text-decoration: none; font-size: 0.6rem;
-            padding: 12px 18px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0 var(--border-dark);
-            transition: all 0.1s; text-transform: uppercase;
-        }
-        .btn-talk:hover { filter: brightness(1.1); }
-        .btn-talk:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
-
-        .theme-toggle-btn { background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1rem; color: var(--retro-gold); display: flex; align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); transition: 0.1s;}
-        .theme-toggle-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
-        .mobile-menu-btn { display: none; background: var(--panel-bg-2); border: 3px solid var(--border-dark); width: 40px; height: 40px; font-size: 1.2rem; color: var(--text-main); display: none; align-items: center; justify-content: center; box-shadow: 4px 4px 0 var(--border-dark); }
-
-        .hero-container { position: relative; text-align: center; padding: 140px 20px 120px; overflow: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .hero-content { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; animation: heroFadeUp 1s ease forwards; }
-
-        @keyframes heroFadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        #particle-canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-        .pixel-particle { position: absolute; width: 6px; height: 6px; opacity: 0.6; animation: floatUp linear infinite; }
-        @keyframes floatUp { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: 0.85; } 90% { opacity: 0.1; } 100% { transform: translateY(-180px); opacity: 0; } }
-
-        .profile-frame { margin-bottom: 25px; display: inline-block; position: relative; padding: 10px; background: transparent; }
-        .profile-pic { width: 170px; height: 170px; object-fit: cover; border: 4px solid var(--border-dark); box-shadow: 10px 10px 0px var(--suit-red), 0 0 0 4px rgba(238,242,255,0.06); image-rendering: auto; position: relative; z-index: 2; animation: profileFloat 3s ease-in-out infinite; background: #fff; }
-
-        /* A single web strand anchoring the portrait, as if it were hung there. */
-        .profile-frame::before {
-            content: ""; position: absolute; z-index: 1;
-            top: -120px; left: 50%; width: 2px; height: 130px;
-            background: linear-gradient(180deg, transparent, var(--web-white));
-            opacity: 0.35; pointer-events: none;
-        }
-        
-      
-        .sticker-gif {
-            position: absolute;
-            bottom: -5px; 
-            right: -85px; 
-            height: 160px; 
-            width: auto;
-            z-index: 5;
-            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
-            transition: transform 0.2s ease;
-        }
-        .sticker-gif:hover {
-            transform: scale(1.1) rotate(3deg);
-        }
-
-        @keyframes profileFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-
-        .gradient-text { color: var(--suit-red); text-shadow: 3px 3px 0px var(--border-dark); }
-        .bio-text { max-width: 760px; margin: 0 auto 30px auto; }
-
-        .cta-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 35px; }
-        .btn-primary, .btn-secondary { display: inline-flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 0.6rem; text-decoration: none; text-transform: uppercase; border: 4px solid var(--border-dark); box-shadow: 6px 6px 0px var(--border-dark); transition: transform 0.15s, box-shadow 0.15s, filter 0.2s; color: #fff; position: relative; overflow: hidden; }
-        .btn-primary::before, .btn-secondary::before { content: ""; position: absolute; top: 0; left: -120%; width: 70%; height: 100%; background: rgba(255,255,255,0.18); transform: skewX(-25deg); transition: left 0.45s ease; }
-        .btn-primary:hover::before, .btn-secondary:hover::before { left: 140%; }
-        .btn-primary:hover, .btn-secondary:hover { transform: translate(-2px, -2px); filter: brightness(1.05); }
-        .btn-primary { background: var(--suit-red); }
-        .btn-secondary { background: var(--panel-bg); color: var(--text-main); border-color: var(--border-dark); }
-        .btn-secondary:hover { border-color: var(--suit-blue); }
-        .cta-buttons a[href="rpg-resume.html"] { background: var(--suit-blue); color: #fff; }
-
-        .btn-primary:active, .btn-secondary:active, .cta-buttons a[href="rpg-resume.html"]:active {
-            transform: translate(4px, 4px);
-            box-shadow: 2px 2px 0px var(--border-dark);
-        }
-
-        .hero-stats { display: grid; grid-template-columns: repeat(3, minmax(150px, 1fr)); gap: 16px; max-width: 760px; margin: 0 auto; }
-        .stat-card { background: var(--panel-bg); border: 4px solid var(--border-dark); border-left: 4px solid var(--suit-red); box-shadow: 6px 6px 0px var(--border-dark); padding: 18px 14px; transition: transform 0.2s; }
-        .stat-card:hover { transform: translateY(-4px); }
-        .stat-card strong { display: block; font-size: 1rem; color: var(--suit-red); margin-bottom: 6px; text-shadow: 2px 2px 0px var(--border-dark); }
-        .stat-card span { font-size: 0.5rem; color: var(--text-muted); }
-
-        .scroll-indicator { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 0.5rem; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; animation: bounceDown 2s infinite; }
-        .scroll-indicator i { color: var(--suit-red); font-size: 1rem; }
-        @keyframes bounceDown { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
-
-        .skills-section, .ai-chat-section, .contact-section { padding: 70px 20px; text-align: center; position: relative; z-index: 2; }
-        .section-title { margin-bottom: 40px; }
-        /* Taut strand under each section heading, with an anchor knot in the middle. */
-        .section-title h2 { position: relative; padding-bottom: 18px; }
-        .section-title h2::after {
-            content: ""; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-            width: 160px; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--suit-red) 20%, var(--web-white) 50%, var(--suit-red) 80%, transparent);
-        }
-
-        .skills-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; max-width: 1250px; margin: 0 auto; }
-
-        @keyframes popInReveal { 0% { opacity: 0; transform: translateY(60px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-
-        .skill-card {
-            background: linear-gradient(180deg, var(--panel-bg), var(--panel-bg-2));
-            width: 280px; padding: 25px; border: 4px solid var(--border-dark);
-            border-top: 4px solid var(--suit-red);
-            box-shadow: 8px 8px 0px var(--border-dark); transition: transform 0.2s, background-color 0.3s, box-shadow 0.2s;
-            opacity: 0; position: relative; overflow: hidden;
-        }
-        /* Web spun into the top-left corner of every card. */
-        .skill-card::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 90px; height: 90px;
-            pointer-events: none; opacity: 0.5; z-index: 1;
-            background-repeat: no-repeat; background-size: 100% 100%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23eef2ff' stroke-width='1.4' opacity='0.5'%3E%3Cpath d='M0 0 L100 100 M0 0 L100 45 M0 0 L45 100'/%3E%3Cpath d='M30 0 Q20 20 0 30 M62 0 Q40 40 0 62 M95 0 Q60 60 0 95'/%3E%3C/g%3E%3C/svg%3E");
-        }
-        .skill-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 0%, rgba(238,242,255,0.10) 50%, transparent 100%); transform: translateX(-120%); transition: transform 0.5s ease; }
-        .skill-card:hover::after { transform: translateX(120%); }
-        .skill-card.show { animation: popInReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .skill-card:nth-child(1).show { animation-delay: 0.1s; } .skill-card:nth-child(2).show { animation-delay: 0.25s; }
-        .skill-card:nth-child(3).show { animation-delay: 0.4s; } .skill-card:nth-child(4).show { animation-delay: 0.55s; }
-        .skill-card:hover { transform: translateY(-8px) rotate(-0.5deg); box-shadow: 10px 10px 0px var(--suit-red); }
-        .skill-card h3, .skill-card p, .skill-card .tags, .skill-card .icon-box { position: relative; z-index: 2; }
-        .icon-box { font-size: 2.5rem; color: var(--suit-red); margin-bottom: 15px; text-shadow: 3px 3px 0px var(--border-dark); }
-        .tags { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-        .tags span { background: var(--border-dark); color: var(--web-white); padding: 6px 8px; font-size: 0.5rem; border: 2px solid var(--suit-blue); transition: transform 0.2s, border-color 0.2s; }
-        .tags span:hover { transform: scale(1.06); border-color: var(--suit-red); }
-
-        .ai-chat-section .section-title p { max-width: 760px; margin: 0 auto; }
-        /* ===== AI CONSOLE: COMIC PANEL ===== */
-        .ai-shell { max-width: 960px; margin: 0 auto; }
-
-        /* The panel itself: newsprint page with a heavy inked border. */
-        .crt-cabinet {
-            position: relative;
-            background: #f6ecd6;
-            /* Ben-Day halftone dots over the paper */
-            background-image: radial-gradient(rgba(208,32,43,0.16) 1.3px, transparent 1.4px);
-            background-size: 7px 7px;
-            border: 6px solid var(--border-dark);
-            box-shadow: 12px 12px 0px var(--border-dark);
-            padding: 0;
-            text-align: left;
-        }
-        [data-theme="light"] .crt-cabinet { background: #fbf5e6; }
-
-        /* Webbing spun into the panel's top corners. */
-        .crt-cabinet::before,
-        .crt-cabinet::after {
-            content: ""; position: absolute; top: 0; width: 120px; height: 120px;
-            pointer-events: none; z-index: 3; opacity: 0.6;
-            background-repeat: no-repeat; background-size: 100% 100%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%2314100f' stroke-width='1.6'%3E%3Cpath d='M0 0 L100 100 M0 0 L100 45 M0 0 L45 100'/%3E%3Cpath d='M30 0 Q20 20 0 30 M62 0 Q40 40 0 62 M95 0 Q60 60 0 95'/%3E%3C/g%3E%3C/svg%3E");
-        }
-        .crt-cabinet::before { left: 0; }
-        .crt-cabinet::after { right: 0; transform: scaleX(-1); }
-        /* Issue header bar across the top of the panel. */
-        .crt-bezel-top {
-            position: relative; z-index: 4;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; flex-wrap: wrap;
-            padding: 10px 16px;
-            background: var(--suit-red);
-            border-bottom: 5px solid var(--border-dark);
-        }
-        .crt-brand {
-            display: flex; align-items: center; gap: 10px;
-            font-family: 'Bangers', 'Press Start 2P', cursive;
-            font-size: 1.5rem; letter-spacing: 2px;
-            color: #fff; text-shadow: 2px 2px 0 var(--border-dark);
-        }
-        /* Was a power LED; now reads as a signal dot on the masthead. */
-        .crt-led {
-            width: 12px; height: 12px; border-radius: 50%;
-            background: var(--retro-gold); border: 2px solid var(--border-dark);
-            animation: crtLed 1.6s ease-in-out infinite; flex-shrink: 0;
-        }
-        @keyframes crtLed { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-        /* Three ink dots, like a comic page's registration marks. */
-        .crt-knobs { display: flex; gap: 8px; }
-        .crt-knobs span {
-            width: 13px; height: 13px; border-radius: 50%;
-            background: #f6ecd6; border: 2px solid var(--border-dark); display: block;
-        }
-        /* Inner page area. No glass, no scanlines -- this is paper now. */
-        .crt-screen {
-            position: relative;
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            padding: 0;
             overflow: hidden;
         }
-        /* Caption box, the yellow narration strip comics open a scene with. */
-        .term-bar {
-            position: relative; z-index: 4;
+
+        .scrub-panel {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 90px 22px;
+            opacity: 0; transform: scale(1.06);
+            transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+            pointer-events: none;
+        }
+        .scrub-panel.is-active {
+            opacity: 1; transform: none; pointer-events: auto;
+        }
+
+        .scrub-panel .num {
+            font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+            color: #86868b; margin-bottom: 22px;
+        }
+        .scrub-panel h3 {
+            font-size: clamp(2rem, 6vw, 4rem);
+            color: #f5f5f7; margin-bottom: 18px;
+        }
+        .scrub-panel p {
+            max-width: 620px; font-size: clamp(1.05rem, 2vw, 1.35rem);
+            line-height: 1.4; color: #a1a1a6; margin-bottom: 28px;
+        }
+
+        .scrub-panel .stack {
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+            margin-bottom: 30px;
+        }
+        .scrub-panel .stack span {
+            font-size: 12px; color: #a1a1a6;
+            padding: 5px 12px; border-radius: 980px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+        .scrub-panel .link-more { color: #2997ff; }
+
+        /* Progress rail: dots showing where you are in the lineup. */
+        .scrub-rail {
+            position: absolute; bottom: 42px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; gap: 8px; z-index: 3;
+        }
+        .scrub-rail i {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.28);
+            transition: background-color 0.4s var(--ease), transform 0.4s var(--ease);
+        }
+        .scrub-rail i.on { background: #f5f5f7; transform: scale(1.35); }
+
+        .scrub-heading {
+            position: absolute; top: 84px; left: 0; right: 0;
+            text-align: center; z-index: 2;
+            font-size: 13px; font-weight: 600; letter-spacing: 0.06em;
+            text-transform: uppercase; color: #6e6e73;
+        }
+
+        /* ============================================================
+           SKILLS -- four large rounded cards on the grey surface.
+           ============================================================ */
+        .cards {
+            display: grid; gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px 34px;
+            transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.10);
+        }
+
+        .card .glyph {
+            font-size: 22px; color: var(--accent); margin-bottom: 20px;
+        }
+        .card h3 { margin-bottom: 10px; }
+        .card p { font-size: 15px; margin-bottom: 20px; }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+        .tags span {
+            font-size: 12px; color: var(--ink-sub);
+            background: var(--chip);
+            padding: 5px 11px; border-radius: 980px;
+        }
+
+        /* ============================================================
+           AI CONSOLE -- a Messages-style card. Class names are the ones
+           the chat script already writes, so the markup names stay put
+           even though the look is entirely new.
+           ============================================================ */
+        .ai-shell { max-width: 760px; margin: 0 auto; }
+
+        .crt-cabinet {
+            background: var(--card);
+            border: 1px solid var(--hairline);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        }
+
+        .crt-bezel-top {
             display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; flex-wrap: wrap;
-            margin: 14px 16px 0;
-            padding: 8px 12px;
-            background: var(--retro-gold);
-            border: 3px solid var(--border-dark);
-            box-shadow: 4px 4px 0 var(--border-dark);
-            font-family: 'Comic Neue', 'VT323', monospace;
-            font-weight: 700; font-size: 0.95rem;
-            color: var(--border-dark);
-            text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 15px 22px;
+            border-bottom: 1px solid var(--hairline);
         }
-        .term-bar .term-path { opacity: 0.85; }
-        .term-meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.85rem; }
-        .term-meta b { color: var(--suit-red-dark); font-weight: 700; }
+        .crt-brand {
+            display: flex; align-items: center; gap: 9px;
+            font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+            color: var(--ink);
+        }
+        .crt-led {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #30d158;
+        }
+        .crt-knobs { display: none; }
 
-        /* Status stickers under the caption. */
+        .crt-screen { padding: 0; }
+
+        .term-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; padding: 12px 22px;
+            font-size: 12px; color: var(--ink-sub);
+        }
+        .term-path { letter-spacing: -0.01em; }
+        .term-meta { display: flex; gap: 14px; }
+        .term-meta b { font-weight: 500; color: var(--ink); }
+
         .term-readout {
-            position: relative; z-index: 4;
-            display: flex; flex-wrap: wrap; gap: 8px;
-            padding: 12px 16px 4px;
-            font-family: 'Comic Neue', 'VT323', monospace;
-            font-weight: 700; font-size: 0.85rem;
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding: 0 22px 14px;
         }
-        .term-readout span {
-            border: 3px solid var(--border-dark);
-            box-shadow: 3px 3px 0 var(--border-dark);
-            padding: 2px 9px;
-            background: var(--suit-blue); color: #fff;
-            white-space: nowrap; text-transform: uppercase;
-        }
-        .term-readout span.warn { background: var(--retro-gold); color: var(--border-dark); }
-        .term-readout span.bad { background: var(--suit-red); color: #fff; }
-        /* The strip where dialogue is laid out. */
-        .term-log {
-            position: relative; z-index: 4;
-            height: 360px; overflow-y: auto;
-            padding: 14px 16px;
-            font-family: 'Comic Neue', 'VT323', monospace;
-            font-size: 1.05rem; line-height: 1.5;
-            text-align: left; color: var(--border-dark);
-        }
-        .term-log::-webkit-scrollbar { width: 12px; }
-        .term-log::-webkit-scrollbar-track { background: rgba(20,16,15,0.10); }
-        .term-log::-webkit-scrollbar-thumb { background: var(--suit-red); border: 2px solid var(--border-dark); }
 
-        /* Every line is a lettered balloon. */
-        .term-line {
-            position: relative;
-            max-width: 86%;
-            margin: 0 0 20px;
-            padding: 10px 14px;
-            border: 3px solid var(--border-dark);
-            box-shadow: 4px 4px 0 var(--border-dark);
-            white-space: pre-wrap; word-break: break-word;
-            animation: termIn 0.2s ease;
+        .term-readout span {
+            font-size: 11px; color: var(--ink-sub);
+            background: var(--chip);
+            padding: 4px 10px; border-radius: 980px;
+            transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
         }
-        @keyframes termIn { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }
+        .term-readout span.warn { background: rgba(255, 159, 10, 0.16); color: #b25e00; }
+        .term-readout span.bad  { background: rgba(255, 69, 58, 0.14);  color: #c0271c; }
+        [data-theme="dark"] .term-readout span.warn { color: #ffb340; }
+        [data-theme="dark"] .term-readout span.bad  { color: #ff6961; }
+
+        .term-log {
+            height: 360px; overflow-y: auto;
+            padding: 6px 22px 18px;
+            display: flex; flex-direction: column; align-items: flex-start;
+            scroll-behavior: smooth;
+        }
+
+        /* Message bubbles. AI on the left in grey, you on the right in blue. */
+        .term-line {
+            max-width: 78%;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 19px;
+            font-size: 15px; line-height: 1.4; letter-spacing: -0.01em;
+            animation: bubbleIn 0.45s var(--ease) both;
+        }
+        @keyframes bubbleIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.97); }
+            to   { opacity: 1; transform: none; }
+        }
+
         .term-line .tag {
             display: block;
-            font-family: 'Bangers', 'Press Start 2P', cursive;
-            font-size: 1.05rem; letter-spacing: 1px;
-            margin-bottom: 2px;
+            font-size: 11px; font-weight: 600; letter-spacing: 0;
+            text-transform: none; opacity: 0.6;
+            margin-bottom: 3px;
         }
 
-        /* AI: white balloon, tail on the left. */
-        .term-line.ai { background: #fffdf7; color: var(--border-dark); border-radius: 14px; }
-        .term-line.ai .tag { color: var(--suit-red); }
-        .term-line.ai::after {
-            content: ""; position: absolute; left: 22px; bottom: -16px;
-            border-width: 16px 12px 0 0; border-style: solid;
-            border-color: var(--border-dark) transparent transparent transparent;
-        }
-
-        /* User: blue balloon pushed to the right, tail on the right. */
+        .term-line.ai   { background: var(--chip); color: var(--ink); }
         .term-line.user {
-            background: var(--suit-blue); color: #fff;
-            border-radius: 14px; margin-left: auto;
+            background: var(--accent); color: #fff;
+            align-self: flex-end; border-bottom-right-radius: 6px;
         }
-        .term-line.user .tag { color: var(--retro-gold); }
-        .term-line.user::after {
-            content: ""; position: absolute; right: 22px; bottom: -16px;
-            border-width: 16px 0 0 12px; border-style: solid;
-            border-color: var(--border-dark) transparent transparent transparent;
-        }
+        .term-line.ai   { border-bottom-left-radius: 6px; }
 
-        /* Boot/system notes: narration caption, not a balloon. */
+        /* System notes are quiet centred captions, not bubbles. */
         .term-line.boot {
-            background: var(--retro-gold); color: var(--border-dark);
-            font-size: 0.9rem; font-style: italic;
-            max-width: 100%; box-shadow: 3px 3px 0 var(--border-dark);
-            margin-bottom: 10px;
+            max-width: 100%; align-self: center; text-align: center;
+            background: none; padding: 3px 0; margin-bottom: 4px;
+            font-size: 12px; color: var(--ink-sub);
         }
 
-        /* Errors: jagged burst in suit red. */
         .term-line.err {
-            background: var(--suit-red); color: #fff;
-            max-width: 100%;
-            clip-path: polygon(0% 8%, 3% 0%, 97% 4%, 100% 12%, 99% 88%, 96% 100%, 4% 96%, 0% 90%);
-            box-shadow: none; border: none;
-            padding: 14px 16px;
-            font-weight: 700;
+            max-width: 100%; align-self: stretch;
+            background: rgba(255, 69, 58, 0.10);
+            color: #c0271c; border-radius: 14px;
+            font-size: 13px;
         }
-        .term-line.err .tag { color: var(--retro-gold); }
-        /* Thinking balloon while the model is working. */
+        [data-theme="dark"] .term-line.err { color: #ff6961; }
+        .term-line.err .tag { opacity: 0.85; }
+
         .term-work {
-            background: #fffdf7; color: var(--suit-red);
-            border-radius: 20px; font-weight: 700;
-            max-width: 240px;
+            background: var(--chip); color: var(--ink-sub);
+            font-size: 14px; max-width: 220px;
         }
         .term-work .spin { display: inline-block; width: 1ch; }
 
-        /* Ink caret parked at the end of the strip. */
+        /* Caret keeps the "waiting for you" beat from the old console. */
         .term-caret {
-            display: inline-block; width: 10px; height: 1.05em;
-            background: var(--border-dark); vertical-align: text-bottom;
-            animation: caretBlink 1s steps(1) infinite;
+            display: block; width: 2px; height: 15px;
+            background: var(--ink-sub); opacity: 0.5;
+            animation: caretBlink 1.1s steps(2, start) infinite;
         }
-        @keyframes caretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        @keyframes caretBlink { 50% { opacity: 0; } }
 
-        /* Macro buttons, styled as inked stickers. */
         .term-prompts {
-            position: relative; z-index: 4;
-            display: flex; flex-wrap: wrap; gap: 10px;
-            padding: 6px 16px 12px;
-            border-top: 3px dashed var(--border-dark);
-            margin-top: 4px;
-            text-align: left;
+            display: flex; flex-wrap: wrap; gap: 8px;
+            padding: 0 22px 16px;
         }
         .prompt-chip {
-            font-family: 'Bangers', 'Press Start 2P', cursive;
-            font-size: 1.05rem; letter-spacing: 1px;
-            padding: 3px 12px;
-            border: 3px solid var(--border-dark);
-            box-shadow: 3px 3px 0 var(--border-dark);
-            background: #fffdf7; color: var(--border-dark);
-            text-transform: uppercase;
-            transition: background 0.15s, color 0.15s, transform 0.1s;
+            font-family: inherit; font-size: 13px; letter-spacing: -0.01em;
+            color: var(--accent); background: transparent;
+            border: 1px solid var(--hairline);
+            padding: 7px 15px; border-radius: 980px; cursor: pointer;
+            transition: background-color 0.3s var(--ease),
+                        border-color 0.3s var(--ease),
+                        transform 0.3s var(--ease);
         }
-        .prompt-chip:hover { background: var(--retro-gold); }
-        .prompt-chip:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--border-dark); }
+        .prompt-chip:hover {
+            background: var(--chip); border-color: var(--accent);
+        }
+        .prompt-chip:active { transform: scale(0.96); }
 
-        /* Where the reader talks back. */
         .term-input-row {
-            position: relative; z-index: 4;
-            display: flex; align-items: stretch; gap: 10px;
-            padding: 12px 16px;
-            border-top: 5px solid var(--border-dark);
-            background: rgba(28,63,184,0.10);
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 18px;
+            border-top: 1px solid var(--hairline);
+            background: var(--surface-alt);
         }
-        .term-sigil {
-            font-family: 'Bangers', 'Press Start 2P', cursive;
-            font-size: 1.5rem; color: var(--suit-red);
-            align-self: center; text-shadow: 2px 2px 0 rgba(20,16,15,0.25);
-        }
+        .term-sigil { display: none; }
+
         .term-input-row input {
             flex: 1; min-width: 0;
-            background: #fffdf7;
-            border: 3px solid var(--border-dark);
+            font-family: inherit; font-size: 15px; letter-spacing: -0.01em;
+            color: var(--ink);
+            background: var(--card);
+            border: 1px solid var(--hairline);
+            border-radius: 980px;
+            padding: 11px 18px;
+            transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+        }
+
+        .term-input-row input:focus {
             outline: none;
-            padding: 6px 10px;
-            font-family: 'Comic Neue', 'VT323', monospace;
-            font-size: 1.05rem; font-weight: 700;
-            color: var(--border-dark); caret-color: var(--suit-red);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.16);
         }
-        .term-input-row input:focus { box-shadow: inset 3px 3px 0 rgba(28,63,184,0.18); }
-        .term-input-row input::placeholder { color: rgba(20,16,15,0.45); font-weight: 400; }
+        .term-input-row input::placeholder { color: var(--ink-sub); }
+        .term-input-row input:disabled { opacity: 0.5; }
+
         .term-send {
-            font-family: 'Bangers', 'Press Start 2P', cursive;
-            font-size: 1.2rem; letter-spacing: 2px;
-            padding: 4px 18px;
-            border: 3px solid var(--border-dark);
-            box-shadow: 4px 4px 0 var(--border-dark);
-            background: var(--suit-red); color: #fff;
-            text-transform: uppercase;
-            transition: filter 0.15s, transform 0.1s;
+            font-family: inherit; font-size: 15px;
+            background: var(--accent); color: #fff;
+            border: 0; border-radius: 980px;
+            padding: 11px 20px; cursor: pointer;
+            transition: background-color 0.3s var(--ease), transform 0.3s var(--ease);
         }
-        .term-send:hover { filter: brightness(1.1); }
-        .term-send:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--border-dark); }
-        .term-send:disabled { filter: grayscale(0.6); cursor: default; }
+        .term-send:hover { background: var(--accent-hover); }
+        .term-send:active { transform: scale(0.96); }
+        .term-send:disabled { opacity: 0.45; cursor: default; }
 
-        /* Footer strip, like a page number line. */
         .crt-footplate {
-            position: relative; z-index: 4;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; flex-wrap: wrap;
-            padding: 8px 16px;
-            background: var(--border-dark);
-            font-size: 0.45rem; color: #f6ecd6; letter-spacing: 1px;
+            display: flex; justify-content: space-between; gap: 12px;
+            padding: 12px 22px;
+            border-top: 1px solid var(--hairline);
+            font-size: 11px; color: var(--ink-sub);
         }
 
-        @media (max-width: 640px) {
-            .crt-cabinet { box-shadow: 7px 7px 0px var(--border-dark); }
-            .crt-cabinet::before, .crt-cabinet::after { width: 80px; height: 80px; }
-            .crt-brand { font-size: 1.2rem; }
-            .term-log { height: 320px; font-size: 1rem; }
-            .term-line { max-width: 94%; }
-            .term-bar { font-size: 0.8rem; }
-            .term-meta { font-size: 0.75rem; gap: 10px; }
-            .term-readout { font-size: 0.75rem; }
-            .term-input-row input { font-size: 1rem; }
+        /* ============================================================
+           CONTACT -- hairline-underlined fields, nothing boxed in.
+           ============================================================ */
+        .contact-form { max-width: 560px; margin: 0 auto; }
+
+        .field {
+            width: 100%; font-family: inherit; font-size: 17px;
+            letter-spacing: -0.01em; color: var(--ink);
+            background: transparent;
+            border: 0; border-bottom: 1px solid var(--hairline);
+            padding: 15px 2px; margin-bottom: 10px;
+            transition: border-color 0.3s var(--ease);
+        }
+        .field:focus { outline: none; border-bottom-color: var(--accent); }
+        .field::placeholder { color: var(--ink-sub); }
+        textarea.field { resize: vertical; min-height: 130px; }
+
+        .form-actions { margin-top: 26px; text-align: center; }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .foot {
+            background: var(--surface-alt);
+            border-top: 1px solid var(--hairline);
+            padding: 40px 0;
+            font-size: 12px; color: var(--ink-sub);
         }
 
-        .contact-form { background: var(--panel-bg); max-width: 650px; margin: 0 auto; padding: 30px; border: 4px solid var(--border-dark); border-top: 4px solid var(--suit-red); box-shadow: 8px 8px 0px var(--border-dark); display: flex; flex-direction: column; gap: 20px; transition: background-color 0.3s; }
-        .contact-form input, .contact-form textarea { font-family: 'Press Start 2P', cursive; background: var(--bg-color); color: var(--text-main); border: 4px solid var(--border-dark); padding: 15px; font-size: 0.6rem; outline: none; width: 100%; transition: background-color 0.3s, color 0.3s, transform 0.2s; }
-        .contact-form input:focus, .contact-form textarea:focus { border-color: var(--suit-red); transform: translateY(-2px); }
-        .contact-form textarea { resize: vertical; min-height: 150px; }
-        .contact-form button { background: var(--suit-red); color: #fff; border: 4px solid var(--border-dark); padding: 15px; font-family: 'Press Start 2P', cursive; font-size: 0.7rem; text-transform: uppercase; box-shadow: 6px 6px 0px var(--border-dark); transition: all 0.1s; }
-        .contact-form button:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--border-dark); }
+        .foot-inner {
+            display: flex; flex-wrap: wrap; gap: 16px;
+            align-items: center; justify-content: space-between;
+        }
+        .foot a { color: var(--ink-sub); }
+        .foot a:hover { color: var(--accent); }
+        .foot-social { display: flex; gap: 18px; font-size: 16px; }
 
-        footer { background: var(--panel-bg); border-top: 4px solid var(--suit-red); padding: 30px; text-align: center; margin-top: 50px; transition: background-color 0.3s; }
-        .social-links { margin-top: 15px; display: flex; justify-content: center; gap: 20px; }
-        .social-links a { color: var(--text-main); font-size: 1.2rem; text-shadow: 2px 2px 0px var(--border-dark); transition: color 0.2s, transform 0.2s; }
-        .social-links a:hover { color: var(--suit-red); transform: translateY(-3px); }
-
-        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        /* --- ANDROID EMULATOR MODAL (FIXED) --- */
+        /* ============================================================
+           EMULATOR MODAL -- kept from the previous build, restyled to
+           match: sheet-style card, blurred scrim, spring-in.
+           ============================================================ */
         .emulator-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px);
+            position: fixed; inset: 0; z-index: 1200;
+            display: none; align-items: center; justify-content: center;
+            padding: 22px;
+            background: rgba(0, 0, 0, 0.45);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
         }
-        .emulator-modal.show { display: flex; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .emulator-modal.show { display: flex; }
 
         .emulator-window {
-            background: var(--panel-bg); border: 4px solid var(--border-dark); box-shadow: 12px 12px 0px rgba(0,0,0,0.8);
-            width: 90%; max-width: 450px; height: 90vh; display: flex; flex-direction: column;
+            width: 100%; max-width: 420px;
+            background: var(--card);
+            border-radius: 26px; overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+            animation: sheetIn 0.5s var(--ease);
+        }
+        @keyframes sheetIn {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: none; }
         }
 
         .emulator-header {
-            background: #1e1e1e; border-bottom: 4px solid var(--border-dark); padding: 10px 15px;
-            display: flex; justify-content: space-between; align-items: center; color: var(--text-muted);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--hairline);
         }
-        .emulator-title { font-size: 0.6rem; font-family: 'Press Start 2P', cursive; color: var(--retro-green); display: flex; align-items: center; gap: 8px;}
-        .emulator-close { background: var(--retro-red); border: 2px solid var(--border-dark); color: #fff; width: 25px; height: 25px; font-size: 0.8rem; cursor: pointer; transition: 0.1s;}
-        .emulator-close:active { transform: translate(2px, 2px); }
-
-        .emulator-body {
-            flex: 1; display: flex; align-items: center; justify-content: center; background: #2b2b2b;
-            background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px);
-            background-size: 20px 20px; padding: 20px; overflow: hidden;
+        .emulator-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+        .emulator-close {
+            width: 30px; height: 30px; border: 0; border-radius: 50%;
+            background: var(--chip); color: var(--ink); cursor: pointer;
         }
-
-        /* FIXED PHONE BEZELS */
+        .emulator-body { padding: 20px; background: var(--surface-alt); }
         .phone-mockup {
-            width: 320px; height: 600px; max-height: 90%; background: #111; border: 4px solid #444; border-radius: 30px;
-            position: relative; display: flex; flex-direction: column; align-items: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
-            padding: 40px 10px; /* Thick top and bottom bezels */
+            margin: 0 auto; width: 100%; max-width: 300px;
+            aspect-ratio: 9 / 19;
+            background: #000; border-radius: 34px; padding: 9px;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
         }
-        
-        .phone-camera { 
-            width: 40px; height: 6px; background: #222; border-radius: 10px; 
-            position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+        .phone-camera {
+            width: 46px; height: 5px; margin: 0 auto 6px;
+            border-radius: 980px; background: #2c2c2e;
         }
 
-        .phone-screen { 
-            width: 100%; height: 100%; background: var(--bg-color); 
-            border: 2px solid #222; border-radius: 4px; overflow: hidden; position: relative;
+        .phone-screen {
+            width: 100%; height: calc(100% - 11px);
+            border-radius: 27px; overflow: hidden; background: #fff;
         }
-        .phone-screen iframe { width: 100%; height: 100%; border: none; display: block; }
-
+        .phone-screen iframe { width: 100%; height: 100%; border: 0; }
         .emulator-console {
-            height: 100px; background: #000; border-top: 4px solid var(--border-dark); padding: 10px;
-            font-family: 'VT323', monospace; font-size: 0.9rem; color: #aaa; display: flex; flex-direction: column; gap: 4px;
+            padding: 12px 18px; font-size: 11px; color: var(--ink-sub);
+            display: flex; flex-direction: column; gap: 2px;
+            border-top: 1px solid var(--hairline);
         }
 
-        @media (max-width: 900px) {
-            nav {
-                position: absolute; top: 0; left: 0; transform: none; width: 100%; max-width: 100%;
-                border-left: none; border-right: none; border-top: none; padding: 15px 20px; margin: 0; border-radius: 0;
-            }
-            .nav-brand-text { display: none; }
-            .nav-center {
-                display: none; width: 100%; flex-direction: column; position: absolute; top: 100%; left: 0;
-                background: var(--panel-bg); border-bottom: 4px solid var(--border-dark); padding: 0; margin: 0; box-shadow: 0px 8px 0px rgba(0,0,0,0.5);
-            }
-            .nav-center.show { display: flex; }
-            .nav-center a { width: 100%; padding: 18px; text-align: center; border-bottom: 2px solid var(--border-dark); font-size: 0.7rem; }
-            .nav-center a:last-child { border-bottom: none; }
-            .mobile-menu-btn { display: flex; }
-            .btn-talk { display: none; }
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 833px) {
+            .cards { grid-template-columns: 1fr; }
+            .section { padding: 84px 0; }
+            .hero-stats div { padding: 0 22px; }
+        }
 
-            .hero-container { min-height: auto; padding: 120px 16px 100px; }
-            h1 { font-size: 1.15rem; }
-            .hero-stats { grid-template-columns: 1fr; max-width: 350px; }
-            .ai-shell { max-width: 100%; }
+        @media (max-width: 734px) {
+            body { font-size: 16px; }
+
+            .nav-links {
+                position: absolute; top: 48px; left: 0; right: 0;
+                flex-direction: column; align-items: stretch; gap: 0;
+                padding: 6px 22px 16px;
+                background: var(--nav-bg);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                backdrop-filter: saturate(180%) blur(20px);
+                border-bottom: 1px solid var(--hairline);
+                display: none;
+            }
+            .nav-links.show { display: flex; }
+            .nav-links a { font-size: 15px; padding: 12px 4px; border-radius: 0; }
+            .nav-burger { display: flex; }
+
+            .hero { padding-top: 104px; }
+            .hero-stats { margin-top: 46px; gap: 22px; }
+            .hero-stats div { border-left: 0; padding: 0; flex: 1 1 40%; }
+
+            .card { padding: 30px 24px; }
+            .term-log { height: 320px; }
+            .term-line { max-width: 88%; }
+            .term-meta { display: none; }
             .term-input-row { flex-wrap: wrap; }
-            .term-send { width: 100%; padding: 8px; }
+            .term-send { width: 100%; }
+            .foot-inner { flex-direction: column; text-align: center; }
+        }
 
-    
-            .sticker-gif {
-                right: -40px; 
-                height: 120px; 
-                bottom: -10px;
+        /* Anyone who has asked their system to reduce motion gets the same
+           page with none of the movement: reveals are already in place,
+           transitions collapse, ambient loops stop. */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 0.001s !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001s !important;
             }
-
-       
-            .jl-badge { pointer-events: none; } 
+            [data-reveal] { opacity: 1; transform: none; }
+            .hero-inner > * { opacity: 1; transform: none; animation: none; }
+            .scroll-cue { animation: none; }
+            .portrait { transform: none !important; }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght;700&family=Special+Elite&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="scanlines"></div>
-    <div class="web-corners" aria-hidden="true"><span class="left"></span><span class="right"></span></div>
+    <nav class="nav" id="nav">
+        <div class="nav-inner">
+            <button class="nav-mark" id="emulator-toggle" title="Open the mobile preview">Jon Lewyn</button>
 
-    <nav>
-        <div class="nav-left">
-            <div class="jl-badge" id="emulator-toggle" title="Launch Mobile Emulator">JL</div>
-            <div class="nav-brand-text">
-                <div class="name">Jon Lewyn</div>
-                <div class="title">Electronics + Software Builder</div>
+            <div class="nav-links" id="nav-center-menu">
+                <a href="index.html" aria-current="page">Home</a>
+                <a href="#work">Work</a>
+                <a href="#skills">Skills</a>
+                <a href="#ai-chat">AI</a>
+                <a href="resume.html">Resume</a>
+                <a href="certificate.html">Certificates</a>
+                <a href="#contact">Contact</a>
             </div>
-        </div>
 
-        <div class="nav-center" id="nav-center-menu">
-            <a href="index.html" class="active">Home</a>
-            <a href="#skills">Skills</a>
-            <a href="projects.html">Projects</a>
-            <a href="#contact">Contact</a>
-        </div>
-
-        <div class="nav-right">
-            <a href="#ai-chat" class="btn-talk"><i class="fas fa-comment-dots"></i> TALK WITH ME</a>
-            <button id="theme-btn" class="theme-toggle-btn"><i class="fas fa-sun"></i></button>
-            <button id="mobile-menu-btn" class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="nav-tools">
+                <button id="theme-btn" class="icon-btn" aria-label="Switch appearance">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="mobile-menu-btn" class="icon-btn nav-burger" aria-label="Menu" aria-expanded="false">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <header class="hero-container">
-        <div id="particle-canvas"></div>
-
-        <div class="hero-content">
-            <div class="profile-frame">
-                <img src="me.jpg" alt="Jon Lewyn" class="profile-pic">
+    <header class="hero">
+        <div class="hero-inner">
+            <div class="portrait" id="portrait">
+                <img src="me.jpg" alt="Jon Lewyn Villaram Tanggaro">
             </div>
 
-            <h1>Hello, I'm <br><span class="gradient-text">Jon Lewyn Villaram Tanggaro</span></h1>
-            <p class="bio-text">
-                An Electronics Engineering student at Polytechnic University of the Philippines Santo Tomas Campus with a passion for bridging the gap between hardware and software.
-                I specialize in building computational tools, embedded systems, and full-stack web development applications.
+            <h1>Hardware thinking.<br>Software speed.</h1>
+
+            <p class="lead">
+                I'm Jon Lewyn &mdash; an Electronics Engineering student at the Polytechnic
+                University of the Philippines, Santo Tomas. I build computational tools,
+                embedded systems, and web apps that put circuit-level thinking behind a
+                screen anyone can use.
             </p>
 
-            <div class="cta-buttons">
-                <a href="#skills" class="btn-primary">Tech Stack</a>
-                <a href="https://github.com/lewynski" target="_blank" class="btn-secondary">
-                    <i class="fab fa-github"></i> GitHub
-                </a>
-                <a href="resume.html" class="btn-secondary">
-                    <i class="fas fa-file-alt"></i> Resume
-                </a>
-                <a href="certificate.html" class="btn-secondary">
-                    <i class="fas fa-certificate"></i> Certificate
-                </a>
-                <a href="rpg-resume.html" class="btn-primary">
-                    <i class="fas fa-gamepad"></i> My life as a Game
-                </a>
+            <div class="btn-row">
+                <a href="#work" class="btn">See my work</a>
+                <a href="#ai-chat" class="link-more">Ask my AI about me <span class="chev">&#8250;</span></a>
             </div>
 
-            <div class="hero-stats reveal">
-                <div class="stat-card">
-                    <strong>5+</strong>
-                    <span>Core Languages</span>
+            <div class="hero-stats">
+                <div>
+                    <strong>6</strong>
+                    <span>Languages I build in</span>
                 </div>
-                <div class="stat-card">
-                    <strong>Hardware</strong>
-                    <span>Embedded + Circuit Focus</span>
+                <div>
+                    <strong>8</strong>
+                    <span>Shipped projects</span>
                 </div>
-                <div class="stat-card">
-                    <strong>Full Stack</strong>
-                    <span>From UI to Logic</span>
+                <div>
+                    <strong>Both</strong>
+                    <span>Board level and browser</span>
                 </div>
             </div>
         </div>
 
-        <div class="scroll-indicator">
-            <span>SCROLL</span>
+        <a href="#work" class="scroll-cue" aria-label="Scroll to my work">
+            <span>Scroll</span>
             <i class="fas fa-angle-down"></i>
-        </div>
+        </a>
     </header>
 
-    <section id="skills" class="skills-section reveal">
-        <div class="section-title">
-            <h2>Technical Arsenal</h2>
-            <p>My toolkit for solving engineering problems.</p>
-        </div>
+    <!-- The track is deliberately tall. Its stage sticks to the viewport and
+         the panels are swapped as you scroll the remaining height. -->
+    <section id="work" class="scrub-track" style="height: 560svh;">
+        <div class="scrub-stage" id="scrub-stage">
+            <p class="scrub-heading">Selected work</p>
 
-        <div class="skills-grid">
-            <div class="skill-card">
-                <div class="icon-box"><i class="fas fa-code"></i></div>
-                <h3>Programming</h3>
-                <p>Developing robust logic and efficient algorithms.</p>
-                <div class="tags">
-                    <span>Python</span> <span>JS</span> <span>HTML/CSS</span> <span>Java</span> <span>C++</span> <span>JavaScript</span>
-                </div>
+            <article class="scrub-panel is-active">
+                <p class="num">01 &mdash; Finance</p>
+                <h3>CapySave</h3>
+                <p>A virtual wealth terminal and budget tracker with a real-time
+                   analytics dashboard and AI financial diagnostics.</p>
+                <div class="stack"><span>JavaScript</span><span>Groq AI</span><span>Chart logic</span></div>
+                <a href="projects/capysave.html" class="link-more">Open CapySave <span class="chev">&#8250;</span></a>
+            </article>
+
+            <article class="scrub-panel">
+                <p class="num">02 &mdash; Botany</p>
+                <h3>FloraDex</h3>
+                <p>An API-chained botanical database. It pulls plant data from Groq AI
+                   and matching imagery from Wikipedia's open API in the same request.</p>
+                <div class="stack"><span>API chaining</span><span>Groq AI</span><span>Wikipedia API</span></div>
+                <a href="projects/floradex.html" class="link-more">Open FloraDex <span class="chev">&#8250;</span></a>
+            </article>
+
+            <article class="scrub-panel">
+                <p class="num">03 &mdash; Prices</p>
+                <h3>PresyoDex</h3>
+                <p>A pricing database for the Philippines. Query any product and it
+                   returns standard retail price estimates in PHP and USD.</p>
+                <div class="stack"><span>Groq AI</span><span>Search UI</span><span>PHP / USD</span></div>
+                <a href="projects/presyodex.html" class="link-more">Open PresyoDex <span class="chev">&#8250;</span></a>
+            </article>
+
+            <article class="scrub-panel">
+                <p class="num">04 &mdash; Networks</p>
+                <h3>NetWatch PH</h3>
+                <p>An ISP diagnostic simulator that generates realistic network status
+                   and latency reports for Philippine regions.</p>
+                <div class="stack"><span>Prompt design</span><span>Groq AI</span><span>Regional data</span></div>
+                <a href="projects/netwatch.html" class="link-more">Open NetWatch <span class="chev">&#8250;</span></a>
+            </article>
+
+            <article class="scrub-panel">
+                <p class="num">And four more</p>
+                <h3>IsdaDex. Xorn. 3301. Cyber Viper.</h3>
+                <p>A marine biology database, a deployed file converter, a cryptic
+                   multi-persona AI terminal, and a canvas arcade game.</p>
+                <a href="projects.html" class="link-more">See every project <span class="chev">&#8250;</span></a>
+            </article>
+
+            <div class="scrub-rail" id="scrub-rail" aria-hidden="true">
+                <i class="on"></i><i></i><i></i><i></i><i></i>
             </div>
-            <div class="skill-card">
-                <div class="icon-box"><i class="fas fa-microchip"></i></div>
-                <h3>Hardware</h3>
-                <p>Bringing code to the physical world.</p>
-                <div class="tags">
-                    <span>Arduino</span> <span>FPGA</span> <span>TinkerCAD</span> <span>Proto Board</span>
-                </div>
+        </div>
+    </section>
+
+    <section id="skills" class="section section--alt">
+        <div class="shell">
+            <div class="head" data-reveal>
+                <p class="eyebrow">What I work with</p>
+                <h2>The toolkit.</h2>
+                <p class="lead">Four areas, one habit: get the idea onto real hardware
+                   or into a real browser as fast as possible.</p>
             </div>
-            <div class="skill-card">
-                <div class="icon-box"><i class="fas fa-drafting-compass"></i></div>
-                <h3>Simulation</h3>
-                <p>Modeling complex circuits and blueprints.</p>
-                <div class="tags">
-                    <span>AutoCAD</span> <span>MATLAB</span> <span>Multisim</span> <span>Proteus</span> <span>TinkerCAD</span> <span>Proto</span> <span>Every Circuit</span>
+
+            <div class="cards">
+                <div class="card" data-reveal data-delay="1">
+                    <div class="glyph"><i class="fas fa-code"></i></div>
+                    <h3>Programming</h3>
+                    <p>Writing the logic and algorithms that everything else sits on.</p>
+                    <div class="tags">
+                        <span>Python</span><span>JavaScript</span><span>Java</span>
+                        <span>C++</span><span>HTML</span><span>CSS</span>
+                    </div>
                 </div>
-            </div>
-            <div class="skill-card">
-                <div class="icon-box"><i class="fas fa-cogs"></i></div>
-                <h3>Productivity & Automation</h3>
-                <p>Data analysis, documentation, and task automation.</p>
-                <div class="tags">
-                    <span>MS Word</span> <span>Excel</span> <span>PowerPoint</span> <span>Macro</span> <span>Render</span> <span>Railway</span> <span>MongoDB</span> <span>Replit</span>
+
+                <div class="card" data-reveal data-delay="2">
+                    <div class="glyph"><i class="fas fa-microchip"></i></div>
+                    <h3>Hardware</h3>
+                    <p>Taking code off the screen and onto a board.</p>
+                    <div class="tags">
+                        <span>Arduino</span><span>FPGA</span><span>TinkerCAD</span><span>Proto board</span>
+                    </div>
+                </div>
+
+                <div class="card" data-reveal data-delay="3">
+                    <div class="glyph"><i class="fas fa-drafting-compass"></i></div>
+                    <h3>Simulation</h3>
+                    <p>Modelling circuits and blueprints before anything gets soldered.</p>
+                    <div class="tags">
+                        <span>AutoCAD</span><span>MATLAB</span><span>Multisim</span>
+                        <span>Proteus</span><span>EveryCircuit</span>
+                    </div>
+                </div>
+
+                <div class="card" data-reveal data-delay="4">
+                    <div class="glyph"><i class="fas fa-cogs"></i></div>
+                    <h3>Deploy &amp; automate</h3>
+                    <p>Getting work hosted, documented, and off my machine.</p>
+                    <div class="tags">
+                        <span>Vercel</span><span>Render</span><span>Railway</span>
+                        <span>MongoDB</span><span>Replit</span><span>Excel macros</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="ai-chat" class="ai-chat-section reveal">
-        <div class="section-title">
-            <h2>Lewyn's AI Console</h2>
-            <p>A terminal wired to my personal assistant. Ask about my projects, skills, or developer journey.</p>
-        </div>
+    <section id="ai-chat" class="section">
+        <div class="shell">
+            <div class="head" data-reveal>
+                <p class="eyebrow">Eiji AI</p>
+                <h2>Ask about my work.</h2>
+                <p class="lead">An assistant that knows my projects, my stack, and how
+                   I got here. The API key stays on the server &mdash; never in your browser.</p>
+            </div>
 
-        <div class="ai-shell">
-            <div class="crt-cabinet">
-                <div class="crt-bezel-top">
-                    <div class="crt-brand">
-                        <span class="crt-led"></span>
-                        <span>EIJI AI &mdash; ISSUE NO. 01</span>
-                    </div>
-                    <div class="crt-knobs" aria-hidden="true">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-
-                <div class="crt-screen">
-                    <div class="term-bar">
-                        <span class="term-path">Meanwhile, in the workshop&hellip;</span>
-                        <span class="term-meta">
-                            <span>MODEL <b>gpt-oss-20b</b></span>
-                            <span>LINK <b>/api/chat</b></span>
-                        </span>
+            <div class="ai-shell" data-reveal data-delay="1">
+                <div class="crt-cabinet">
+                    <div class="crt-bezel-top">
+                        <div class="crt-brand">
+                            <span class="crt-led"></span>
+                            <span>Eiji AI</span>
+                        </div>
+                        <div class="crt-knobs" aria-hidden="true"><span></span></div>
                     </div>
 
-                    <div class="term-readout" id="term-readout">
-                        <span id="stat-link">LINK: CHECKING</span>
-                        <span>KEY: SERVER-SIDE</span>
-                        <span>MODE: SIDEKICK</span>
-                        <span>TOPICS: PROJECTS / SKILLS / ECE</span>
+                    <div class="crt-screen">
+                        <div class="term-bar">
+                            <span class="term-path">Portfolio assistant</span>
+                            <span class="term-meta">
+                                <span>Model <b>gpt-oss-20b</b></span>
+                                <span>Endpoint <b>/api/chat</b></span>
+                            </span>
+                        </div>
+
+                        <div class="term-readout" id="term-readout">
+                            <span id="stat-link">Link: checking</span>
+                            <span>Key: on the server</span>
+                            <span>Topics: projects, skills, ECE</span>
+                        </div>
+
+                        <div class="term-log" id="chat-messages"></div>
+
+                        <div class="term-prompts">
+                            <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's projects">Projects</button>
+                            <button class="prompt-chip" data-prompt="What are Jon Lewyn's technical skills?">Skills</button>
+                            <button class="prompt-chip" data-prompt="What makes Jon Lewyn different as a developer?">Why me</button>
+                            <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's OJT and work experience">Experience</button>
+                        </div>
+
+                        <div class="term-input-row">
+                            <span class="term-sigil" aria-hidden="true">&#8250;</span>
+                            <input type="text" id="chat-input" placeholder="Ask a question" autocomplete="off" aria-label="Ask Eiji AI">
+                            <button id="chat-send-btn" class="term-send">Send</button>
+                        </div>
                     </div>
 
-                    <div class="term-log" id="chat-messages"></div>
-
-                    <div class="term-prompts">
-                        <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's projects">projects!</button>
-                        <button class="prompt-chip" data-prompt="What are Jon Lewyn's technical skills?">skills!</button>
-                        <button class="prompt-chip" data-prompt="What makes Jon Lewyn different as a developer?">why him?</button>
-                        <button class="prompt-chip" data-prompt="Tell me about Jon Lewyn's OJT and work experience">experience!</button>
+                    <div class="crt-footplate">
+                        <span>Eiji AI runs through a serverless endpoint</span>
+                        <span>No keys in the browser</span>
                     </div>
-
-                    <div class="term-input-row">
-                        <span class="term-sigil">&raquo;</span>
-                        <input type="text" id="chat-input" placeholder="ask me something..." autocomplete="off" aria-label="Ask Eiji AI">
-                        <button id="chat-send-btn" class="term-send">thwip!</button>
-                    </div>
-                </div>
-
-                <div class="crt-footplate">
-                    <span>EIJI AI &mdash; SPUN IN THE WORKSHOP</span>
-                    <span>NO KEYS STORED IN BROWSER</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="contact" class="contact-section reveal">
-        <div class="section-title">
-            <h2>Email Me</h2>
-            <p>Send a mail directly to my inbox.</p>
+    <section id="contact" class="section section--alt">
+        <div class="shell">
+            <div class="head" data-reveal>
+                <p class="eyebrow">Contact</p>
+                <h2>Send me a message.</h2>
+                <p class="lead">It goes straight to my inbox. I read everything.</p>
+            </div>
+
+            <form action="https://formsubmit.co/lewynvllram@gmail.com" method="POST" class="contact-form" data-reveal data-delay="1">
+                <input type="hidden" name="_subject" value="New message from your portfolio">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_next" value="https://lewynski.github.io/">
+
+                <input class="field" type="text" name="name" placeholder="Your name" required>
+                <input class="field" type="email" name="email" placeholder="Your email" required>
+                <textarea class="field" name="message" placeholder="What would you like to build?" required></textarea>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn">Send message</button>
+                </div>
+            </form>
         </div>
-
-        <form action="https://formsubmit.co/lewynvllram@gmail.com" method="POST" class="contact-form">
-            <input type="hidden" name="_subject" value="New Message from Unfiltered Portfolio!">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_next" value="https://lewynski.github.io/">
-
-            <input type="text" name="name" placeholder="NAME" required>
-            <input type="email" name="email" placeholder="EMAIL ADDRESS" required>
-            <textarea name="message" placeholder="ENTER YOUR MESSAGE..." required></textarea>
-
-            <button type="submit">SEND MESSAGE ▶</button>
-        </form>
     </section>
 
-    <footer>
-        <p>&copy; 2026-2027 Unfiltered Website.<br>Built by Jon Lewyn Villaram Tanggaro.</p>
-        <div class="social-links">
-            <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank"><i class="fab fa-linkedin"></i></a>
-            <a href="https://github.com/lewynski" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="mailto:lewynvllram@gmail.com"><i class="fas fa-envelope"></i></a>
+    <footer class="foot">
+        <div class="shell foot-inner">
+            <p>&copy; 2026 Jon Lewyn Villaram Tanggaro. Built and maintained by hand.</p>
+            <div class="foot-social">
+                <a href="https://www.linkedin.com/in/jon-lewyn-tanggaro" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/lewynski" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="mailto:lewynvllram@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+            </div>
         </div>
     </footer>
 
     <div id="emulator-modal" class="emulator-modal">
         <div class="emulator-window">
             <div class="emulator-header">
-                <div class="emulator-title"><i class="fas fa-mobile-alt"></i> Android Emulator </div>
-                <button id="close-emulator" class="emulator-close"><i class="fas fa-times"></i></button>
+                <div class="emulator-title">Mobile preview</div>
+                <button id="close-emulator" class="emulator-close" aria-label="Close preview"><i class="fas fa-times"></i></button>
             </div>
             <div class="emulator-body">
                 <div class="phone-mockup">
                     <div class="phone-camera"></div>
                     <div class="phone-screen">
-                        <iframe src="index.html" frameborder="0"></iframe>
+                        <iframe src="index.html" title="Mobile preview of this site"></iframe>
                     </div>
                 </div>
             </div>
             <div class="emulator-console">
-                <span>> adb connect localhost:5555</span>
-                <span>> deploying unfiltered-website.apk</span>
-                <span style="color: var(--retro-green);">> App launched successfully. Mobile view active.</span>
+                <span>This is the same page, rendered at phone width.</span>
+                <span>Press Escape or click outside to close.</span>
             </div>
         </div>
     </div>
 
     <script>
-        const themeBtn = document.getElementById('theme-btn');
-        const themeIcon = themeBtn.querySelector('i');
-        const body = document.documentElement;
+        /* Everything motion-related checks this first. */
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        const savedTheme = localStorage.getItem('arcade-theme');
-        if (savedTheme === 'light') {
-            body.setAttribute('data-theme', 'light');
-            themeIcon.classList.replace('fa-sun', 'fa-moon');
-            themeIcon.style.color = 'var(--retro-purple)';
+        /* ---------- Appearance ---------- */
+        const themeBtn  = document.getElementById('theme-btn');
+        const themeIcon = themeBtn.querySelector('i');
+        const root      = document.documentElement;
+
+        function paintThemeIcon() {
+            const dark = root.getAttribute('data-theme') === 'dark';
+            themeIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+            themeBtn.setAttribute('title', dark ? 'Switch to light' : 'Switch to dark');
         }
+
+        if (localStorage.getItem('arcade-theme') === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+        }
+        paintThemeIcon();
 
         themeBtn.addEventListener('click', () => {
-            if (body.getAttribute('data-theme') === 'light') {
-                body.removeAttribute('data-theme');
-                localStorage.setItem('arcade-theme', 'dark');
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-                themeIcon.style.color = 'var(--retro-gold)';
-            } else {
-                body.setAttribute('data-theme', 'light');
+            const dark = root.getAttribute('data-theme') === 'dark';
+            if (dark) {
+                root.removeAttribute('data-theme');
                 localStorage.setItem('arcade-theme', 'light');
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
-                themeIcon.style.color = 'var(--retro-purple)';
+            } else {
+                root.setAttribute('data-theme', 'dark');
+                localStorage.setItem('arcade-theme', 'dark');
             }
+            paintThemeIcon();
         });
 
+        /* ---------- Mobile menu ---------- */
         const mobileBtn = document.getElementById('mobile-menu-btn');
-        const navMenu = document.getElementById('nav-center-menu');
+        const navMenu   = document.getElementById('nav-center-menu');
 
         mobileBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('show');
-            const icon = mobileBtn.querySelector('i');
-            if (navMenu.classList.contains('show')) {
-                icon.classList.replace('fa-bars', 'fa-times');
-            } else {
-                icon.classList.replace('fa-times', 'fa-bars');
-            }
+            const open = navMenu.classList.toggle('show');
+            mobileBtn.setAttribute('aria-expanded', String(open));
+            mobileBtn.querySelector('i').className = open ? 'fas fa-times' : 'fas fa-bars';
         });
 
-        const particleCanvas = document.getElementById('particle-canvas');
-        const colors = ['#d0202b', '#1c3fb8', '#eef2ff', '#8f1219', '#2f5fe0'];
-
-        function createParticles() {
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'pixel-particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.animationDuration = (Math.random() * 3 + 2.5) + 's';
-                particle.style.animationDelay = (Math.random() * 5) + 's';
-                particleCanvas.appendChild(particle);
-            }
-        }
-        createParticles();
-
-        const observerOptions = { threshold: 0.18 };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible', 'show');
-                    observer.unobserve(entry.target);
-                }
+        navMenu.querySelectorAll('a').forEach((a) => {
+            a.addEventListener('click', () => {
+                navMenu.classList.remove('show');
+                mobileBtn.setAttribute('aria-expanded', 'false');
+                mobileBtn.querySelector('i').className = 'fas fa-bars';
             });
-        }, observerOptions);
-
-        document.querySelectorAll('.skill-card, .reveal').forEach(el => {
-            observer.observe(el);
         });
 
-        // --- EMULATOR LOGIC ---
-        const emulatorToggle = document.getElementById('emulator-toggle');
-        const emulatorModal = document.getElementById('emulator-modal');
-        const closeEmulator = document.getElementById('close-emulator');
+        /* ---------- Scroll reveal ----------
+           One observer for the whole page. Each element fires once and is
+           then dropped, so scrolling back up costs nothing. */
+        const revealTargets = document.querySelectorAll('[data-reveal]');
 
+        if (reduceMotion) {
+            revealTargets.forEach((el) => el.classList.add('is-in'));
+        } else {
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('is-in');
+                    revealObserver.unobserve(entry.target);
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+            revealTargets.forEach((el) => revealObserver.observe(el));
+        }
+
+        /* ---------- Scroll-driven effects ----------
+           Nav backdrop, hero parallax, and the sticky project scrub all read
+           the same scroll position inside one rAF-throttled handler. */
+        const nav        = document.getElementById('nav');
+        const portrait   = document.getElementById('portrait');
+        const scrubTrack = document.getElementById('work');
+        const scrubRail  = document.getElementById('scrub-rail');
+        const panels     = Array.prototype.slice.call(document.querySelectorAll('.scrub-panel'));
+        const dots       = scrubRail ? Array.prototype.slice.call(scrubRail.children) : [];
+
+        let activePanel = 0;
+        let ticking = false;
+
+        function clamp01(n) { return n < 0 ? 0 : (n > 1 ? 1 : n); }
+
+        function onScrollFrame() {
+            const y = window.scrollY || window.pageYOffset;
+
+            /* Nav gains its blur panel as soon as the page moves. */
+            nav.classList.toggle('is-stuck', y > 12);
+
+            /* Hero portrait drifts down and shrinks slightly on the way out.
+               At the very top we clear the inline styles instead of writing
+               them, so the page-load rise animation is not overridden. */
+            if (portrait && !reduceMotion) {
+                const p = clamp01(y / (window.innerHeight * 0.85));
+                if (p > 0.001) {
+                    portrait.style.transform =
+                        'translateY(' + (p * 54).toFixed(1) + 'px) scale(' + (1 - p * 0.14).toFixed(3) + ')';
+                    portrait.style.opacity = (1 - p * 0.55).toFixed(3);
+                } else {
+                    portrait.style.transform = '';
+                    portrait.style.opacity = '';
+                }
+            }
+
+            /* Project scrub: map how far through the tall track we are onto
+               which panel should be showing. */
+            if (scrubTrack && panels.length) {
+                const rect  = scrubTrack.getBoundingClientRect();
+                const range = scrubTrack.offsetHeight - window.innerHeight;
+                const p     = range > 0 ? clamp01(-rect.top / range) : 0;
+
+                let idx = Math.floor(p * panels.length);
+                if (idx > panels.length - 1) idx = panels.length - 1;
+
+                if (idx !== activePanel) {
+                    panels[activePanel].classList.remove('is-active');
+                    if (dots[activePanel]) dots[activePanel].classList.remove('on');
+                    panels[idx].classList.add('is-active');
+                    if (dots[idx]) dots[idx].classList.add('on');
+                    activePanel = idx;
+                }
+            }
+
+            ticking = false;
+        }
+
+        function requestScrollFrame() {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(onScrollFrame);
+        }
+
+        window.addEventListener('scroll', requestScrollFrame, { passive: true });
+        window.addEventListener('resize', requestScrollFrame);
+        onScrollFrame();
+
+        /* ---------- Mobile preview ---------- */
+        const emulatorToggle = document.getElementById('emulator-toggle');
+        const emulatorModal  = document.getElementById('emulator-modal');
+        const closeEmulator  = document.getElementById('close-emulator');
+
+        function shutEmulator() { emulatorModal.classList.remove('show'); }
+
+        /* Inside the preview iframe the button would open a preview of a
+           preview, so it is disabled there. */
         if (window.self !== window.top) {
             emulatorToggle.style.pointerEvents = 'none';
         } else {
-            emulatorToggle.addEventListener('click', () => {
-                emulatorModal.classList.add('show');
-            });
+            emulatorToggle.addEventListener('click', () => emulatorModal.classList.add('show'));
         }
 
-        closeEmulator.addEventListener('click', () => {
-            emulatorModal.classList.remove('show');
-        });
-
+        closeEmulator.addEventListener('click', shutEmulator);
         emulatorModal.addEventListener('click', (e) => {
-            if (e.target === emulatorModal) {
-                emulatorModal.classList.remove('show');
-            }
+            if (e.target === emulatorModal) shutEmulator();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') shutEmulator();
         });
 
-        // --- AI CHAT LOGIC (CRT TERMINAL) ---
-        /* No API key here. The key lives in Vercel as GROQ_API_KEY and is only
-           ever read by /api/chat on the server. The browser just talks to /api/chat. */
+        /* ================= AI CHAT =================
+           No API key here. The key lives in Vercel as GROQ_API_KEY and is only
+           ever read by /api/chat on the server. The browser talks to /api/chat. */
         const CHAT_ENDPOINT = '/api/chat';
 
         const chatLog     = document.getElementById('chat-messages');
@@ -1004,32 +1241,34 @@
 
         function setReadout(state, label) {
             if (!statLink) return;
-            statLink.textContent = 'LINK: ' + label;
+            statLink.textContent = 'Link: ' + label;
             statLink.classList.remove('warn', 'bad');
             if (state === 'warn') statLink.classList.add('warn');
             if (state === 'bad')  statLink.classList.add('bad');
         }
-        const SPIN_FRAMES = ['|', '/', '-', '\\'];
+
+        /* Typing indicator: dots that grow, the way a message app shows it. */
+        const SPIN_FRAMES = ['.', '..', '...'];
         let spinTimer = null;
 
         function startWork() {
             const line = document.createElement('div');
             line.className = 'term-line term-work';
             line.id = 'term-working';
+            const label = document.createElement('span');
+            label.textContent = 'Thinking';
             const spin = document.createElement('span');
             spin.className = 'spin';
             spin.textContent = SPIN_FRAMES[0];
-            const label = document.createElement('span');
-            label.textContent = ' querying model...';
-            line.appendChild(spin);
             line.appendChild(label);
+            line.appendChild(spin);
             chatLog.appendChild(line);
             scrollLog();
             let i = 0;
             spinTimer = setInterval(() => {
                 i = (i + 1) % SPIN_FRAMES.length;
                 spin.textContent = SPIN_FRAMES[i];
-            }, 120);
+            }, 320);
         }
 
         function stopWork() {
@@ -1047,14 +1286,11 @@
             scrollLog();
         }
 
-        /* Boot sequence: prints a few lines with a small delay so it feels like a console. */
-        /* Caption-box lines that read like comic narration instead of a boot log. */
+        /* Two quiet captions before the greeting, so the panel states plainly
+           where the key lives before anyone asks. */
         const BOOT_LINES = [
-            'Somewhere in Sto. Tomas, a console flickers awake...',
-            'The persona loads. The webbing holds.',
-            'Powered by openai/gpt-oss-20b.',
-            'The key stays on the server -- never in your browser.',
-            'Ready!'
+            'Connecting to the assistant',
+            'The API key stays on the server'
         ];
 
         function bootSequence() {
@@ -1064,14 +1300,15 @@
                 if (i < BOOT_LINES.length) {
                     termLine('boot', BOOT_LINES[i]);
                     i++;
-                    setTimeout(step, 260);
+                    setTimeout(step, 320);
                 } else {
-                    termLine('ai', "Hey, I'm Eiji AI. Ask me anything about Jon Lewyn's projects, skills, or engineering journey.", 'EIJI');
+                    termLine('ai', "Hi, I'm Eiji. Ask me anything about Jon Lewyn's projects, his stack, or how he got into engineering.", 'Eiji');
                     setCaret();
                 }
             };
-            setTimeout(step, 400);
+            setTimeout(step, 420);
         }
+
         function setBusy(busy) {
             chatBusy = busy;
             if (chatSendBtn) chatSendBtn.disabled = busy;
@@ -1087,7 +1324,7 @@
             if (caret) caret.remove();
 
             if (chatInput && presetText === undefined) chatInput.value = '';
-            termLine('user', text, 'YOU');
+            termLine('user', text, 'You');
             conversationHistory.push({ role: 'user', content: text });
 
             setBusy(true);
@@ -1105,14 +1342,13 @@
                 let data = null;
                 try { data = await res.json(); } catch (_) { data = null; }
 
-                /* A 404 with no JSON body is Vercel/Pages saying the route does not exist.
-                   A 404 WITH a JSON body came from our own function, so it is an upstream
-                   problem (e.g. a retired model), not a missing backend. */
+                /* A 404 with no JSON body is the host saying the route does not
+                   exist. A 404 WITH a JSON body came from our own function, so
+                   it is an upstream problem, not a missing backend. */
                 if (res.status === 404 && !data) {
                     linkOnline = false;
-                    setReadout('bad', 'OFFLINE');
-                    termLine('err', 'backend not found (404). the AI needs a serverless host -- try the Vercel deployment of this site.', 'ALERT!');
-                    termLine('boot', 'static hosts like GitHub Pages cannot run /api/chat.');
+                    setReadout('bad', 'offline');
+                    termLine('err', 'This page is on a static host, so /api/chat does not exist here. Open the Vercel deployment to use the assistant.', "Can't reach the assistant");
                     setBusy(false);
                     setCaret();
                     return;
@@ -1120,30 +1356,31 @@
 
                 if (!res.ok || !data || data.error) {
                     linkOnline = false;
-                    setReadout('warn', 'ERROR');
-                    let msg = (data && data.error) ? data.error : ('request failed (' + res.status + ')');
-                    if (data && data.upstreamStatus) msg += ' [upstream ' + data.upstreamStatus + ']';
-                    termLine('err', msg, 'ALERT!');
+                    setReadout('warn', 'error');
+                    let msg = (data && data.error) ? data.error : ('The request failed (' + res.status + ').');
+                    if (data && data.upstreamStatus) msg += ' Upstream returned ' + data.upstreamStatus + '.';
+                    termLine('err', msg, 'Message not sent');
                     setBusy(false);
                     setCaret();
                     return;
                 }
 
                 linkOnline = true;
-                setReadout('ok', 'ONLINE');
-                const reply = data.reply || '(empty response)';
-                termLine('ai', reply, 'EIJI');
+                setReadout('ok', 'online');
+                const reply = data.reply || 'No reply came back. Try asking again.';
+                termLine('ai', reply, 'Eiji');
                 conversationHistory.push({ role: 'assistant', content: reply });
             } catch (err) {
                 stopWork();
                 linkOnline = false;
-                setReadout('bad', 'OFFLINE');
-                termLine('err', 'could not reach /api/chat. if you are viewing this on GitHub Pages, the AI backend only exists on the Vercel deployment.', 'ALERT!');
+                setReadout('bad', 'offline');
+                termLine('err', 'Could not reach /api/chat. If you are on the GitHub Pages copy of this site, the assistant only runs on the Vercel deployment.', "Can't reach the assistant");
             }
 
             setBusy(false);
             setCaret();
         }
+
         if (chatSendBtn) chatSendBtn.addEventListener('click', () => handleSend());
         if (chatInput) {
             chatInput.addEventListener('keydown', (e) => {
@@ -1158,16 +1395,17 @@
             });
         });
 
-        /* Probe the backend once so the readout is honest before the first question.
-           A HEAD/GET on the endpoint returns 405 when the function exists, 404 when it doesn't. */
+        /* Probe the backend once so the readout is honest before the first
+           question. A GET returns 405 when the function exists, 404 when it
+           does not. */
         (function probeLink() {
             if (!statLink) return;
             fetch(CHAT_ENDPOINT, { method: 'GET' })
                 .then((res) => {
-                    if (res.status === 404) { setReadout('bad', 'OFFLINE'); linkOnline = false; }
-                    else { setReadout('ok', 'READY'); linkOnline = true; }
+                    if (res.status === 404) { setReadout('bad', 'offline'); linkOnline = false; }
+                    else { setReadout('ok', 'ready'); linkOnline = true; }
                 })
-                .catch(() => { setReadout('bad', 'OFFLINE'); linkOnline = false; });
+                .catch(() => { setReadout('bad', 'offline'); linkOnline = false; });
         })();
 
         bootSequence();
