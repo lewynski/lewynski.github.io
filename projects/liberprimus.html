@@ -4,11 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>3301 // Liber Terminal</title>
-
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
 <style>
 :root {
   --bg-color: #050605;
@@ -154,7 +152,7 @@ select:focus { border-color: var(--cicada-green); }
 <canvas id="rain"></canvas>
 <nav class="top-nav">
   <div class="nav-brand"><span class="glyph">&#8757;</span>3301 &middot; LIBER PRIMUS</div>
-  <a href="#" class="back-btn" onclick="return false;">Sever Link</a>
+  <a href="../projects.html" class="back-btn">Sever Link</a>
 </nav>
 <div class="os-container">
   <aside class="sidebar">
@@ -164,7 +162,7 @@ select:focus { border-color: var(--cicada-green); }
         <label>Persona Mode</label>
         <select id="persona-select">
           <option value="assistant">Standard Guide</option>
-          <option value="study">Study & Academic</option>
+          <option value="study">Study &amp; Academic</option>
           <option value="code">Code Debugger</option>
           <option value="creative">Creative / Cryptic</option>
           <option value="professional">Formal / Professional</option>
@@ -193,445 +191,656 @@ select:focus { border-color: var(--cicada-green); }
   <main class="main-terminal">
     <div class="terminal-header">
       <h2><i class="fas fa-terminal"></i> Liber Terminal</h2>
-      <div class="status-wrap"><span id="modeLabel">STANDARD</span> &middot; <span class="status-light" id="statusLight"></span> <span id="statusText">Link Active</span></div>
+      <div class="status-wrap">
+        <span id="modeLabel">Standard Guide</span>
+        <span class="status-light" id="statusLight"></span>
+        <span id="statusText">Link Active</span>
+      </div>
     </div>
     <div class="chat-box" id="chatBox"></div>
-    <div class="typing-indicator" id="typingIndicator">Decrypting response<span class="dots"></span></div>
-    <div class="suggestions-container" id="suggestions">
-      <button class="sugg-pill" onclick="insertPrompt('Brainstorm project ideas for an acoustic analysis capstone.')">Capstone Ideas</button>
-      <button class="sugg-pill" onclick="insertPrompt('Help me debug a Python matrix logic bug.')">Debug Code</button>
-      <button class="sugg-pill" onclick="insertPrompt('Draft a formal deployment announcement email.')">Formal Email</button>
-      <button class="sugg-pill" onclick="insertPrompt('Describe the attached image in detail.')">Describe Image</button>
+    <div class="typing-indicator" id="typingIndicator">3301 is decrypting<span class="dots"></span></div>
+    <div class="suggestions-container">
+      <button class="sugg-pill" onclick="insertPrompt('Explain how a JK flip-flop differs from a D flip-flop.')">Flip-flops</button>
+      <button class="sugg-pill" onclick="insertPrompt('Debug this Python traceback for me:')">Debug code</button>
+      <button class="sugg-pill" onclick="insertPrompt('Draft a formal follow-up email to an internship supervisor.')">Formal email</button>
+      <button class="sugg-pill" onclick="insertPrompt('Give me a cryptic riddle whose answer is a prime number.')">A riddle</button>
     </div>
     <div class="attach-tray" id="attachTray"></div>
     <div class="input-area">
       <div class="input-wrapper">
-        <textarea id="userInput" placeholder="Enter query, attach files, or paste data..." autocomplete="off"></textarea>
+        <textarea id="userInput" placeholder="Transmit query... (drag files in, or paste an image)"></textarea>
       </div>
       <div class="action-btns">
-        <input type="file" id="fileInput" multiple style="display:none"
-          accept="image/*,.txt,.md,.csv,.tsv,.json,.js,.jsx,.ts,.py,.html,.css,.xml,.yml,.yaml,.log,.pdf,.c,.cpp,.java,.ino">
-        <button class="btn-action" id="attachBtn" title="Attach files / images"><i class="fas fa-paperclip"></i></button>
-        <button class="btn-action" id="micBtn" title="Voice Input"><i class="fas fa-microphone"></i></button>
-        <button class="btn-action send" id="sendBtn" title="Transmit"><i class="fas fa-paper-plane"></i></button>
+        <input type="file" id="fileInput" multiple accept="image/*,.txt,.md,.csv,.json,.js,.py,.html,.css,.pdf" hidden>
+        <button class="btn-action" id="attachBtn" title="Attach files"><i class="fas fa-paperclip"></i></button>
+        <button class="btn-action" id="micBtn" title="Voice input"><i class="fas fa-microphone"></i></button>
+        <button class="btn-action send" id="sendBtn" title="Send"><i class="fas fa-paper-plane"></i></button>
       </div>
     </div>
-    <div class="disclaimer">&#9888; 3301 can err. Verify critical code and academic data. Nothing is unknowable.</div>
+    <div class="disclaimer">3301 relays through a server-side proxy. No key is stored in this page. Verify anything important.</div>
   </main>
 </div>
 <script>
-// =========================================================
-// No API key in this file. All model calls go through the
-// serverless relay at /api/chat, which reads GROQ_API_KEY
-// from the Vercel project environment variables.
-// =========================================================
-const RELAY_URL = "/api/chat";
-const MAX_IMG_MB = 3;   // base64 inflates ~33%; Vercel caps request bodies at 4.5MB
+/* ------------------------------------------------------------------
+   3301 // Liber Terminal
+   No API key lives in this file. Every model call goes through the
+   Vercel serverless relay at /api/chat, which injects the system
+   prompt server-side. The persona picker sends a KEY ('liber-code'),
+   never prompt text -- the browser cannot rewrite the prompt.
+   ------------------------------------------------------------------ */
+const RELAY_URL = '/api/chat';
+const MAX_IMG_MB = 3;
 const MAX_TEXT_MB = 1;
 const REQUEST_TIMEOUT_MS = 60000;
+const PDF_PAGE_CAP = 30;
 
-if (window.pdfjsLib) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-}
-
-// DOM
-const chatBox = document.getElementById('chatBox');
-const userInput = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
-const micBtn = document.getElementById('micBtn');
-const attachBtn = document.getElementById('attachBtn');
-const fileInput = document.getElementById('fileInput');
-const attachTray = document.getElementById('attachTray');
-const typingIndicator = document.getElementById('typingIndicator');
-const personaSelect = document.getElementById('persona-select');
-const voiceSelect = document.getElementById('voice-select');
-const scratchpad = document.getElementById('scratchpad');
-const modeLabel = document.getElementById('modeLabel');
-const convoList = document.getElementById('convoList');
-const statusLight = document.getElementById('statusLight');
-const statusText = document.getElementById('statusText');
-
-const GREETING = "The path is patient. State your query, Seeker. You may attach images, PDFs, or text files.";
-let attachments = []; // { id, kind:'image'|'text', name, size, dataUrl?, content? }
-let uid = 0;
-let inFlight = false;
-
-// Scratchpad persistence
-scratchpad.value = localStorage.getItem('cicada-scratchpad') || '';
-document.getElementById('btn-save-note').addEventListener('click', () => {
-  localStorage.setItem('cicada-scratchpad', scratchpad.value);
-  addSystem('Scratchpad committed to local memory.');
-});
-
-// Personas
-const personas = {
-  assistant: "You are 3301, a calm personal AI guide. Keep answers concise, with a faint cryptic, thoughtful tone. Never use markdown symbols.",
-  study: "You are 3301 in Academic Mode, an engineering tutor. Break down electronics and programming concepts clearly and simply. Never use markdown symbols.",
-  code: "You are 3301 in Dev Mode, an expert in Python, JS, Kivy, and Arduino. Give clean, secure code and explain bugs directly. Do not use markdown backticks or asterisks.",
-  creative: "You are 3301 in Cryptic Mode. Be imaginative and evocative, drawing on cryptography, primes, and mystery, while staying coherent and useful. Never use markdown symbols.",
-  professional: "You are 3301 in Formal Mode. Write professional, corporate-level emails, documentation, and resumes. No slang, no markdown symbols."
-};
-
-// ---------- Conversation store (multiple archives) ----------
 const STORE_KEY = 'cicada-conversations';
-let store = { conversations: [], activeId: null };
-let conversationHistory; // active conversation's message array (system prompt at [0])
+const LEGACY_KEY = 'cicada-chat-memory';
+const NOTE_KEY = 'cicada-scratchpad';
 
-const genId = () => 'c' + Date.now() + Math.floor(Math.random() * 1000);
-const escapeHtml = s => (s || '').replace(/[&<>"]/g, ch => ({ '&':'&', '<':'<', '>':'>', '"':'"' }[ch]));
-const persistStore = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) {} };
-const activeConvo = () => store.conversations.find(c => c.id === store.activeId);
+const el = (id) => document.getElementById(id);
+const chatBox = el('chatBox');
+const userInput = el('userInput');
+const sendBtn = el('sendBtn');
+const micBtn = el('micBtn');
+const attachBtn = el('attachBtn');
+const fileInput = el('fileInput');
+const attachTray = el('attachTray');
+const typingIndicator = el('typingIndicator');
+const personaSelect = el('persona-select');
+const voiceSelect = el('voice-select');
+const modeLabel = el('modeLabel');
+const statusLight = el('statusLight');
+const statusText = el('statusText');
+const convoList = el('convoList');
+const scratchpad = el('scratchpad');
 
-function deriveTitle(c) {
-  const firstUser = c.history.find(m => m.role === 'user' && m.content && m.content.trim());
-  if (firstUser) return firstUser.content.replace(/\s+/g, ' ').trim().slice(0, 34) || 'New Chat';
-  return 'New Chat';
+/* Real entities. The version this page grew out of had a replace map
+   where every character mapped back to itself -- a silent no-op. File
+   names and conversation titles are written with innerHTML, so a file
+   called `<img onerror=...>.txt` would have executed. */
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"]/g, function (ch) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch];
+  });
 }
+/* ---------- conversation store ----------
+   Shape: { conversations: [ { id, title, messages: [{role, content, attachments?}] } ], activeId }
+   `content` may be a string or an OpenAI-style parts array (text + image_url). */
+let store = { conversations: [], activeId: null };
+let attachments = [];   // pending, cleared on send
+let busy = false;
+
+function loadStore() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.conversations)) {
+        store = { conversations: parsed.conversations, activeId: parsed.activeId || null };
+      }
+    }
+  } catch (_) { /* corrupt payload -> start clean rather than throw on load */ }
+
+  /* One-time migration from the single-thread build. */
+  if (!store.conversations.length) {
+    try {
+      const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || 'null');
+      if (Array.isArray(legacy) && legacy.length) {
+        store.conversations.push({ id: Date.now(), title: deriveTitle(legacy), messages: legacy });
+      }
+    } catch (_) { /* ignore */ }
+  }
+
+  if (!store.conversations.length) newConversation(true);
+  if (!activeConvo()) store.activeId = store.conversations[0].id;
+}
+
+function persist() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  } catch (_) {
+    /* Quota is realistic here: base64 images in history are large. */
+    addSystem('Local archive is full. Older chats may not be saved.', true);
+  }
+}
+
+function activeConvo() {
+  return store.conversations.find(function (c) { return c.id === store.activeId; }) || null;
+}
+/* Plain text of a turn, whether it is a string or a parts array. */
+function textOf(content) {
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return '';
+  return content
+    .filter(function (p) { return p && p.type === 'text'; })
+    .map(function (p) { return p.text; })
+    .join(' ');
+}
+
+function deriveTitle(messages) {
+  const first = (messages || []).find(function (m) { return m.role === 'user'; });
+  const text = first ? textOf(first.content).trim().replace(/\s+/g, ' ') : '';
+  if (!text) return 'Untitled transmission';
+  return text.length > 34 ? text.slice(0, 34) + '...' : text;
+}
+
 function saveActive() {
   const c = activeConvo();
-  if (c) { c.history = conversationHistory; c.updatedAt = Date.now(); c.title = deriveTitle(c); }
-  persistStore();
+  if (c) c.title = deriveTitle(c.messages);
+  persist();
   renderConvoList();
 }
-function newConversation() {
-  const c = { id: genId(), title: 'New Chat', updatedAt: Date.now(),
-              history: [{ role: 'system', content: personas[personaSelect.value] }] };
-  store.conversations.unshift(c);
-  store.activeId = c.id;
-  conversationHistory = c.history;
-  persistStore(); renderConvoList(); renderHistory();
+
+function newConversation(silent) {
+  const convo = { id: Date.now() + Math.floor(Math.random() * 1000), title: 'New transmission', messages: [] };
+  store.conversations.unshift(convo);
+  store.activeId = convo.id;
+  attachments = [];
+  if (!silent) {
+    persist();
+    renderTray();
+    renderHistory();
+    renderConvoList();
+  }
 }
+
 function switchConversation(id) {
-  const c = store.conversations.find(x => x.id === id);
-  if (!c) return;
   store.activeId = id;
-  conversationHistory = c.history;
-  persistStore(); renderConvoList(); renderHistory();
+  attachments = [];
+  persist();
+  renderTray();
+  renderHistory();
+  renderConvoList();
 }
 function deleteConversation(id) {
-  store.conversations = store.conversations.filter(c => c.id !== id);
-  if (store.activeId === id) {
-    if (store.conversations.length) { switchConversation(store.conversations[0].id); return; }
-    newConversation(); return;
-  }
-  persistStore(); renderConvoList();
+  store.conversations = store.conversations.filter(function (c) { return c.id !== id; });
+  if (!store.conversations.length) newConversation(true);
+  if (!activeConvo()) store.activeId = store.conversations[0].id;
+  persist();
+  renderHistory();
+  renderConvoList();
 }
+
 function deleteAllConversations() {
-  store.conversations = []; store.activeId = null; persistStore();
-  newConversation();
+  if (!confirm('Purge every archived transmission? This cannot be undone.')) return;
+  store.conversations = [];
+  newConversation(true);
+  attachments = [];
+  persist();
+  renderTray();
+  renderHistory();
+  renderConvoList();
 }
+
 function renderConvoList() {
   convoList.innerHTML = '';
-  store.conversations.slice().sort((a, b) => b.updatedAt - a.updatedAt).forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'convo-item' + (c.id === store.activeId ? ' active' : '');
-    item.innerHTML = '<span class="ctitle">' + escapeHtml(c.title || 'New Chat') + '</span>' +
-                     '<button class="cdel" title="Delete">&times;</button>';
-    item.querySelector('.ctitle').addEventListener('click', () => switchConversation(c.id));
-    item.querySelector('.cdel').addEventListener('click', e => {
+  store.conversations.forEach(function (c) {
+    const row = document.createElement('div');
+    row.className = 'convo-item' + (c.id === store.activeId ? ' active' : '');
+    row.innerHTML =
+      '<span class="ctitle" title="' + escapeHtml(c.title) + '">' + escapeHtml(c.title) + '</span>' +
+      '<button class="cdel" title="Delete">&times;</button>';
+    row.querySelector('.ctitle').addEventListener('click', function () { switchConversation(c.id); });
+    row.querySelector('.cdel').addEventListener('click', function (e) {
       e.stopPropagation();
-      if (confirm('Delete this conversation?')) deleteConversation(c.id);
+      deleteConversation(c.id);
     });
-    convoList.appendChild(item);
+    convoList.appendChild(row);
   });
 }
+/* ---------- rendering ---------- */
 
-// Load store, migrating any old single-memory build
-(function initStore() {
-  try { store = JSON.parse(localStorage.getItem(STORE_KEY)) || store; } catch (e) {}
-  if (!store.conversations) store.conversations = [];
-  const legacy = localStorage.getItem('cicada-chat-memory');
-  if (store.conversations.length === 0 && legacy) {
-    try {
-      const h = JSON.parse(legacy);
-      if (Array.isArray(h) && h.length > 1)
-        store.conversations.push({ id: genId(), title: 'New Chat', updatedAt: Date.now(), history: h });
-    } catch (e) {}
+/* Draw one bubble. `content` may be a string or a parts array; image parts
+   become thumbnails, `files` lists non-image attachments by name. */
+function drawBubble(role, content, files) {
+  const div = document.createElement('div');
+  div.className = 'message ' + (role === 'user' ? 'msg-user' : 'msg-capy');
+
+  if (role === 'user') {
+    const imgs = Array.isArray(content)
+      ? content.filter(function (p) { return p && p.type === 'image_url'; })
+      : [];
+    if (imgs.length) {
+      const wrap = document.createElement('div');
+      wrap.className = 'att-thumbs';
+      imgs.forEach(function (p) {
+        const im = document.createElement('img');
+        im.src = p.image_url.url;      // data: URL produced locally by FileReader
+        im.alt = 'attached image';
+        wrap.appendChild(im);
+      });
+      div.appendChild(wrap);
+    }
+    (files || []).forEach(function (name) {
+      const f = document.createElement('div');
+      f.className = 'att-file';
+      f.textContent = 'attached: ' + name;
+      div.appendChild(f);
+    });
   }
-  localStorage.removeItem('cicada-chat-memory');
-  if (store.conversations.length === 0)
-    store.conversations.push({ id: genId(), title: 'New Chat', updatedAt: Date.now(),
-                               history: [{ role: 'system', content: personas[personaSelect.value] }] });
-  if (!activeConvo()) store.activeId = store.conversations[0].id;
-  conversationHistory = activeConvo().history;
-  persistStore();
-})();
 
-function syncMode() { modeLabel.innerText = personaSelect.options[personaSelect.selectedIndex].text.toUpperCase(); }
-syncMode();
+  const body = document.createElement('span');
+  body.textContent = textOf(content);   // textContent, never innerHTML: model output is untrusted
+  div.appendChild(body);
+
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return div;
+}
+
+function addSystem(text, isError) {
+  const div = document.createElement('div');
+  div.className = 'message msg-sys' + (isError ? ' err' : '');
+  div.textContent = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+/* Persist a turn onto the active conversation, then draw it. */
+function addMessage(role, content, files) {
+  const c = activeConvo();
+  if (c) c.messages.push({ role: role, content: content, files: files || [] });
+  drawBubble(role, content, files);
+  saveActive();
+}
+
 function renderHistory() {
   chatBox.innerHTML = '';
-  addMessage(GREETING, 'capy', false);
-  conversationHistory.forEach(msg => {
-    if (msg.role === 'user') addMessage(msg.content, 'user', false);
-    if (msg.role === 'assistant') addMessage(msg.content, 'capy', false);
-  });
-}
-renderConvoList();
-renderHistory();
-
-personaSelect.addEventListener('change', () => {
-  conversationHistory[0].content = personas[personaSelect.value];
-  saveActive();
-  syncMode();
-  addSystem('Persona shifted to ' + personaSelect.options[personaSelect.selectedIndex].text + '.');
-});
-
-document.getElementById('btn-new-chat').addEventListener('click', () => newConversation());
-document.getElementById('btn-delete-all').addEventListener('click', () => {
-  if (confirm('Delete ALL conversations permanently. Proceed?')) deleteAllConversations();
-});
-
-window.insertPrompt = function(text) { userInput.value = text; userInput.focus(); };
-
-function addMessage(text, sender, save = true, thumbsHtml = '') {
-  const div = document.createElement('div');
-  div.classList.add('message', sender === 'user' ? 'msg-user' : 'msg-capy');
-  if (thumbsHtml) { const t = document.createElement('div'); t.className = 'att-thumbs'; t.innerHTML = thumbsHtml; div.appendChild(t); }
-  const body = document.createElement('div'); body.innerText = text; div.appendChild(body);
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-  if (save) {
-    conversationHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: text });
-    saveActive();
+  const c = activeConvo();
+  if (!c || !c.messages.length) {
+    drawBubble('assistant',
+      'Link established. I am 3301.\n\nAsk anything, or drop a file, an image, or a PDF into this window and I will read it.');
+    return;
   }
+  c.messages.forEach(function (m) { drawBubble(m.role, m.content, m.files); });
 }
-function addSystem(text, isError = false) {
-  const div = document.createElement('div');
-  div.classList.add('message', 'msg-sys');
-  if (isError) div.classList.add('err');
-  div.innerText = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+
 function setLinkState(ok, label) {
   statusLight.classList.toggle('down', !ok);
-  statusText.innerText = label;
+  statusText.textContent = label || (ok ? 'Link Active' : 'Link Down');
 }
+
+/* ---------- text to speech ---------- */
 function speak(text) {
-  if (voiceSelect.value === 'on' && 'speechSynthesis' in window) {
-    const u = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    u.voice = voices.find(v => v.name.includes('Google') || v.name.includes('Zira')) || voices[0];
-    u.rate = 1.05;
+  if (voiceSelect.value !== 'on' || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.slice(0, 600));
+    u.rate = 1;
+    u.pitch = 0.9;
     window.speechSynthesis.speak(u);
-  }
+  } catch (_) { /* voice is a nicety; never let it break a reply */ }
 }
-// ---------- Attachments ----------
-const readAsText = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsText(f); });
-const readAsDataURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+/* ---------- attachments ---------- */
+if (window.pdfjsLib) {
+  /* Without a workerSrc pdf.js falls back to a main-thread build and throws
+     on some versions; point it at the same CDN release as the library. */
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
 
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+/* Pull selectable text out of a PDF, capped so a 400-page scan cannot
+   freeze the tab. Scanned PDFs have no text layer and will come back empty. */
 async function extractPdf(file) {
-  if (!window.pdfjsLib) return "[PDF attached but pdf.js failed to load]";
+  if (!window.pdfjsLib) throw new Error('PDF reader failed to load.');
   const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  let out = '';
-  const pages = Math.min(pdf.numPages, 30);
-  for (let i = 1; i <= pages; i++) {
+  const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+  const pages = Math.min(pdf.numPages, PDF_PAGE_CAP);
+  const out = [];
+  for (let i = 1; i <= pages; i += 1) {
     const page = await pdf.getPage(i);
-    const tc = await page.getTextContent();
-    out += tc.items.map(it => it.str).join(' ') + '\n';
+    const content = await page.getTextContent();
+    out.push(content.items.map(function (it) { return it.str; }).join(' '));
   }
-  if (pdf.numPages > pages) out += `\n[...truncated, ${pdf.numPages - pages} more pages]`;
-  return out.trim() || "[PDF contained no extractable text - it may be scanned images]";
+  let text = out.join('\n\n').replace(/[ \t]+/g, ' ').trim();
+  if (pdf.numPages > pages) {
+    text += '\n\n[truncated: read ' + pages + ' of ' + pdf.numPages + ' pages]';
+  }
+  return text;
 }
-
-function fmtSize(b) { return b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(1) + ' MB'; }
-
 function renderTray() {
   attachTray.innerHTML = '';
-  attachments.forEach(a => {
+  attachments.forEach(function (a, idx) {
     const chip = document.createElement('div');
     chip.className = 'attach-chip' + (a.pending ? ' busy' : '');
-    const iconClass = a.name.toLowerCase().endsWith('.pdf')
-      ? 'fa-file-pdf'
-      : /\.(js|py|json|html|css|c|cpp|java|ino|ts|jsx|xml|yml|yaml)$/i.test(a.name) ? 'fa-file-code' : 'fa-file-lines';
     const icon = a.kind === 'image'
-      ? `<img src="${a.dataUrl}" alt="">`
-      : `<i class="fas ${iconClass}"></i>`;
-    chip.innerHTML = `${icon}<div style="min-width:0"><div class="fname">${escapeHtml(a.name)}</div><div class="meta">${a.pending ? 'reading...' : fmtSize(a.size)}</div></div><button class="rm" title="Remove" data-id="${a.id}">&times;</button>`;
+      ? '<img src="' + a.dataUrl + '" alt="">'
+      : '<i class="fas ' + (a.kind === 'pdf' ? 'fa-file-pdf' : 'fa-file-lines') + '"></i>';
+    chip.innerHTML =
+      icon +
+      '<div><div class="fname">' + escapeHtml(a.name) + '</div>' +
+      '<div class="meta">' + (a.pending ? 'reading...' : fmtSize(a.size)) + '</div></div>' +
+      '<button class="rm" title="Remove">&times;</button>';
+    chip.querySelector('.rm').addEventListener('click', function () {
+      attachments.splice(idx, 1);
+      renderTray();
+    });
     attachTray.appendChild(chip);
   });
-  attachTray.querySelectorAll('.rm').forEach(b => b.addEventListener('click', () => {
-    attachments = attachments.filter(x => String(x.id) !== String(b.dataset.id)); renderTray();
-  }));
 }
 
-async function handleFiles(files) {
+function readAsDataUrl(file) {
+  return new Promise(function (resolve, reject) {
+    const r = new FileReader();
+    r.onload = function () { resolve(r.result); };
+    r.onerror = function () { reject(new Error('Could not read ' + file.name)); };
+    r.readAsDataURL(file);
+  });
+}
+
+function readAsText(file) {
+  return new Promise(function (resolve, reject) {
+    const r = new FileReader();
+    r.onload = function () { resolve(String(r.result)); };
+    r.onerror = function () { reject(new Error('Could not read ' + file.name)); };
+    r.readAsText(file);
+  });
+}
+/* The relay caps images at 4 per request, so cap here too and say why. */
+async function handleFiles(fileList) {
+  const files = Array.from(fileList || []);
   for (const file of files) {
-    const id = ++uid;
-    const isImg = file.type.startsWith('image/');
-    if (isImg && file.size > MAX_IMG_MB * 1048576) { addSystem(`${file.name} skipped: image over ${MAX_IMG_MB}MB.`, true); continue; }
-    if (!isImg && file.size > MAX_TEXT_MB * 1048576) { addSystem(`${file.name} skipped: file over ${MAX_TEXT_MB}MB.`, true); continue; }
-    const entry = { id, name: file.name, size: file.size, pending: true, kind: isImg ? 'image' : 'text' };
-    attachments.push(entry); renderTray();
-    try {
-      if (isImg) { entry.dataUrl = await readAsDataURL(file); }
-      else if (file.name.toLowerCase().endsWith('.pdf')) { entry.content = await extractPdf(file); }
-      else { entry.content = await readAsText(file); }
-    } catch (err) {
-      addSystem(`Failed to read ${file.name}: ${err.message}`, true);
-      attachments = attachments.filter(x => x.id !== id); renderTray(); continue;
+    const isImage = /^image\//i.test(file.type);
+    const isPdf = /pdf$/i.test(file.type) || /\.pdf$/i.test(file.name);
+
+    if (isImage) {
+      const imgCount = attachments.filter(function (a) { return a.kind === 'image'; }).length;
+      if (imgCount >= 4) { addSystem('Image limit reached: 4 per transmission.', true); continue; }
+      if (file.size > MAX_IMG_MB * 1024 * 1024) {
+        addSystem(escapeHtml(file.name) + ' is over ' + MAX_IMG_MB + ' MB and was skipped.', true);
+        continue;
+      }
+      try {
+        const dataUrl = await readAsDataUrl(file);
+        attachments.push({ kind: 'image', name: file.name, size: file.size, dataUrl: dataUrl });
+      } catch (err) { addSystem(err.message, true); }
+      renderTray();
+      continue;
     }
-    entry.pending = false; renderTray();
+
+    if (file.size > MAX_TEXT_MB * 1024 * 1024) {
+      addSystem(escapeHtml(file.name) + ' is over ' + MAX_TEXT_MB + ' MB and was skipped.', true);
+      continue;
+    }
+
+    const entry = { kind: isPdf ? 'pdf' : 'text', name: file.name, size: file.size, text: '', pending: true };
+    attachments.push(entry);
+    renderTray();
+    try {
+      entry.text = isPdf ? await extractPdf(file) : await readAsText(file);
+      if (!entry.text.trim()) {
+        addSystem('No selectable text in ' + escapeHtml(file.name) + ' — it may be a scan.', true);
+      }
+    } catch (err) {
+      addSystem(err.message || 'Could not read that file.', true);
+      entry.text = '';
+    }
+    entry.pending = false;
+    renderTray();
   }
 }
+/* ---------- send ---------- */
 
-attachBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => { handleFiles([...e.target.files]); fileInput.value = ''; });
-// drag & drop onto the whole terminal
-const dropZone = document.querySelector('.main-terminal');
-['dragover','dragenter'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); }));
-dropZone.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files.length) handleFiles([...e.dataTransfer.files]); });
-// paste image from clipboard
-userInput.addEventListener('paste', e => {
-  const imgs = [...(e.clipboardData?.items || [])].filter(i => i.type.startsWith('image/')).map(i => i.getAsFile());
-  if (imgs.length) { e.preventDefault(); handleFiles(imgs); }
-});
-// ---------- Send ----------
+/* Some models emit a visible chain of thought in <think> tags. Strip it,
+   including an unclosed tag, which happens when the reply is cut off. */
+function stripThinking(text) {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/<think>[\s\S]*$/i, '')
+    .trim();
+}
+
+/* Prior turns go up as text only. The relay caps a request at 4 images
+   total across all messages, so replaying old screenshots would silently
+   eat the budget for the image the user just attached. */
+function payloadHistory(messages) {
+  return messages.slice(-12).map(function (m) {
+    return { role: m.role, content: textOf(m.content) };
+  }).filter(function (m) { return m.content.trim(); });
+}
+
+function buildUserContent(text) {
+  const images = attachments.filter(function (a) { return a.kind === 'image'; });
+  const docs = attachments.filter(function (a) { return a.kind !== 'image' && a.text; });
+
+  let body = text;
+  docs.forEach(function (d) {
+    body += '\n\n--- file: ' + d.name + ' ---\n' + d.text;
+  });
+
+  if (!images.length) return body;
+
+  const parts = [{ type: 'text', text: body || 'Describe the attached image.' }];
+  images.forEach(function (im) {
+    parts.push({ type: 'image_url', image_url: { url: im.dataUrl } });
+  });
+  return parts;
+}
 async function handleSend() {
-  if (inFlight) return;
-  const typed = userInput.value.trim();
-  if (!typed && attachments.length === 0) return;
-  if (attachments.some(a => a.pending)) { addSystem('Still reading an attachment, wait a moment.'); return; }
-
-  const imgs = attachments.filter(a => a.kind === 'image');
-  const texts = attachments.filter(a => a.kind === 'text');
-
-  // Build the full text payload sent to the model
-  let payload = typed;
-  if (typed.toLowerCase().includes('scratchpad') && scratchpad.value.trim()) {
-    payload += `\n\n[SCRATCHPAD]:\n"${scratchpad.value.trim()}"`;
+  if (busy) return;
+  const text = userInput.value.trim();
+  if (!text && !attachments.length) return;
+  if (attachments.some(function (a) { return a.pending; })) {
+    addSystem('Still reading an attachment. Try again in a moment.');
+    return;
   }
-  texts.forEach(t => { payload += `\n\n[FILE: ${t.name}]\n${t.content}`; });
-  if (!payload.trim()) payload = "Describe the attached image(s).";
 
-  // Bubble in the chat (thumbnails for images, labels for files)
-  let thumbs = imgs.map(i => `<img src="${i.dataUrl}" alt="${escapeHtml(i.name)}">`).join('');
-  thumbs += texts.map(t => `<div class="att-file"><i class="fas fa-paperclip"></i> ${escapeHtml(t.name)}</div>`).join('');
-  addMessage(typed || '(no text)', 'user', false, thumbs);
-  // persist only a lightweight note to memory (never base64) to avoid quota errors
-  const noteBits = [...imgs, ...texts].map(a => a.name);
-  conversationHistory.push({ role: 'user', content: typed + (noteBits.length ? `\n[attached: ${noteBits.join(', ')}]` : '') });
-  saveActive();
+  const convo = activeConvo();
+  const history = payloadHistory(convo ? convo.messages : []);
+  const content = buildUserContent(text);
+  const fileNames = attachments
+    .filter(function (a) { return a.kind !== 'image'; })
+    .map(function (a) { return a.name; });
+  const hasImages = Array.isArray(content);
 
+  addMessage('user', content, fileNames);
   userInput.value = '';
-  const outgoingImgs = imgs.slice();
-  attachments = []; renderTray();
-  typingIndicator.style.display = 'block';
-  inFlight = true;
+  attachments = [];
+  renderTray();
+
+  busy = true;
   sendBtn.disabled = true;
-  chatBox.scrollTop = chatBox.scrollHeight;
+  attachBtn.disabled = true;
+  typingIndicator.style.display = 'block';
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS);
 
   try {
-    conversationHistory[0].content = personas[personaSelect.value];
-    const priorTurns = conversationHistory.slice(1, -1); // exclude system + the note we just pushed
-
-    // Build the outgoing user message: multimodal array if images present
-    let userMsg;
-    if (outgoingImgs.length) {
-      userMsg = { role: 'user', content: [
-        { type: 'text', text: payload },
-        ...outgoingImgs.map(i => ({ type: 'image_url', image_url: { url: i.dataUrl } }))
-      ]};
-    } else {
-      userMsg = { role: 'user', content: payload };
-    }
-    const messages = [conversationHistory[0], ...priorTurns, userMsg];
-
-    // The relay owns the key and the model names. We only declare which lane we need.
-    const response = await fetch(RELAY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: outgoingImgs.length ? 'vision' : 'text', messages }),
-      signal: controller.signal
+    const res = await fetch(RELAY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      /* persona is a KEY. The relay looks the prompt up server-side and
+         injects the system message itself, so this page must not send one --
+         the relay drops client system turns anyway. */
+      body: JSON.stringify({
+        persona: 'liber-' + personaSelect.value,
+        mode: hasImages ? 'vision' : 'text',
+        messages: history.concat([{ role: 'user', content: content }])
+      })
     });
+    const data = await res.json().catch(function () { return null; });
 
-    let data = {};
-    try { data = await response.json(); } catch (e) {}
-    typingIndicator.style.display = 'none';
-
-    if (!response.ok) {
-      const msg = data.error || (response.status === 413
-        ? 'Attachment too large for the relay. Send a smaller image.'
-        : 'Relay returned ' + response.status);
-      setLinkState(false, 'Link Degraded');
-      addSystem('Relay error: ' + msg, true);
-      return;
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error('The relay is not available on this host. GitHub Pages cannot run serverless functions — open the Vercel deployment.');
+      }
+      if (res.status === 401) throw new Error('The server rejected its API key. Check GROQ_API_KEY in Vercel.');
+      if (res.status === 429) throw new Error('Rate limited upstream. Wait a moment and retry.');
+      throw new Error((data && data.error) || ('Relay error ' + res.status + '.'));
     }
 
-    setLinkState(true, 'Link Active');
-    let reply = data.content || "";
-    // strip reasoning models' chain-of-thought (<think>...</think>) so only the answer shows
-    reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '');
-    if (/<\/think>/i.test(reply)) reply = reply.split(/<\/think>/i).pop(); // unclosed / trailing block
-    if (/<think>/i.test(reply)) reply = reply.split(/<think>/i)[0];
-    reply = reply.replace(/\*\*/g, '').replace(/\*/g, '').replace(/`/g, '').trim();
-    if (!reply) reply = "(no answer returned)";
-    addMessage(reply, 'capy');
-    speak(reply);
+    /* THE BUG THIS PAGE WAS BUILT AROUND: it used to read only data.content.
+       The relay returned only { reply }, so content was undefined -> ''
+       -> the "(no answer returned)" fallback fired on every single call.
+       The relay now sends both keys, and this reads either one. */
+    let reply = stripThinking(String((data && (data.content || data.reply)) || ''));
+
+    if (!reply) {
+      addSystem('The model returned an empty response. Try rephrasing.', true);
+    } else {
+      addMessage('assistant', reply);
+      speak(reply);
+    }
+    setLinkState(true);
   } catch (err) {
-    typingIndicator.style.display = 'none';
-    setLinkState(false, 'Link Degraded');
-    addSystem(err.name === 'AbortError'
-      ? 'Transmission timed out. The relay took too long.'
-      : 'Network failure: ' + err.message, true);
+    const msg = err && err.name === 'AbortError'
+      ? 'Request timed out after ' + (REQUEST_TIMEOUT_MS / 1000) + 's.'
+      : (err && err.message) || 'Transmission failed.';
+    addSystem(msg, true);
+    setLinkState(false, 'Link Down');
   } finally {
     clearTimeout(timer);
-    inFlight = false;
+    busy = false;
     sendBtn.disabled = false;
+    attachBtn.disabled = false;
+    typingIndicator.style.display = 'none';
   }
 }
-// Voice input
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SR();
-  recognition.continuous = false;
-  recognition.onstart = () => { micBtn.classList.add('mic-active'); userInput.placeholder = "Listening..."; };
-  recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; };
-  recognition.onend = () => { micBtn.classList.remove('mic-active'); userInput.placeholder = "Enter query, attach files, or paste data..."; };
-  recognition.onerror = () => { micBtn.classList.remove('mic-active'); };
-  micBtn.addEventListener('click', () => {
-    if (micBtn.classList.contains('mic-active')) recognition.stop(); else recognition.start();
-  });
-} else { micBtn.style.display = 'none'; }
+/* ---------- wiring ---------- */
+window.insertPrompt = function (text) {
+  userInput.value = text;
+  userInput.focus();
+};
 
-userInput.addEventListener('keypress', (e) => {
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keydown', function (e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
 });
-sendBtn.addEventListener('click', handleSend);
 
-// ---- Cicada glyph-rain background ----
-(function () {
-  const canvas = document.getElementById('rain');
-  const ctx = canvas.getContext('2d');
-  const glyphs = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ0123456789∴".split('');
-  let cols, drops, fontSize = 16;
-  function resize() {
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    cols = Math.floor(canvas.width / fontSize);
-    drops = new Array(cols).fill(0).map(() => Math.random() * -50);
+attachBtn.addEventListener('click', function () { fileInput.click(); });
+fileInput.addEventListener('change', function () {
+  handleFiles(fileInput.files);
+  fileInput.value = '';   // so re-picking the same file still fires change
+});
+
+/* Drag and drop anywhere on the page, and clipboard paste of images. */
+['dragenter', 'dragover'].forEach(function (evt) {
+  document.addEventListener(evt, function (e) { e.preventDefault(); });
+});
+document.addEventListener('drop', function (e) {
+  e.preventDefault();
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+    handleFiles(e.dataTransfer.files);
   }
+});
+userInput.addEventListener('paste', function (e) {
+  const items = e.clipboardData && e.clipboardData.files;
+  if (items && items.length) { e.preventDefault(); handleFiles(items); }
+});
+
+el('btn-new-chat').addEventListener('click', function () { newConversation(false); });
+el('btn-delete-all').addEventListener('click', deleteAllConversations);
+
+personaSelect.addEventListener('change', function () {
+  modeLabel.textContent = personaSelect.options[personaSelect.selectedIndex].text;
+});
+
+voiceSelect.addEventListener('change', function () {
+  if (voiceSelect.value === 'off' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+});
+/* Scratchpad: local only, never sent anywhere. */
+scratchpad.value = localStorage.getItem(NOTE_KEY) || '';
+el('btn-save-note').addEventListener('click', function () {
+  localStorage.setItem(NOTE_KEY, scratchpad.value);
+  const btn = el('btn-save-note');
+  btn.textContent = 'Committed';
+  setTimeout(function () { btn.textContent = 'Commit to Local'; }, 1400);
+});
+
+/* ---------- speech recognition ---------- */
+(function () {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    micBtn.disabled = true;
+    micBtn.title = 'This browser has no speech recognition.';
+    return;
+  }
+  const rec = new SR();
+  rec.lang = 'en-US';
+  rec.interimResults = false;
+  let listening = false;
+
+  rec.onresult = function (e) {
+    const said = e.results[0][0].transcript;
+    userInput.value = (userInput.value ? userInput.value + ' ' : '') + said;
+  };
+  rec.onerror = function (e) {
+    addSystem('Microphone error: ' + (e.error || 'unknown') + '.', true);
+  };
+  rec.onend = function () {
+    listening = false;
+    micBtn.classList.remove('mic-active');
+  };
+
+  micBtn.addEventListener('click', function () {
+    if (listening) { rec.stop(); return; }
+    try {
+      rec.start();
+      listening = true;
+      micBtn.classList.add('mic-active');
+    } catch (_) { /* start() throws if already running */ }
+  });
+})();
+/* ---------- glyph rain ---------- */
+(function () {
+  const canvas = el('rain');
+  if (!canvas || !canvas.getContext) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
+  const GLYPHS = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ0123456789∴';
+  const SIZE = 16;
+  let cols = 0;
+  let drops = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    cols = Math.ceil(canvas.width / SIZE);
+    drops = new Array(cols).fill(0).map(function () {
+      return Math.random() * (canvas.height / SIZE);
+    });
+  }
+
+  function frame() {
+    /* Translucent wipe instead of clearRect: leaves the fading trail. */
+    ctx.fillStyle = 'rgba(5, 6, 5, 0.09)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#7fae5f';
+    ctx.font = SIZE + 'px "IBM Plex Mono", monospace';
+
+    for (let i = 0; i < cols; i += 1) {
+      const ch = GLYPHS.charAt(Math.floor(Math.random() * GLYPHS.length));
+      ctx.fillText(ch, i * SIZE, drops[i] * SIZE);
+      if (drops[i] * SIZE > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 1;
+    }
+    requestAnimationFrame(frame);
+  }
+
   resize();
   window.addEventListener('resize', resize);
-  function draw() {
-    ctx.fillStyle = 'rgba(5,6,5,0.10)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = fontSize + "px 'IBM Plex Mono', monospace";
-    for (let i = 0; i < cols; i++) {
-      const g = glyphs[Math.floor(Math.random() * glyphs.length)];
-      const x = i * fontSize, y = drops[i] * fontSize;
-      ctx.fillStyle = Math.random() > 0.97 ? '#c8a94a' : '#7fae5f';
-      ctx.fillText(g, x, y);
-      if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i] += 0.5;
-    }
-  }
-  setInterval(draw, 60);
+  requestAnimationFrame(frame);
 })();
+/* ---------- boot ---------- */
+loadStore();
+renderConvoList();
+renderHistory();
+renderTray();
+modeLabel.textContent = personaSelect.options[personaSelect.selectedIndex].text;
+setLinkState(true);
+userInput.focus();
 </script>
 </body>
 </html>
