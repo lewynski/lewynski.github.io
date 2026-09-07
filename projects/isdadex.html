@@ -540,15 +540,30 @@
         const fallbackIcon = document.querySelector('.fallback-icon');
         const errorMessage = document.getElementById('error-message');
 
-        // Get API key from environment variable (Vercel)
-        const getApiKey = async () => {
+        // Call your existing chat.js API endpoint
+        const callChatAPI = async (message, systemPrompt) => {
             try {
-                const response = await fetch('/api/get-api-key');
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        systemPrompt: systemPrompt
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'API Error');
+                }
+                
                 const data = await response.json();
-                return data.apiKey;
+                return data.message || data.content;
             } catch (e) {
-                console.error('Error fetching API key:', e);
-                return null;
+                console.error('Error calling chat API:', e);
+                throw e;
             }
         };
 
@@ -643,12 +658,6 @@
             fallbackIcon.style.display = 'block';
 
             try {
-                const apiKey = await getApiKey();
-                
-                if (!apiKey) {
-                    throw new Error('API configuration error. Please add GROQ_API_KEY to your Vercel environment variables.');
-                }
-
                 const systemPrompt = `You are IsdaDex, an expert marine biology and fisheries database. 
                 You specialize in global marine life and heavily in local Philippine fishes (like Bangus, Lapu-Lapu, Galunggong, Tilapia, etc.).
                 The user will give you a fish or marine animal name.
@@ -658,33 +667,12 @@
                 TASTE: [Culinary profile - e.g., Flaky white meat, great for Sinigang / Not edible]
                 FACT: [One very interesting trivia fact]`;
 
-                const [groqRes, imgUrl] = await Promise.all([
-                    fetch("https://api.groq.com/openai/v1/chat/completions", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${apiKey}`,
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            model: "llama-3.1-8b-instant",
-                            messages: [
-                                { role: "system", content: systemPrompt },
-                                { role: "user", content: `Analyze marine species: ${itemName}` }
-                            ],
-                            temperature: 0.4,
-                            max_tokens: 150
-                        })
-                    }),
+                const userMessage = `Analyze marine species: ${itemName}`;
+
+                const [aiResponse, imgUrl] = await Promise.all([
+                    callChatAPI(userMessage, systemPrompt),
                     fetchImage(itemName)
                 ]);
-
-                if (!groqRes.ok) {
-                    const error = await groqRes.json();
-                    throw new Error(error.error?.message || 'API Error');
-                }
-
-                const groqData = await groqRes.json();
-                const aiResponse = groqData.choices[0].message.content;
 
                 let sci = "Unknown", hab = "N/A", taste = "N/A", fact = "N/A";
                 const lines = aiResponse.split('\n');
