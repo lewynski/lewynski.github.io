@@ -541,7 +541,7 @@
         const errorMessage = document.getElementById('error-message');
 
         // Call your existing chat.js API endpoint
-        const callChatAPI = async (message, systemPrompt) => {
+        const callChatAPI = async (userMessage, systemPrompt) => {
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
@@ -549,18 +549,20 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: message,
-                        systemPrompt: systemPrompt
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userMessage }
+                        ]
                     })
                 });
                 
                 if (!response.ok) {
                     const error = await response.json();
-                    throw new Error(error.message || 'API Error');
+                    throw new Error(error.error || 'API Error');
                 }
                 
                 const data = await response.json();
-                return data.message || data.content;
+                return data.reply;
             } catch (e) {
                 console.error('Error calling chat API:', e);
                 throw e;
