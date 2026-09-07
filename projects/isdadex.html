@@ -2,162 +2,532 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IsdaDex | Marine Database</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root {
-            --bg-color: #1e1e2f; --panel-bg: #2a2a40; --text-main: #f8f8f2;
-            --text-muted: #a8a8b2; --retro-green: #4ade80; --retro-blue: #3b82f6;
-            --retro-purple: #bd93f9; --retro-pink: #ff79c6; --retro-gold: #facc15;
-            --retro-cyan: #8be9fd; --border-dark: #000000;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --bg-tertiary: #efefef;
+            --text-primary: #1d1d1d;
+            --text-secondary: #6f6f77;
+            --text-tertiary: #a1a1a6;
+            --border-color: #e5e5e7;
+            --accent: #0071e3;
+            --accent-hover: #0077ed;
+            --success: #34c759;
+            --warning: #ff9500;
+            --error: #ff3b30;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.15);
+        }
 
         body {
-            font-family: 'VT323', monospace; background-color: var(--bg-color); color: var(--text-main);
-            font-size: clamp(1rem, 2vw, 1.3rem); line-height: 1.6; padding: 20px;
-            background-image: linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px);
-            background-size: 30px 30px; min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        a, button { cursor: pointer; }
-
-        .back-btn {
-            display: inline-block; margin-bottom: 20px; background: var(--panel-bg); color: var(--text-main);
-            padding: 10px 15px; text-decoration: none; font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.6rem);
-            border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s;
-        }
-        .back-btn:hover { background: var(--retro-cyan); color: #000;}
-        .back-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-
-        .app-container {
-            max-width: 1000px; margin: 0 auto; background: var(--panel-bg); border: 6px solid var(--border-dark);
-            box-shadow: 12px 12px 0px var(--border-dark); padding: 30px;
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
         }
 
-        header { text-align: center; border-bottom: 4px dashed var(--border-dark); padding-bottom: 20px; margin-bottom: 30px; }
-        h1 { font-family: 'Press Start 2P', cursive; font-size: clamp(1.2rem, 4vw, 1.8rem); color: var(--retro-cyan); text-shadow: 4px 4px 0px var(--border-dark); margin-bottom: 10px; line-height: 1.4;}
-        .subtitle { color: var(--retro-blue); font-size: clamp(0.9rem, 2vw, 1.2rem); }
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 56px;
+        }
 
-        /* --- LAYOUT GRIDS --- */
-        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;}
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        /* --- INPUT FORM --- */
-        .panel { background: rgba(0,0,0,0.2); border: 4px solid var(--border-dark); padding: 20px; display: flex; flex-direction: column;}
-        .panel h2 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.65rem, 2vw, 0.8rem); color: var(--retro-cyan); margin-bottom: 20px; border-bottom: 2px solid var(--border-dark); padding-bottom: 10px;}
-        
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-family: 'Press Start 2P', cursive; font-size: clamp(0.45rem, 1.5vw, 0.55rem); color: var(--retro-gold); margin-bottom: 8px; line-height: 1.4;}
+        .logo i {
+            color: var(--accent);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        /* Fish Display Card */
+        .fish-card {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .image-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--bg-secondary);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .image-container .fallback-icon {
+            font-size: 48px;
+            color: var(--text-tertiary);
+            opacity: 0.6;
+        }
+
+        /* Data Display */
+        .data-panel {
+            background: var(--bg-secondary);
+            border-radius: 18px;
+            padding: 24px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .data-content {
+            display: grid;
+            gap: 16px;
+        }
+
+        .data-item {
+            display: grid;
+            gap: 6px;
+        }
+
+        .data-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-tertiary);
+            text-align: center;
+        }
+
+        /* Right Column - Input & History */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Input Panel */
+        .input-panel {
+            background: var(--bg-secondary);
+            border-radius: 18px;
+            padding: 24px;
+        }
+
+        .input-panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
         .form-group input {
-            width: 100%; padding: 15px; font-family: 'VT323', monospace; font-size: clamp(1.2rem, 3vw, 1.5rem); background: var(--bg-color);
-            color: var(--text-main); border: 4px solid var(--border-dark); outline: none; text-transform: capitalize;
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: all 0.2s;
         }
-        .form-group input:focus { border-color: var(--retro-cyan); }
-        
-        .btn-submit {
-            width: 100%; background: var(--retro-blue); color: #fff; padding: 15px; border: 4px solid var(--border-dark); 
-            box-shadow: 4px 4px 0px var(--border-dark); font-family: 'Press Start 2P', cursive; font-size: clamp(0.6rem, 2vw, 0.8rem); 
-            margin-top: 10px; transition: all 0.1s; cursor: pointer;
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
         }
-        .btn-submit:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-        .btn-submit:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: 0px 0px 0px var(--border-dark); transform: translate(4px, 4px);}
 
-        /* --- FISH DISPLAY --- */
-        .fish-display { display: flex; flex-direction: column; gap: 15px; }
-        .img-box {
-            width: 100%; height: 250px; border: 4px solid var(--border-dark); background: #000;
-            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
-            box-shadow: 6px 6px 0px var(--border-dark);
+        .form-group input::placeholder {
+            color: var(--text-tertiary);
         }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
-        .img-box i { font-size: 4rem; color: var(--retro-blue); opacity: 0.5; }
-        
-        .data-box {
-            background: #000; border: 4px solid var(--retro-cyan); padding: 15px;
-            color: var(--retro-cyan); font-size: 1.1rem; line-height: 1.5; min-height: 200px;
+
+        /* Button */
+        .btn {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .data-row { margin-bottom: 10px; border-bottom: 1px dashed rgba(139, 233, 253, 0.3); padding-bottom: 10px;}
-        .data-label { font-family: 'Press Start 2P', cursive; font-size: 0.5rem; color: var(--retro-blue); display: block; margin-bottom: 4px;}
-        
-        .cursor { display: inline-block; width: 10px; height: 15px; background: var(--retro-cyan); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px;}
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* --- HISTORY LOGS --- */
-        #history-list { list-style: none; height: 250px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; -webkit-overflow-scrolling: touch;}
-        #history-list::-webkit-scrollbar { width: 8px; }
-        #history-list::-webkit-scrollbar-thumb { background: var(--border-dark); }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
 
-        .tx-item { background: var(--panel-bg); border: 2px solid var(--border-dark); padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s;}
-        .tx-item:hover { border-color: var(--retro-cyan); }
-        .tx-info h4 { font-family: 'Press Start 2P', cursive; font-size: clamp(0.5rem, 1.5vw, 0.6rem); color: #fff; margin-bottom: 5px; line-height: 1.4;}
-        .tx-info p { font-size: clamp(0.75rem, 2vw, 0.85rem); color: var(--text-muted); }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+        }
 
-        .btn-reset { width: 100%; background: transparent; color: var(--retro-red); padding: 12px; border: 2px dashed var(--retro-red); font-family: 'Press Start 2P', cursive; font-size: clamp(0.55rem, 1.5vw, 0.6rem); text-transform: uppercase; margin-top: auto; transition: all 0.2s; cursor: pointer; }
-        .btn-reset:hover { background: var(--retro-red); color: #fff; }
-        .empty-state { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.2rem;}
+        .btn-primary:active:not(:disabled) {
+            transform: scale(0.98);
+        }
 
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .app-container { padding: 15px; border-width: 4px; }
-            .main-content { grid-template-columns: 1fr; gap: 20px; }
-            .img-box { height: 200px; }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--error);
+            border: 1.5px solid var(--error);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 59, 48, 0.05);
+        }
+
+        /* History Panel */
+        .history-panel {
+            background: var(--bg-secondary);
+            border-radius: 18px;
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+
+        .history-item {
+            padding: 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: var(--bg-primary);
+            border-color: var(--accent);
+            transform: translateX(2px);
+        }
+
+        .history-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .history-item-subtitle {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .empty-history {
+            text-align: center;
+            color: var(--text-tertiary);
+            padding: 32px 16px;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .sidebar {
+                grid-column: 1;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                padding: 80px 16px 40px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                margin-bottom: 40px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .input-panel,
+            .history-panel,
+            .data-panel {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .image-container {
+                border-radius: 16px;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.6;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Error State */
+        .error-message {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .success-message {
+            background: rgba(52, 199, 89, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
 
-    <a href="../projects.html" class="back-btn">◀ RETURN TO ARCHIVE</a>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="logo">
+                <i class="fas fa-fish"></i>
+                IsdaDex
+            </a>
+            <div style="font-size: 14px; color: var(--text-secondary);">
+                Marine Database
+            </div>
+        </div>
+    </nav>
 
-    <div class="app-container">
-        <header>
-            <h1><i class="fas fa-fish"></i> ISDADEX</h1>
-            <div class="subtitle">Marine & Freshwater Database v1.0</div>
-        </header>
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Marine Species Database</h1>
+            <p>Explore global and Philippine aquatic life</p>
+        </div>
 
-        <div class="main-content">
-            
-            <div class="fish-display">
-                <div class="img-box" id="image-container">
-                    <i class="fas fa-water" id="fallback-icon"></i>
-                    <img id="fish-img" src="" alt="Fish Image">
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left: Fish Display -->
+            <div class="fish-card">
+                <div class="image-container">
+                    <i class="fas fa-water fallback-icon"></i>
+                    <img id="fish-img" src="" alt="Fish specimen">
                 </div>
                 
-                <div class="data-box" id="data-output">
-                    > Enter a marine species to initiate scan...<span class="cursor"></span>
+                <div class="data-panel">
+                    <div id="data-output" class="empty-state">
+                        Search for a marine species to begin
+                    </div>
                 </div>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div class="panel">
-                    <h2><i class="fas fa-search"></i> SCAN TARGET</h2>
+            <!-- Right: Input & History -->
+            <div class="sidebar">
+                <!-- Input Panel -->
+                <div class="input-panel">
+                    <h2>Search</h2>
                     <form id="scan-form">
+                        <div id="error-message"></div>
                         <div class="form-group">
-                            <label>FISH / MARINE LIFE NAME</label>
-                            <input type="text" id="item-input" placeholder="e.g. Bangus, Lapu-Lapu, Great White Shark..." required autocomplete="off">
+                            <label for="item-input">Species Name</label>
+                            <input 
+                                type="text" 
+                                id="item-input" 
+                                placeholder="e.g., Bangus, Lapu-Lapu, Great White Shark" 
+                                required
+                                autocomplete="off"
+                            >
                         </div>
-                        <button type="submit" class="btn-submit" id="btn-scan">ANALYZE SPECIMEN</button>
+                        <button type="submit" class="btn btn-primary" id="btn-scan">
+                            <span>Search Species</span>
+                        </button>
                     </form>
                 </div>
 
-                <div class="panel" style="flex-grow: 1;">
-                    <h2><i class="fas fa-book-open"></i> FIELD LOGS</h2>
-                    <ul id="history-list"></ul>
-                    <button id="btn-reset" class="btn-reset"><i class="fas fa-trash-alt"></i> PURGE LOGS</button>
+                <!-- History Panel -->
+                <div class="history-panel">
+                    <h2>Recent Searches</h2>
+                    <div class="history-list" id="history-list">
+                        <div class="empty-history">No searches yet</div>
+                    </div>
+                    <button id="btn-reset" class="btn btn-secondary">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Clear History</span>
+                    </button>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
-        // ⚠️ INSERT YOUR API KEY HERE ⚠️
-        const GROQ_API_KEY = "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"; 
-
         let scanHistory = JSON.parse(localStorage.getItem('isdadex-history')) || [];
         
         const form = document.getElementById('scan-form');
@@ -167,155 +537,174 @@
         const historyList = document.getElementById('history-list');
         const btnReset = document.getElementById('btn-reset');
         const fishImg = document.getElementById('fish-img');
-        const fallbackIcon = document.getElementById('fallback-icon');
-        
-        let typeWriterTimeout;
+        const fallbackIcon = document.querySelector('.fallback-icon');
+        const errorMessage = document.getElementById('error-message');
+
+        // Get API key from environment variable (Vercel)
+        const getApiKey = async () => {
+            try {
+                const response = await fetch('/api/get-api-key');
+                const data = await response.json();
+                return data.apiKey;
+            } catch (e) {
+                console.error('Error fetching API key:', e);
+                return null;
+            }
+        };
 
         function renderHistory() {
             historyList.innerHTML = '';
             if (scanHistory.length === 0) {
-                historyList.innerHTML = '<div class="empty-state">No specimens scanned.</div>';
+                historyList.innerHTML = '<div class="empty-history">No searches yet</div>';
                 return;
             }
 
             [...scanHistory].reverse().forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'tx-item';
-                li.innerHTML = `
-                    <div class="tx-info">
-                        <h4>${item.name}</h4>
-                        <p>${item.sciName}</p>
-                    </div>
-                    <i class="fas fa-chevron-right" style="color: var(--retro-cyan); font-size: 0.8rem;"></i>
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-item-title">${item.name}</div>
+                    <div class="history-item-subtitle">${item.sciName}</div>
                 `;
-                // Allow clicking history to view it again
-                li.addEventListener('click', () => displayData(item));
-                historyList.appendChild(li);
+                div.addEventListener('click', () => displayData(item));
+                historyList.appendChild(div);
             });
-        }
-
-        function typeWriterHTML(htmlContent) {
-            clearTimeout(typeWriterTimeout);
-            dataOutput.innerHTML = "";
-            let i = 0;
-            dataOutput.innerHTML = htmlContent; 
         }
 
         function displayData(data) {
             fishImg.style.display = 'block';
             fallbackIcon.style.display = 'none';
             fishImg.src = data.imgUrl;
+            fishImg.onerror = () => {
+                fishImg.style.display = 'none';
+                fallbackIcon.style.display = 'block';
+            };
 
             const html = `
-                <div class="data-row">
-                    <span class="data-label">SCIENTIFIC DESIGNATION</span>
-                    ${data.sciName}
-                </div>
-                <div class="data-row">
-                    <span class="data-label">HABITAT</span>
-                    ${data.habitat}
-                </div>
-                <div class="data-row">
-                    <span class="data-label">CULINARY PROFILE</span>
-                    ${data.taste}
-                </div>
-                <div class="data-row" style="border-bottom: none;">
-                    <span class="data-label">DATABASE FACT</span>
-                    ${data.fact}
+                <div class="data-content">
+                    <div class="data-item">
+                        <div class="data-label">Scientific Name</div>
+                        <div class="data-value">${data.sciName}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Habitat</div>
+                        <div class="data-value">${data.habitat}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Culinary Profile</div>
+                        <div class="data-value">${data.taste}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Interesting Fact</div>
+                        <div class="data-value">${data.fact}</div>
+                    </div>
                 </div>
             `;
-            typeWriterHTML(html);
+            dataOutput.innerHTML = html;
         }
 
-        // Wikipedia Fetch Logic (Smart Search)
         async function fetchImage(query) {
             try {
-                // We add "fish" to the query if it doesn't have it, to help Wiki find the animal, not a place or person.
                 let searchQuery = query.toLowerCase().includes('fish') ? query : query + " fish";
                 
-                const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(searchQuery)}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=600&origin=*`);
+                const res = await fetch(
+                    `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(searchQuery)}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=600&origin=*`
+                );
                 const data = await res.json();
                 
                 if (data.query && data.query.pages) {
                     const pages = data.query.pages;
-                    const pageId = Object.keys(pages)[0]; 
+                    const pageId = Object.keys(pages)[0];
                     
                     if (pages[pageId].thumbnail) {
                         return pages[pageId].thumbnail.source;
                     }
                 }
-                // Fallback ocean/fish image if search fails
-                return 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=600&auto=format&fit=crop'; 
+                return 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?q=80&w=800&auto=format&fit=crop';
             } catch (e) {
-                return 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=600&auto=format&fit=crop';
+                return 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?q=80&w=800&auto=format&fit=crop';
             }
         }
 
-        form.addEventListener('submit', async function(e) {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             let itemName = inputItem.value.trim();
             itemName = itemName.charAt(0).toUpperCase() + itemName.slice(1).toLowerCase();
-            if(!itemName) return;
+            
+            if (!itemName) return;
 
+            errorMessage.innerHTML = '';
             btnScan.disabled = true;
-            btnScan.textContent = "SCANNING...";
-            dataOutput.innerHTML = "> Querying marine networks...<span class='cursor'></span>";
+            const originalText = btnScan.innerHTML;
+            btnScan.innerHTML = '<span class="loading"></span>';
+            
+            dataOutput.innerHTML = '<div class="empty-state">Searching marine database...</div>';
             fishImg.style.display = 'none';
             fallbackIcon.style.display = 'block';
 
-            if (GROQ_API_KEY === "YOUR_GROQ_API_KEY_HERE") {
-                setTimeout(() => {
-                    dataOutput.innerHTML = "> ERROR: Groq API Key missing. Neural link severed.";
-                    btnScan.disabled = false;
-                    btnScan.textContent = "ANALYZE SPECIMEN";
-                }, 1000);
-                return;
-            }
-
-            // Custom prompt tailored for Philippine fishes as well as global ones
-            const systemPrompt = `You are IsdaDex, an expert marine biology and fisheries database. 
-            You specialize in global marine life and heavily in local Philippine fishes (like Bangus, Lapu-Lapu, Galunggong, Tilapia, etc.).
-            The user will give you a fish or marine animal name.
-            You MUST format your reply exactly like this on four lines:
-            SCI: [Scientific Name]
-            HAB: [Habitat - e.g., Saltwater, Freshwater, Brackish, Coral Reefs]
-            TASTE: [Culinary profile - e.g., Flaky white meat, great for Sinigang / Not edible]
-            FACT: [One very interesting trivia fact]`;
-
             try {
-                // Fetch AI Data and Image simultaneously
+                const apiKey = await getApiKey();
+                
+                if (!apiKey) {
+                    throw new Error('API configuration error. Please add GROQ_API_KEY to your Vercel environment variables.');
+                }
+
+                const systemPrompt = `You are IsdaDex, an expert marine biology and fisheries database. 
+                You specialize in global marine life and heavily in local Philippine fishes (like Bangus, Lapu-Lapu, Galunggong, Tilapia, etc.).
+                The user will give you a fish or marine animal name.
+                You MUST format your reply exactly like this on four lines:
+                SCI: [Scientific Name]
+                HAB: [Habitat - e.g., Saltwater, Freshwater, Brackish, Coral Reefs]
+                TASTE: [Culinary profile - e.g., Flaky white meat, great for Sinigang / Not edible]
+                FACT: [One very interesting trivia fact]`;
+
                 const [groqRes, imgUrl] = await Promise.all([
                     fetch("https://api.groq.com/openai/v1/chat/completions", {
                         method: "POST",
-                        headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
+                        headers: {
+                            "Authorization": `Bearer ${apiKey}`,
+                            "Content-Type": "application/json"
+                        },
                         body: JSON.stringify({
-                            model: "llama-3.1-8b-instant", 
+                            model: "llama-3.1-8b-instant",
                             messages: [
                                 { role: "system", content: systemPrompt },
                                 { role: "user", content: `Analyze marine species: ${itemName}` }
                             ],
                             temperature: 0.4,
-                            max_tokens: 150 
+                            max_tokens: 150
                         })
                     }),
                     fetchImage(itemName)
                 ]);
 
-                if (!groqRes.ok) throw new Error("API Connection Failed");
+                if (!groqRes.ok) {
+                    const error = await groqRes.json();
+                    throw new Error(error.error?.message || 'API Error');
+                }
 
                 const groqData = await groqRes.json();
                 const aiResponse = groqData.choices[0].message.content;
 
                 let sci = "Unknown", hab = "N/A", taste = "N/A", fact = "N/A";
                 const lines = aiResponse.split('\n');
+                
                 lines.forEach(line => {
-                    if(line.startsWith('SCI:')) sci = line.replace('SCI:', '').trim();
-                    if(line.startsWith('HAB:')) hab = line.replace('HAB:', '').trim();
-                    if(line.startsWith('TASTE:')) taste = line.replace('TASTE:', '').trim();
-                    if(line.startsWith('FACT:')) fact = line.replace('FACT:', '').trim();
+                    if (line.startsWith('SCI:')) sci = line.replace('SCI:', '').trim();
+                    if (line.startsWith('HAB:')) hab = line.replace('HAB:', '').trim();
+                    if (line.startsWith('TASTE:')) taste = line.replace('TASTE:', '').trim();
+                    if (line.startsWith('FACT:')) fact = line.replace('FACT:', '').trim();
                 });
 
-                const newData = { id: Date.now(), name: itemName, sciName: sci, habitat: hab, taste: taste, fact: fact, imgUrl: imgUrl };
+                const newData = {
+                    id: Date.now(),
+                    name: itemName,
+                    sciName: sci,
+                    habitat: hab,
+                    taste: taste,
+                    fact: fact,
+                    imgUrl: imgUrl
+                };
                 
                 scanHistory.push(newData);
                 localStorage.setItem('isdadex-history', JSON.stringify(scanHistory));
@@ -326,20 +715,26 @@
 
             } catch (error) {
                 console.error(error);
-                dataOutput.innerHTML = "> ERROR: Specimen not found in database.";
+                errorMessage.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        ${error.message || 'Unable to fetch species data. Please try again.'}
+                    </div>
+                `;
+                dataOutput.innerHTML = '<div class="empty-state">Search failed. Try another species.</div>';
+            } finally {
+                btnScan.disabled = false;
+                btnScan.innerHTML = originalText;
+                inputItem.focus();
             }
-
-            btnScan.disabled = false;
-            btnScan.textContent = "ANALYZE SPECIMEN";
-            inputItem.focus();
         });
 
         btnReset.addEventListener('click', () => {
-            if(confirm("Purge all field logs?")) {
+            if (confirm('Clear all search history?')) {
                 scanHistory = [];
                 localStorage.removeItem('isdadex-history');
                 renderHistory();
-                dataOutput.innerHTML = "> Memory wiped. Ready for new scans.<span class='cursor'></span>";
+                dataOutput.innerHTML = '<div class="empty-state">Search for a marine species to begin</div>';
                 fishImg.style.display = 'none';
                 fallbackIcon.style.display = 'block';
             }
