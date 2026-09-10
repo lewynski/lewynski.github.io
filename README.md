@@ -1,54 +1,149 @@
-# ⚡ Unfiltered: The Digital Website Biography
+# ⚡ Unfiltered: Digital Security & Engineering Portfolio
 
-[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Flewynski.github.io&style=flat-square&label=Live%20Site&logo=github&color=2ecc71)](https://lewynski.github.io)
-[![Developer](https://img.shields.io/badge/Developer-Lewynski-blue?style=flat-square&logo=visualstudiocode)](https://github.com/lewynski)
-[![Focus](https://img.shields.io/badge/Focus-ECE%20%26%20Web%20Dev-orange?style=flat-square)](https://github.com/lewynski)
+[![Website Status](https://img.shields.io/website?url=https%3A%2F%2Fjonlewynv.online&style=for-the-badge&label=LIVE&logo=linux&color=1f1f1f&logoColor=33ff33)](https://jonlewynv.online)
+[![Developer](https://img.shields.io/badge/Developer-Lewynski-33ff33?style=for-the-badge&logo=linux&logoColor=1f1f1f&labelColor=1f1f1f)](https://github.com/lewynski)
+[![Focus](https://img.shields.io/badge/Focus-ECE%20%26%20Cybersecurity-33ff33?style=for-the-badge&logo=terminal&logoColor=1f1f1f&labelColor=1f1f1f)](https://jonlewynv.online)
 
-> *"Where complex engineering math meets creative coding."*
+```
+ _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _   _  
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+|_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_|
+```
 
----
-
-## 👨‍💻 About Me
-
-Welcome to **Unfiltered**. I am an **Electronics Engineering (ECE)** student and developer with a passion for building computational tools. My work focuses on translating complex mathematical concepts like Matrix Operations and Signal Processing into interactive, user-friendly web applications.
-
-* 🔭 **Currently working on:** Advanced matrix solvers & AI-integrated tools.
-* 🌱 **Learning:** Embedded Systems & Modern Web Frameworks.
-* 💬 **Ask me about:** Basic programming questions and also other technologies related.
+> *"Where complex engineering meets digital security. No filter. Pure logic."*
 
 ---
 
-## 🚀 Featured Projects
+## 🔓 About
 
-### 🧙‍♂️ [Storytelling Calculator (Calc-splainer)](https://lewynski.github.io/projects/calc-splainer.html)
-> *Winner of the "Most Creative" concept in my repo.*
-An interactive calculator that doesn't just give you the answer it uses AI logic to **narrate a whimsical story** about how the numbers met and interacted.
-* **Tech:** JavaScript (BigInt), Tailwind CSS, Gemini API Logic.
+**Unfiltered** is my digital headquarters. I'm an **Electronics & Communication Engineering (ECE)** student with a deep dive into cybersecurity, penetration testing, and computational systems. This is where I document my journey of breaking systems, building solutions, and understanding the digital architecture that powers our world.
 
-### 🧮 [Determinant & Crout Solver](https://lewynski.github.io/projects/crout.html)
-High-precision mathematical tools designed for ECE students to solve complex linear algebra problems instantly.
-* **Features:** Step-by-step matrix decomposition, Error handling for singular matrices
+**Live at:** `https://jonlewynv.online`
 
 ---
 
-## 🛠️ Tech Stack
+## 🎯 Mission
 
-| Frontend | Core Languages | Tools |
-| :---: | :---: | :---: |
-| ![HTML5](https://img.shields.io/badge/-HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) | ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | ![VS Code](https://img.shields.io/badge/-VS%20Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white) |
-| ![CSS3](https://img.shields.io/badge/-CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) | ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square&logo=python&logoColor=white) | ![Git](https://img.shields.io/badge/-Git-F05032?style=flat-square&logo=git&logoColor=white) |
-| ![Tailwind](https://img.shields.io/badge/-Tailwind-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | ![Markdown](https://img.shields.io/badge/-Markdown-000000?style=flat-square&logo=markdown&logoColor=white) | ![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white) |
-
----
-
-## 📬 Connect with Me
-
-* 🌐 **Portfolio:** [lewynski.github.io](https://lewynski.github.io)
-* 🐙 **GitHub:** [@lewynski](https://github.com/lewynski)
-* 💬 **Discord:** [Chat with me](https://discord.com/users/879936602414133288)
+- 🔍 **Ethical Hacking & Security** — Understanding vulnerabilities from first principles
+- 🔧 **Hardware & Software** — Where ECE theory meets practical exploitation and defense
+- 💻 **Web Development** — Building secure, efficient applications
+- 📊 **Signal Processing & Analysis** — Cryptography, steganography, and beyond
+- 🛡️ **Defense Mechanisms** — Securing what matters
 
 ---
 
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=00cba9&height=100&section=footer"/>
-</p>
+## 🚀 Toolbox
+
+### Penetration Testing & Security
+![Kali Linux](https://img.shields.io/badge/-Kali%20Linux-33ff33?style=flat-square&logo=linux&logoColor=1f1f1f&labelColor=1f1f1f)
+![Metasploit](https://img.shields.io/badge/-Metasploit-33ff33?style=flat-square&logoColor=1f1f1f&labelColor=1f1f1f)
+![Wireshark](https://img.shields.io/badge/-Wireshark-33ff33?style=flat-square&logoColor=1f1f1f&labelColor=1f1f1f)
+![Burp Suite](https://img.shields.io/badge/-Burp%20Suite-33ff33?style=flat-square&logoColor=1f1f1f&labelColor=1f1f1f)
+
+### Languages & Frameworks
+![Python](https://img.shields.io/badge/-Python-33ff33?style=flat-square&logo=python&logoColor=1f1f1f&labelColor=1f1f1f)
+![JavaScript](https://img.shields.io/badge/-JavaScript-33ff33?style=flat-square&logo=javascript&logoColor=1f1f1f&labelColor=1f1f1f)
+![Bash](https://img.shields.io/badge/-Bash-33ff33?style=flat-square&logo=gnubash&logoColor=1f1f1f&labelColor=1f1f1f)
+![C](https://img.shields.io/badge/-C-33ff33?style=flat-square&logo=c&logoColor=1f1f1f&labelColor=1f1f1f)
+
+### Development Stack
+![React](https://img.shields.io/badge/-React-33ff33?style=flat-square&logo=react&logoColor=1f1f1f&labelColor=1f1f1f)
+![Node.js](https://img.shields.io/badge/-Node.js-33ff33?style=flat-square&logo=node.js&logoColor=1f1f1f&labelColor=1f1f1f)
+![HTML5](https://img.shields.io/badge/-HTML5-33ff33?style=flat-square&logo=html5&logoColor=1f1f1f&labelColor=1f1f1f)
+![CSS3](https://img.shields.io/badge/-CSS3-33ff33?style=flat-square&logo=css3&logoColor=1f1f1f&labelColor=1f1f1f)
+
+### Systems & Infrastructure
+![Linux](https://img.shields.io/badge/-Linux-33ff33?style=flat-square&logo=linux&logoColor=1f1f1f&labelColor=1f1f1f)
+![Git](https://img.shields.io/badge/-Git-33ff33?style=flat-square&logo=git&logoColor=1f1f1f&labelColor=1f1f1f)
+![Docker](https://img.shields.io/badge/-Docker-33ff33?style=flat-square&logo=docker&logoColor=1f1f1f&labelColor=1f1f1f)
+![GitHub](https://img.shields.io/badge/-GitHub-33ff33?style=flat-square&logo=github&logoColor=1f1f1f&labelColor=1f1f1f)
+
+---
+
+## 🎯 Current Projects
+
+All projects live on **jonlewynv.online** — a custom-built platform showcasing:
+
+- 🔐 **Security Research** — Vulnerability analysis and exploit development
+- ⚙️ **Engineering Tools** — Signal processing and systems analysis applications
+- 💡 **CTF Solutions** — Capture The Flag write-ups and walkthroughs
+- 🌐 **Web Security** — Full-stack applications with security-first architecture
+- 📡 **RF & Hardware Hacking** — SDR projects and protocol analysis
+
+---
+
+## 🛡️ Expertise Areas
+
+```
+┌─────────────────────────────────────┐
+│  SECURITY & PENETRATION TESTING     │
+│  ✓ Network Analysis & Exploitation  │
+│  ✓ Web Application Security         │
+│  ✓ Reverse Engineering              │
+│  ✓ Cryptography & Steganography     │
+├─────────────────────────────────────┤
+│  ENGINEERING & DEVELOPMENT          │
+│  ✓ ECE Fundamentals                 │
+│  ✓ Full-Stack Web Development       │
+│  ✓ Signal Processing                │
+│  ✓ Embedded Systems                 │
+└─────────────────────────────────────┘
+```
+
+---
+
+## 📖 Philosophy
+
+> *No Filter. No Limits. Just Logic.*
+
+I believe in:
+- **Transparency** — Understanding systems from the ground up
+- **Ethics** — Security research with responsibility
+- **Continuous Learning** — The landscape never stops evolving
+- **Knowledge Sharing** — Making security accessible to everyone
+
+---
+
+## 🔗 Connect & Collaborate
+
+- 🌐 **Website**: [jonlewynv.online](https://jonlewynv.online)
+- 💼 **GitHub**: [@lewynski](https://github.com/lewynski)
+- 📧 **Email**: Open to penetration testing collaborations and security discussions
+
+---
+
+## ⚡ Quick Stats
+
+```
+$ whoami
+> Lewynski - ECE Student | Security Researcher | Full-Stack Developer
+
+$ uptime
+> Always learning, always testing, always building
+
+$ ping jonlewynv.online
+> ACTIVE ✓
+```
+
+---
+
+<div align="center">
+
+```
+    ___  __________  ______
+   / _ \/ ___/ ___/ / __/ /
+  / , _/ /____/ /___/ /_/ / 
+ / |_|/ /___/_____/\__/____/  
+                              
+```
+
+**Built with 🖤 by Lewynski**
+
+*"The only system secure enough is one you understand completely."*
+
+---
+
+![Profile Views](https://img.shields.io/badge/Profile%20Views-%3F%3F%3F-33ff33?style=flat-square&logo=linux&logoColor=1f1f1f&labelColor=1f1f1f)
+![Last Updated](https://img.shields.io/badge/Last%20Updated-2024-33ff33?style=flat-square&logo=linux&logoColor=1f1f1f&labelColor=1f1f1f)
+
+</div>
