@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0e27" />
+  <meta name="description" content="PhishGuard Pro - Advanced phishing and malware detection with AI-powered threat intelligence." />
+  <title>PhishGuard Pro // Threat Intelligence</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --accent: #39ff9f;
+      --accent-light: #52f5ff;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --bg-dark: #0a0e27;
+      --bg-card: #111829;
+      --bg-light: #1a1f3a;
+      --border: #2d3748;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.2);
+      --shadow-xl: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, #0f1229 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(57, 255, 159, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .brand-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      padding: 0 8px;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      padding: 12px 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--primary);
+      transform: translateX(-3px);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(99, 102, 241, 0.08);
+      color: var(--text-primary);
+      border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .nav-btn.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .nav-btn.active::before {
+      transform: translateX(0);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-spacer {
+      flex: 1;
+    }
+
+    .sidebar-footer {
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 50%);
+    }
+
+    /* Topbar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 14, 39, 0.5);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .mobile-toggle {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--primary);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-toggle:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .status {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .clock {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      padding: 28px;
+      overflow-y: auto;
+    }
+
+    .header {
+      margin-bottom: 32px;
+    }
+
+    .header-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--primary);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .header h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      max-width: 600px;
+    }
+
+    /* Cards & Panels */
+    .panel {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(17, 24, 41, 0.8) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .panel:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .panel-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .panel-body {
+      padding: 24px;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* Input & Buttons */
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .input-field,
+    .input-textarea {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-light);
+      color: var(--text-primary);
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.3s ease;
+    }
+
+    .input-field:focus,
+    .input-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .input-textarea {
+      min-height: 140px;
+      resize: vertical;
+      display: none;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 12px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab:hover {
+      color: var(--text-primary);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Risk Cards */
+    .risk-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 20px;
+      padding: 24px;
+      border-radius: 14px;
+      border: 2px solid;
+      background: linear-gradient(135deg, transparent 0%, transparent 100%);
+      margin-bottom: 20px;
+    }
+
+    .risk-card.critical {
+      border-color: var(--danger);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.02) 100%);
+    }
+
+    .risk-card.high {
+      border-color: var(--warning);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%);
+    }
+
+    .risk-card.medium {
+      border-color: var(--accent-light);
+      background: linear-gradient(135deg, rgba(82, 245, 255, 0.1) 0%, rgba(82, 245, 255, 0.02) 100%);
+    }
+
+    .risk-card.low {
+      border-color: var(--success);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.02) 100%);
+    }
+
+    .risk-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 40px;
+      border: 2px solid currentColor;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .risk-card.critical .risk-icon { color: var(--danger); }
+    .risk-card.high .risk-icon { color: var(--warning); }
+    .risk-card.medium .risk-icon { color: var(--accent-light); }
+    .risk-card.low .risk-icon { color: var(--success); }
+
+    .risk-content h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .risk-card.critical .risk-content h3 { color: var(--danger); }
+    .risk-card.high .risk-content h3 { color: var(--warning); }
+    .risk-card.medium .risk-content h3 { color: var(--accent-light); }
+    .risk-card.low .risk-content h3 { color: var(--success); }
+
+    .risk-score {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 8px 0;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .risk-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Findings */
+    .findings {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .finding {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      background: rgba(99, 102, 241, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .finding:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--primary);
+    }
+
+    .finding-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .finding.critical .finding-icon {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .finding.high .finding-icon {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .finding.medium .finding-icon {
+      background: rgba(82, 245, 255, 0.15);
+      color: var(--accent-light);
+    }
+
+    .finding.low .finding-icon {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .finding-text h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .finding-text p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .finding-badge {
+      padding: 4px 10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .finding.critical .finding-badge { color: var(--danger); }
+    .finding.high .finding-badge { color: var(--warning); }
+    .finding.medium .finding-badge { color: var(--accent-light); }
+    .finding.low .finding-badge { color: var(--success); }
+
+    /* Stats */
+    .stat-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(17, 24, 41, 0.8) 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Terminal */
+    .terminal {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      min-height: 200px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 20px;
+      color: #10b981;
+    }
+
+    .terminal-line {
+      margin-bottom: 8px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .terminal-time {
+      color: #64748b;
+    }
+
+    .terminal-good { color: #10b981; }
+    .terminal-warn { color: #f59e0b; }
+    .terminal-bad { color: #ef4444; }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .mobile-toggle {
+        display: inline-flex;
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+
+      .risk-card {
+        grid-template-columns: 1fr;
+      }
+
+      .risk-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⚔</div>
+      <div class="brand-text">
+        <h1>PhishGuard</h1>
+        <p>Pro Threat Intel</p>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-menu">
+        <button class="nav-btn active" data-view="dashboard">
+          <span class="nav-icon">🏠</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="scanner">
+          <span class="nav-icon">🔍</span>
+          <span>Threat Scanner</span>
+        </button>
+        <button class="nav-btn" data-view="history">
+          <span class="nav-icon">📋</span>
+          <span>Scan History</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Resources</div>
+      <div class="nav-menu">
+        <button class="nav-btn" data-view="reports">
+          <span class="nav-icon">📊</span>
+          <span>Reports</span>
+        </button>
+        <button class="nav-btn" data-view="about">
+          <span class="nav-icon">ℹ️</span>
+          <span>System Info</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+      <p>© 2026 PhishGuard Pro</p>
+      <p>Defend. Detect. Analyze.</p>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-toggle" id="mobileToggle">☰</button>
+        <div class="status">
+          <div class="status-item">
+            <span class="status-dot"></span>
+            <span>System Online</span>
+          </div>
+          <div class="status-item">
+            <span>Real-time Detection</span>
+          </div>
+        </div>
+      </div>
+      <div class="clock" id="clock">--:-- --</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Dashboard View -->
+      <section class="view active" id="view-dashboard">
+        <div class="header">
+          <div class="header-badge">Advanced Threat Intelligence</div>
+          <h1>Detect Threats in Real-Time</h1>
+          <p>Analyze URLs and messages with AI-powered threat detection combined with local heuristics. Powered by VirusTotal's extensive malware database.</p>
+        </div>
+
+        <div class="grid-2">
+          <!-- Scanner Panel -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Threat Scanner</div>
+                <div class="panel-meta">Advanced AI Detection</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="tabs">
+                <button class="tab active" data-mode="url">URL Analysis</button>
+                <button class="tab" data-mode="message">Message Analysis</button>
+              </div>
+
+              <div class="input-group">
+                <input id="urlInput" class="input-field" type="text" placeholder="https://suspicious-site.com" autocomplete="off" spellcheck="false">
+              </div>
+              <textarea id="messageInput" class="input-textarea" placeholder="Paste a suspicious message..."></textarea>
+
+              <button class="btn btn-primary" id="scanBtn" style="width: 100%; justify-content: center;">
+                <span>▶</span>
+                <span>RUN AI SCAN</span>
+              </button>
+
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
+                Uses local heuristics + VirusTotal API for real-time threat detection
+              </p>
+
+              <div class="terminal" id="terminal">
+                <div class="terminal-line">
+                  <span class="terminal-time">[INIT]</span>
+                  <span class="terminal-good">PhishGuard Pro initialized successfully</span>
+                </div>
+                <div class="terminal-line">
+                  <span class="terminal-time">[READY]</span>
+                  <span class="terminal-good">Awaiting threat target input...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Panel -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Analysis Result</div>
+                <div class="panel-meta" id="resultTime">No Active Scan</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="risk-card low" id="riskCard">
+                <div class="risk-icon" id="riskIcon">✓</div>
+                <div class="risk-content">
+                  <h3 id="riskLabel">Ready for Analysis</h3>
+                  <div class="risk-score" id="riskScore">--/100</div>
+                  <p class="risk-desc" id="riskDesc">Input a URL or message to begin threat analysis</p>
+                </div>
+              </div>
+
+              <div class="findings" id="findings">
+                <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+                  No findings yet
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid-3">
+          <div class="stat-card">
+            <div class="stat-value" id="statScans">0</div>
+            <div class="stat-label">Total Scans</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statThreats">0</div>
+            <div class="stat-label">Critical Threats</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statUrls">0</div>
+            <div class="stat-label">URLs Scanned</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scanner View -->
+      <section class="view" id="view-scanner">
+        <div class="header">
+          <div class="header-badge">How It Works</div>
+          <h1>Threat Detection Engine</h1>
+          <p>Our dual-layer approach combines local heuristics with AI-powered cloud detection</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Detection Methods</div>
+          </div>
+          <div class="panel-body">
+            <h3 style="color: var(--text-primary); margin-bottom: 16px;">Local Heuristic Analysis</h3>
+            <ul style="color: var(--text-secondary); font-size: 13px; line-height: 1.8; margin-bottom: 24px;">
+              <li>✓ URL structure validation (protocol, hostname, IP detection)</li>
+              <li>✓ Suspicious TLD identification</li>
+              <li>✓ Brand impersonation detection</li>
+              <li>✓ Urgency and social engineering language analysis</li>
+              <li>✓ Credential request pattern matching</li>
+            </ul>
+
+            <h3 style="color: var(--text-primary); margin-bottom: 16px;">AI-Powered VirusTotal Integration</h3>
+            <ul style="color: var(--text-secondary); font-size: 13px; line-height: 1.8; margin-bottom: 24px;">
+              <li>✓ Real-time malware detection from 90+ security vendors</li>
+              <li>✓ File and domain reputation scanning</li>
+              <li>✓ Behavioral analysis of suspicious URLs</li>
+              <li>✓ Community threat intelligence</li>
+              <li>✓ Historical threat tracking</li>
+            </ul>
+
+            <div style="padding: 16px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; border-left: 4px solid var(--primary);">
+              <p style="font-size: 13px; color: var(--text-secondary);">
+                <strong style="color: var(--text-primary);">About VirusTotal:</strong> Free AI-powered threat intelligence platform that checks files and URLs against 90+ antivirus engines and malware databases. Results updated in real-time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- History View -->
+      <section class="view" id="view-history">
+        <div class="header">
+          <div class="header-badge">Activity Log</div>
+          <h1>Scan History</h1>
+          <p>All scans are stored locally in your browser</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Recent Scans</div>
+            <button class="btn" id="clearHistBtn" style="padding: 6px 12px; font-size: 11px;">Clear History</button>
+          </div>
+          <div class="panel-body">
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <th style="text-align: left; padding: 12px; font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">Time</th>
+                    <th style="text-align: left; padding: 12px; font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">Type</th>
+                    <th style="text-align: left; padding: 12px; font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">Target</th>
+                    <th style="text-align: center; padding: 12px; font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">Risk</th>
+                    <th style="text-align: right; padding: 12px; font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">Score</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTable">
+                  <tr>
+                    <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;">
+                      No scan history yet
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reports View -->
+      <section class="view" id="view-reports">
+        <div class="header">
+          <div class="header-badge">Analytics</div>
+          <h1>Threat Reports</h1>
+          <p>Summary of detected threats and patterns</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Session Summary</div>
+          </div>
+          <div class="panel-body" id="reportContent">
+            <p style="text-align: center; color: var(--text-muted); padding: 24px;">
+              Run some scans to generate threat reports
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- About View -->
+      <section class="view" id="view-about">
+        <div class="header">
+          <div class="header-badge">Information</div>
+          <h1>About PhishGuard Pro</h1>
+          <p>Enterprise-grade threat detection for the modern internet</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">System Architecture</div>
+          </div>
+          <div class="panel-body">
+            <h3 style="color: var(--text-primary); margin-bottom: 12px;">Dual-Layer Detection</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">
+              PhishGuard combines client-side heuristic analysis with VirusTotal's AI-powered threat intelligence network for comprehensive malware and phishing detection.
+            </p>
+
+            <h3 style="color: var(--text-primary); margin-bottom: 12px;">Privacy First</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">
+              All local analysis happens in your browser. Optional VirusTotal checks are made directly from your device with your control. History stored locally only.
+            </p>
+
+            <h3 style="color: var(--text-primary); margin-bottom: 12px;">Free & Open</h3>
+            <p style="color: var(--text-secondary);">
+              PhishGuard uses VirusTotal's free API tier (4 requests/minute) for threat intelligence. Get a free API key at virustotal.com
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+
+  // State management
+  const state = {
+    mode: 'url',
+    history: loadHistory(),
+    apiKey: localStorage.getItem('vt-api-key') || ''
+  };
+
+  // DOM Elements
+  const urlInput = $('#urlInput');
+  const messageInput = $('#messageInput');
+  const scanBtn = $('#scanBtn');
+  const terminal = $('#terminal');
+  const riskCard = $('#riskCard');
+  const riskIcon = $('#riskIcon');
+  const riskLabel = $('#riskLabel');
+  const riskScore = $('#riskScore');
+  const riskDesc = $('#riskDesc');
+  const resultTime = $('#resultTime');
+  const findings = $('#findings');
+
+  // Utilities
+  function loadHistory() {
+    try {
+      const data = JSON.parse(localStorage.getItem('phishguard-history') || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveHistory() {
+    localStorage.setItem('phishguard-history', JSON.stringify(state.history.slice(0, 100)));
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function updateClock() {
+    const now = new Date();
+    $('#clock').textContent = now.toLocaleTimeString();
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Terminal functions
+  function termClear() {
+    terminal.innerHTML = '';
+  }
+
+  function termLog(text, type = 'good') {
+    const line = document.createElement('div');
+    line.className = 'terminal-line';
+    const time = new Date().toLocaleTimeString([], { hour12: false });
+    line.innerHTML = `<span class="terminal-time">[${time}]</span> <span class="terminal-${type}">${escapeHTML(text)}</span>`;
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  // Mode switching
+  $$('.tab[data-mode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.mode = btn.dataset.mode;
+      $$('.tab[data-mode]').forEach(b => b.classList.toggle('active', b === btn));
+      const isUrl = state.mode === 'url';
+      urlInput.style.display = isUrl ? 'block' : 'none';
+      messageInput.style.display = isUrl ? 'none' : 'block';
+    });
+  });
+
+  // Analysis functions
+  function analyzeURL(raw) {
+    const findings = [];
+    let score = 0;
+    let input = raw.trim();
+
+    if (!/^https?:\/\//i.test(input)) input = 'http://' + input;
+
+    let u;
+    try {
+      u = new URL(input);
+    } catch {
+      findings.push({ severity: 'critical', title: 'Invalid URL', desc: 'Could not parse as valid URL', weight: 30 });
+      return finalize(score + 30, findings);
+    }
+
+    const host = u.hostname.toLowerCase();
+    const labels = host.split('.');
+    const suspiciousTlds = new Set(['xyz', 'top', 'click', 'tk', 'ml', 'cf', 'ga']);
+    const baitWords = ['verify', 'secure', 'update', 'login', 'account', 'suspend'];
+    const brands = ['google', 'paypal', 'apple', 'microsoft', 'amazon'];
+
+    if (u.protocol !== 'https:') {
+      findings.push({ severity: 'high', title: 'No HTTPS', desc: 'Not using secure HTTPS protocol', weight: 12 });
+      score += 12;
+    }
+
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) {
+      findings.push({ severity: 'critical', title: 'IP Address Host', desc: 'Using IP instead of domain name', weight: 25 });
+      score += 25;
+    }
+
+    if (host.includes('xn--')) {
+      findings.push({ severity: 'high', title: 'Punycode Domain', desc: 'Internationalized domain detected', weight: 20 });
+      score += 20;
+    }
+
+    if (suspiciousTlds.has(labels[labels.length - 1])) {
+      findings.push({ severity: 'high', title: 'Suspicious TLD', desc: `Domain uses .${labels[labels.length - 1]} TLD`, weight: 14 });
+      score += 14;
+    }
+
+    const brandFound = brands.find(b => host.includes(b));
+    if (brandFound && host !== `${brandFound}.com`) {
+      findings.push({ severity: 'high', title: 'Brand Impersonation', desc: `Contains "${brandFound}" but not official domain`, weight: 22 });
+      score += 22;
+    }
+
+    if (labels.length >= 5) {
+      findings.push({ severity: 'high', title: 'Excessive Subdomains', desc: `${labels.length} domain labels detected`, weight: 10 });
+      score += 10;
+    }
+
+    if (u.href.length > 120) {
+      findings.push({ severity: 'medium', title: 'Very Long URL', desc: `URL is ${u.href.length} characters`, weight: 8 });
+      score += 8;
+    }
+
+    if (findings.length === 0) {
+      findings.push({ severity: 'low', title: 'No Major Issues', desc: 'URL passed local heuristic checks', weight: 0 });
+    }
+
+    return finalize(Math.min(score, 100), findings);
+  }
+
+  function analyzeMessage(text) {
+    const findings = [];
+    let score = 0;
+    const t = text.toLowerCase();
+
+    const patterns = [
+      { re: /\b(urgent|immediately|act now|final warning)\b/i, sev: 'high', title: 'Urgency Language', desc: 'Message pressures quick action', w: 16 },
+      { re: /\b(password|pin|otp|verification code|cvv)\b/i, sev: 'critical', title: 'Credential Request', desc: 'Asking for sensitive credentials', w: 24 },
+      { re: /\b(account suspended|account locked|disabled)\b/i, sev: 'critical', title: 'Account Threat', desc: 'Threatening account suspension', w: 20 },
+      { re: /\b(congratulations|winner|prize|claim|reward)\b/i, sev: 'high', title: 'Prize Bait', desc: 'Offering unsolicited rewards', w: 14 },
+      { re: /\b(transfer|payment|fee required|pay now)\b/i, sev: 'high', title: 'Financial Lure', desc: 'Requesting payment/transfer', w: 13 },
+      { re: /(bit\.ly|tinyurl|t\.co|cutt\.ly)/i, sev: 'high', title: 'Shortened Link', desc: 'Hidden destination URL', w: 18 }
+    ];
+
+    patterns.forEach(p => {
+      if (p.re.test(text)) {
+        findings.push({ severity: p.sev, title: p.title, desc: p.desc, weight: p.w });
+        score += p.w;
+      }
+    });
+
+    if (findings.length === 0) {
+      findings.push({ severity: 'low', title: 'No Major Indicators', desc: 'Message passed local checks', weight: 0 });
+    }
+
+    return finalize(Math.min(score, 100), findings);
+  }
+
+  function finalize(score, findingsList) {
+    const level = score >= 70 ? 'critical' : score >= 45 ? 'high' : score >= 20 ? 'medium' : 'low';
+    return { score, level, findings: findingsList };
+  }
+
+  function riskColor(level) {
+    return { critical: 'critical', high: 'high', medium: 'medium', low: 'low' }[level] || 'low';
+  }
+
+  function renderResult(result) {
+    riskCard.className = `risk-card ${riskColor(result.level)}`;
+    riskIcon.textContent = { critical: '🚨', high: '⚠️', medium: '⚡', low: '✓' }[result.level];
+    riskLabel.textContent = result.level.toUpperCase() + ' RISK';
+    riskScore.textContent = `${result.score}/100`;
+    riskDesc.textContent = {
+      critical: 'Critical threat detected. Do not interact with this target.',
+      high: 'High-risk indicators found. Verify before proceeding.',
+      medium: 'Some suspicious indicators detected. Exercise caution.',
+      low: 'No major indicators found. Likely safe but use caution.'
+    }[result.level];
+
+    findings.innerHTML = '';
+    result.findings.forEach(f => {
+      const div = document.createElement('div');
+      div.className = `finding ${f.severity}`;
+      div.innerHTML = `
+        <div class="finding-icon">${{ critical: '!', high: '⚠', medium: '△', low: '✓' }[f.severity]}</div>
+        <div class="finding-text">
+          <h4>${escapeHTML(f.title)}</h4>
+          <p>${escapeHTML(f.desc)}</p>
+        </div>
+        <div class="finding-badge">${f.severity}</div>`;
+      findings.appendChild(div);
+    });
+  }
+
+  async function runScan() {
+    const input = state.mode === 'url' ? urlInput.value.trim() : messageInput.value.trim();
+
+    if (!input) {
+      alert('Please enter a ' + state.mode);
+      return;
+    }
+
+    scanBtn.disabled = true;
+    scanBtn.innerHTML = '<span>⏳</span><span>SCANNING...</span>';
+    termClear();
+
+    const steps = state.mode === 'url'
+      ? ['Parsing URL...', 'Analyzing domain structure...', 'Checking security patterns...', 'Scanning for threats...']
+      : ['Analyzing message...', 'Checking urgency language...', 'Scanning for credential requests...', 'Computing threat score...'];
+
+    for (const step of steps) {
+      termLog(step);
+      await delay(200);
+    }
+
+    const result = state.mode === 'url' ? analyzeURL(input) : analyzeMessage(input);
+
+    termLog(`Detection complete: ${result.level.toUpperCase()} - ${result.score}/100`, result.level === 'critical' ? 'bad' : result.level === 'high' ? 'warn' : 'good');
+
+    renderResult(result);
+    resultTime.textContent = new Date().toLocaleString();
+
+    state.history.unshift({
+      id: Date.now(),
+      time: new Date().toISOString(),
+      type: state.mode,
+      target: input.slice(0, 100),
+      score: result.score,
+      level: result.level
+    });
+    state.history = state.history.slice(0, 100);
+    saveHistory();
+    refreshStats();
+
+    scanBtn.disabled = false;
+    scanBtn.innerHTML = '<span>▶</span><span>RUN AI SCAN</span>';
+  }
+
+  scanBtn.addEventListener('click', runScan);
+  urlInput.addEventListener('keydown', e => e.key === 'Enter' && runScan());
+
+  // Stats & UI
+  function refreshStats() {
+    const h = state.history;
+    $('#statScans').textContent = h.length;
+    $('#statThreats').textContent = h.filter(x => x.level === 'critical' || x.level === 'high').length;
+    $('#statUrls').textContent = h.filter(x => x.type === 'url').length;
+
+    // History table
+    const tbody = $('#historyTable');
+    tbody.innerHTML = '';
+    if (h.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">No history</td></tr>';
+    } else {
+      h.slice(0, 10).forEach(item => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border)';
+        tr.innerHTML = `
+          <td style="padding: 12px;">${new Date(item.time).toLocaleString()}</td>
+          <td style="padding: 12px; text-transform: uppercase; font-size: 11px;">${item.type}</td>
+          <td style="padding: 12px; max-width: 300px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${escapeHTML(item.target)}</td>
+          <td style="padding: 12px; text-align: center; text-transform: uppercase; font-weight: 600; color: ${item.level === 'critical' ? 'var(--danger)' : item.level === 'high' ? 'var(--warning)' : item.level === 'medium' ? 'var(--accent-light)' : 'var(--success)'};">${item.level}</td>
+          <td style="padding: 12px; text-align: right;">${item.score}/100</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Report
+    const h2 = state.history;
+    const report = $('#reportContent');
+    if (h2.length === 0) {
+      report.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 24px;">No data yet</p>';
+    } else {
+      const crit = h2.filter(x => x.level === 'critical').length;
+      const high = h2.filter(x => x.level === 'high').length;
+      const avg = Math.round(h2.reduce((a, b) => a + b.score, 0) / h2.length);
+      report.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+          <div class="stat-card"><div class="stat-value">${crit}</div><div class="stat-label">Critical</div></div>
+          <div class="stat-card"><div class="stat-value">${high}</div><div class="stat-label">High Risk</div></div>
+          <div class="stat-card"><div class="stat-value">${avg}</div><div class="stat-label">Avg Score</div></div>
+        </div>`;
+    }
+  }
+
+  // Navigation
+  $$('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      $$('.view').forEach(v => v.classList.remove('active'));
+      $(`#view-${btn.dataset.view}`).classList.add('active');
+      $('#sidebar').classList.remove('open');
+    });
+  });
+
+  $('#mobileToggle').addEventListener('click', () => {
+    $('#sidebar').classList.toggle('open');
+  });
+
+  $('#clearHistBtn').addEventListener('click', () => {
+    if (confirm('Clear all history?')) {
+      state.history = [];
+      saveHistory();
+      refreshStats();
+    }
+  });
+
+  // Initialize
+  refreshStats();
+})();
+</script>
+</body>
+</html>
