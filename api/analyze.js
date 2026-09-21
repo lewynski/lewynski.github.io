@@ -1,42 +1,30 @@
-// Vercel Serverless Function: /api/analyze
+// api/analyze.js
+// Vercel Serverless Function for PhishGuard
 //
-// Required Vercel Environment Variable:
+// Required Vercel environment variable:
 //
 // VIRUSTOTAL_API_KEY = your VirusTotal API key
 //
-// IMPORTANT:
-// Never put your VirusTotal API key inside index.html.
+// NEVER put the API key inside index.html.
 
 const VT_BASE = "https://www.virustotal.com/api/v3";
 
-/* -------------------------------------------------------
-   RESPONSE HELPER
-------------------------------------------------------- */
+
+/* =====================================================
+   RESPONSE
+===================================================== */
 
 function send(res, status, body) {
-  return res.status(status).json(body);
+  res.status(status).json(body);
 }
 
-/* -------------------------------------------------------
-   CREATE VIRUSTOTAL URL ID
 
-   VirusTotal identifies URLs using URL-safe Base64
-   without "=" padding.
-------------------------------------------------------- */
-
-function base64UrlWithoutPadding(value) {
-  return Buffer.from(value, "utf8")
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-}
-
-/* -------------------------------------------------------
+/* =====================================================
    NORMALIZE URL
-------------------------------------------------------- */
+===================================================== */
 
 function normalizeUrl(raw) {
+
   let value = String(raw || "").trim();
 
   if (!value) {
@@ -50,275 +38,500 @@ function normalizeUrl(raw) {
   const parsed = new URL(value);
 
   if (!["http:", "https:"].includes(parsed.protocol)) {
-    throw new Error("Only HTTP and HTTPS URLs are supported.");
+    throw new Error(
+      "Only HTTP and HTTPS URLs are supported."
+    );
   }
 
   return parsed.href;
 }
 
-/* -------------------------------------------------------
-   VIRUSTOTAL FETCH HELPER
-------------------------------------------------------- */
 
-async function vtFetch(path, apiKey, options = {}) {
-  return fetch(VT_BASE + path, {
-    ...options,
+/* =====================================================
+   CREATE VIRUSTOTAL URL ID
+===================================================== */
 
-    headers: {
-      "x-apikey": apiKey,
-      ...(options.headers || {})
-    }
-  });
+function toVirusTotalUrlId(url) {
+
+  return Buffer
+    .from(url, "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 
-/* -------------------------------------------------------
-   GET EXISTING VIRUSTOTAL URL REPORT
-------------------------------------------------------- */
 
-async function getUrlReport(url, apiKey) {
-  const id = base64UrlWithoutPadding(url);
+/* =====================================================
+   VIRUSTOTAL FETCH
+===================================================== */
 
-  const response = await vtFetch(
-    `/urls/${encodeURIComponent(id)}`,
-    apiKey
+async function vtFetch(
+  path,
+  apiKey,
+  options = {}
+) {
+
+  return fetch(
+    VT_BASE + path,
+    {
+      ...options,
+
+      headers: {
+
+        "x-apikey": apiKey,
+
+        ...(options.headers || {})
+      }
+    }
   );
+}
 
-  // URL does not exist in VirusTotal yet
+
+/* =====================================================
+   GET EXISTING URL REPORT
+===================================================== */
+
+async function getUrlReport(
+  url,
+  apiKey
+) {
+
+  const id =
+    toVirusTotalUrlId(url);
+
+  const response =
+    await vtFetch(
+      `/urls/${encodeURIComponent(id)}`,
+      apiKey
+    );
+
+
+  /*
+    VirusTotal does not know
+    this URL yet.
+  */
+
   if (response.status === 404) {
     return null;
   }
 
+
   if (!response.ok) {
-    const body = await response.text();
+
+    const text =
+      await response.text();
 
     throw new Error(
-      `VirusTotal report request failed (${response.status}): ` +
-      body.slice(0, 250)
+      `VirusTotal report request failed ` +
+      `(${response.status}): ` +
+      text.slice(0, 200)
     );
   }
+
 
   return response.json();
 }
 
-/* -------------------------------------------------------
-   SUBMIT NEW URL TO VIRUSTOTAL
-------------------------------------------------------- */
 
-async function submitUrl(url, apiKey) {
-  const body = new URLSearchParams({
-    url: url
-  });
+/* =====================================================
+   SUBMIT NEW URL
+===================================================== */
 
-  const response = await vtFetch(
-    "/urls",
-    apiKey,
-    {
-      method: "POST",
+async function submitUrl(
+  url,
+  apiKey
+) {
 
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
+  const body =
+    new URLSearchParams({
+      url
+    });
 
-      body
-    }
-  );
+
+  const response =
+    await vtFetch(
+      "/urls",
+      apiKey,
+      {
+
+        method: "POST",
+
+        headers: {
+
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body
+      }
+    );
+
 
   if (!response.ok) {
-    const text = await response.text();
+
+    const text =
+      await response.text();
 
     throw new Error(
-      `VirusTotal submit failed (${response.status}): ` +
-      text.slice(0, 250)
+      `VirusTotal submit failed ` +
+      `(${response.status}): ` +
+      text.slice(0, 200)
     );
   }
 
-  const json = await response.json();
 
-  return json?.data?.id || null;
+  const json =
+    await response.json();
+
+
+  return (
+    json?.data?.id ||
+    null
+  );
 }
 
-/* -------------------------------------------------------
-   GET VIRUSTOTAL ANALYSIS STATUS
-------------------------------------------------------- */
 
-async function getAnalysis(analysisId, apiKey) {
-  const response = await vtFetch(
-    `/analyses/${encodeURIComponent(analysisId)}`,
-    apiKey
-  );
+/* =====================================================
+   GET ANALYSIS STATUS
+===================================================== */
+
+async function getAnalysis(
+  id,
+  apiKey
+) {
+
+  const response =
+    await vtFetch(
+      `/analyses/${encodeURIComponent(id)}`,
+      apiKey
+    );
+
 
   if (!response.ok) {
-    const text = await response.text();
+
+    const text =
+      await response.text();
 
     throw new Error(
-      `VirusTotal analysis request failed (${response.status}): ` +
-      text.slice(0, 250)
+      `VirusTotal analysis request failed ` +
+      `(${response.status}): ` +
+      text.slice(0, 200)
     );
   }
+
 
   return response.json();
 }
 
-/* -------------------------------------------------------
-   SMALL DELAY
-------------------------------------------------------- */
+
+/* =====================================================
+   DELAY
+===================================================== */
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+
+  return new Promise(
+    resolve =>
+      setTimeout(resolve, ms)
+  );
 }
 
-/* -------------------------------------------------------
-   NORMALIZE VIRUSTOTAL ENGINE STATISTICS
-------------------------------------------------------- */
 
-function cleanStats(stats = {}) {
-  const malicious = Number(stats.malicious || 0);
-  const suspicious = Number(stats.suspicious || 0);
-  const harmless = Number(stats.harmless || 0);
-  const undetected = Number(stats.undetected || 0);
-  const timeout = Number(stats.timeout || 0);
-  const failure = Number(stats.failure || 0);
+/* =====================================================
+   CLEAN VIRUSTOTAL STATISTICS
+===================================================== */
+
+function cleanStats(
+  stats = {}
+) {
+
+  const malicious =
+    Number(stats.malicious || 0);
+
+  const suspicious =
+    Number(stats.suspicious || 0);
+
+  const harmless =
+    Number(stats.harmless || 0);
+
+  const undetected =
+    Number(stats.undetected || 0);
+
+  const timeout =
+    Number(stats.timeout || 0);
+
+  const failure =
+    Number(stats.failure || 0);
 
   const unsupported =
-    Number(stats["type-unsupported"] || 0);
+    Number(
+      stats["type-unsupported"] || 0
+    );
+
 
   const total =
+
     malicious +
+
     suspicious +
+
     harmless +
+
     undetected +
+
     timeout +
+
     failure +
+
     unsupported;
 
+
   return {
+
     malicious,
+
     suspicious,
+
     harmless,
+
     undetected,
+
     timeout,
+
     failure,
+
     unsupported,
+
     total
   };
 }
 
-/* -------------------------------------------------------
-   CALCULATE RISK SCORE
+
+/* =====================================================
+   PHISHGUARD RISK SCORE
 
    IMPORTANT:
-   This is a RISK SCORE from 0-100.
 
-   It is NOT:
-   - a percentage chance that the website is malicious
-   - VirusTotal's official percentage
-   - an AI confidence percentage
+   This is NOT a probability.
 
-------------------------------------------------------- */
+   22/100 does NOT mean:
 
-function calculateRiskScore(stats) {
-  const s = cleanStats(stats);
+   "22% chance this website is malicious."
+
+   It is simply PhishGuard's own risk score.
+===================================================== */
+
+function calculateRiskScore(
+  stats
+) {
+
+  const s =
+    cleanStats(stats);
+
 
   if (s.total <= 0) {
+
     return 0;
   }
 
+
   /*
-     Malicious verdict = full weight
-     Suspicious verdict = half weight
+    Suspicious detections receive
+    half the weight of malicious ones.
   */
 
-  const weightedRate =
+  const weightedFlags =
+
+    s.malicious +
+
     (
-      (s.malicious * 1.0) +
-      (s.suspicious * 0.5)
-    ) / s.total;
+      s.suspicious *
+      0.5
+    );
 
-  let score = Math.round(
-    weightedRate * 100
-  );
 
   /*
-     IMPORTANT:
-
-     Simply calculating:
-
-        malicious / total
-
-     can make dangerous URLs look too safe.
-
-     Example:
-
-        6 malicious
-        80 total
-
-     Raw percentage = 7.5%
-
-     That does NOT mean the website only has a
-     7.5% risk.
-
-     So we also consider the absolute number
-     of vendors flagging the URL.
+    Vendor detection ratio.
   */
 
-  if (s.malicious >= 10) {
-    score = Math.max(score, 92);
+  let score =
+
+    Math.round(
+
+      (
+        weightedFlags /
+        s.total
+      ) *
+
+      100
+    );
+
+
+  /* =================================================
+     ABSOLUTE MALICIOUS DETECTIONS
+
+     Two isolated detections no longer
+     automatically mean HIGH risk.
+  ================================================= */
+
+
+  if (
+    s.malicious >= 15
+  ) {
+
+    score =
+      Math.max(
+        score,
+        95
+      );
   }
 
-  else if (s.malicious >= 6) {
-    score = Math.max(score, 82);
+
+  else if (
+    s.malicious >= 10
+  ) {
+
+    score =
+      Math.max(
+        score,
+        85
+      );
   }
 
-  else if (s.malicious >= 4) {
-    score = Math.max(score, 70);
+
+  else if (
+    s.malicious >= 7
+  ) {
+
+    score =
+      Math.max(
+        score,
+        72
+      );
   }
 
-  else if (s.malicious >= 3) {
-    score = Math.max(score, 60);
+
+  else if (
+    s.malicious >= 5
+  ) {
+
+    score =
+      Math.max(
+        score,
+        58
+      );
   }
 
-  else if (s.malicious >= 2) {
-    score = Math.max(score, 45);
+
+  else if (
+    s.malicious >= 3
+  ) {
+
+    score =
+      Math.max(
+        score,
+        38
+      );
   }
 
-  else if (s.malicious === 1) {
-    score = Math.max(score, 25);
+
+  else if (
+    s.malicious === 2
+  ) {
+
+    score =
+      Math.max(
+        score,
+        22
+      );
   }
 
-  /*
-     Suspicious verdicts only
-  */
 
-  if (s.malicious === 0) {
+  else if (
+    s.malicious === 1
+  ) {
 
-    if (s.suspicious >= 4) {
-      score = Math.max(score, 40);
+    score =
+      Math.max(
+        score,
+        10
+      );
+  }
+
+
+  /* =================================================
+     SUSPICIOUS-ONLY DETECTIONS
+  ================================================= */
+
+
+  if (
+    s.malicious === 0
+  ) {
+
+    if (
+      s.suspicious >= 6
+    ) {
+
+      score =
+        Math.max(
+          score,
+          35
+        );
     }
 
-    else if (s.suspicious >= 2) {
-      score = Math.max(score, 25);
+
+    else if (
+      s.suspicious >= 3
+    ) {
+
+      score =
+        Math.max(
+          score,
+          20
+        );
     }
 
-    else if (s.suspicious === 1) {
-      score = Math.max(score, 12);
-    }
 
+    else if (
+      s.suspicious >= 1
+    ) {
+
+      score =
+        Math.max(
+          score,
+          8
+        );
+    }
   }
+
 
   return Math.max(
+
     0,
-    Math.min(100, score)
+
+    Math.min(
+      100,
+      score
+    )
   );
 }
 
-/* -------------------------------------------------------
-   MAIN VERCEL API HANDLER
-------------------------------------------------------- */
 
-module.exports = async function handler(req, res) {
+/* =====================================================
+   MAIN VERCEL FUNCTION
+===================================================== */
+
+module.exports =
+async function handler(
+  req,
+  res
+) {
+
 
   /*
-     Don't cache security results.
+    Security reports should not
+    be browser/proxy cached.
   */
 
   res.setHeader(
@@ -326,32 +539,44 @@ module.exports = async function handler(req, res) {
     "no-store"
   );
 
-  /* ---------------------------------------------------
-     ONLY ALLOW POST
-  --------------------------------------------------- */
 
-  if (req.method !== "POST") {
+  /* =================================================
+     METHOD CHECK
+  ================================================= */
+
+
+  if (
+    req.method !== "POST"
+  ) {
 
     res.setHeader(
       "Allow",
       "POST"
     );
 
+
     return send(
       res,
       405,
       {
-        error: "Method not allowed. Use POST."
+
+        error:
+          "Method not allowed. Use POST."
       }
     );
   }
 
-  /* ---------------------------------------------------
-     GET API KEY
-  --------------------------------------------------- */
+
+  /* =================================================
+     API KEY
+  ================================================= */
+
 
   const apiKey =
-    process.env.VIRUSTOTAL_API_KEY;
+
+    process.env
+      .VIRUSTOTAL_API_KEY;
+
 
   if (!apiKey) {
 
@@ -359,23 +584,28 @@ module.exports = async function handler(req, res) {
       res,
       500,
       {
+
         error:
           "VIRUSTOTAL_API_KEY is not configured on the server."
       }
     );
   }
 
-  /* ---------------------------------------------------
+
+  /* =================================================
      VALIDATE URL
-  --------------------------------------------------- */
+  ================================================= */
+
 
   let url;
 
+
   try {
 
-    url = normalizeUrl(
-      req.body?.url
-    );
+    url =
+      normalizeUrl(
+        req.body?.url
+      );
 
   }
 
@@ -385,47 +615,61 @@ module.exports = async function handler(req, res) {
       res,
       400,
       {
+
         error:
+
           err.message ||
+
           "Invalid URL."
       }
     );
   }
 
-  /* ---------------------------------------------------
-     VIRUSTOTAL ANALYSIS
-  --------------------------------------------------- */
+
+  /* =================================================
+     VIRUSTOTAL
+  ================================================= */
+
 
   try {
 
+
     /*
-       First check if VirusTotal already
-       knows about this exact URL.
+      First try to retrieve
+      an existing report.
     */
 
     let report =
+
       await getUrlReport(
         url,
         apiKey
       );
 
+
     let source =
       "existing_report";
 
-    /* -------------------------------------------------
+
+    /* =================================================
        NEW URL
-    ------------------------------------------------- */
+    ================================================= */
+
 
     if (!report) {
+
 
       source =
         "new_scan";
 
+
       const analysisId =
+
         await submitUrl(
           url,
           apiKey
         );
+
 
       if (!analysisId) {
 
@@ -434,125 +678,170 @@ module.exports = async function handler(req, res) {
         );
       }
 
-      /*
-         Wait briefly for VirusTotal.
 
-         Public API scans may take a little time.
+      /*
+        Give VirusTotal some time
+        to process the submitted URL.
       */
 
       for (
+
         let attempt = 0;
+
         attempt < 4;
+
         attempt++
+
       ) {
 
-        await sleep(850);
+
+        await sleep(900);
+
 
         const analysis =
+
           await getAnalysis(
             analysisId,
             apiKey
           );
 
+
         const status =
-          analysis?.data?.attributes?.status;
+
+          analysis
+            ?.data
+            ?.attributes
+            ?.status;
+
 
         if (
           status === "completed"
         ) {
+
           break;
         }
       }
 
+
       /*
-         Request normalized URL report
-         after analysis.
+        Retrieve normalized
+        URL report.
       */
 
       report =
+
         await getUrlReport(
           url,
           apiKey
         );
     }
 
-    /* -------------------------------------------------
+
+    /* =================================================
        REPORT NOT READY
-    ------------------------------------------------- */
+    ================================================= */
+
 
     if (
-      !report?.data?.attributes
+      !report
+        ?.data
+        ?.attributes
     ) {
 
       return send(
         res,
         202,
         {
+
           error:
-            "VirusTotal accepted the URL, but the report is not ready yet. Scan again in a few seconds."
+
+            "VirusTotal accepted the URL, " +
+            "but the report is not ready yet. " +
+            "Scan again in a few seconds."
         }
       );
     }
 
-    /* -------------------------------------------------
-       READ VIRUSTOTAL DATA
-    ------------------------------------------------- */
+
+    /* =================================================
+       RESULTS
+    ================================================= */
+
 
     const attributes =
+
       report.data.attributes;
 
+
     const stats =
+
       cleanStats(
-        attributes.last_analysis_stats || {}
+
+        attributes
+          .last_analysis_stats ||
+
+        {}
       );
 
-    const riskScore =
-      calculateRiskScore(stats);
 
-    /* -------------------------------------------------
-       RETURN DATA TO PHISHGUARD.HTML
-    ------------------------------------------------- */
+    const riskScore =
+
+      calculateRiskScore(
+        stats
+      );
+
+
+    /* =================================================
+       RETURN TO FRONTEND
+    ================================================= */
+
 
     return send(
       res,
       200,
       {
+
         ok: true,
 
         source,
-
-        /*
-           Main risk score
-        */
 
         risk_score:
           riskScore,
 
         /*
-           Kept for compatibility with
-           older PhishGuard frontend.
+          Compatibility with older
+          versions of PhishGuard.
         */
 
         score:
           riskScore,
 
-        /*
-           Actual VirusTotal statistics
-        */
-
-        vt_data: stats,
 
         /*
-           Additional VT information
+          Actual VirusTotal
+          verdict counts.
         */
+
+        vt_data:
+          stats,
+
 
         reputation:
+
           Number(
-            attributes.reputation || 0
+
+            attributes
+              .reputation ||
+
+            0
           ),
 
+
         last_analysis_date:
-          attributes.last_analysis_date ||
+
+          attributes
+            .last_analysis_date ||
+
           null
       }
     );
@@ -561,17 +850,24 @@ module.exports = async function handler(req, res) {
 
   catch (err) {
 
+
     console.error(
-      "PhishGuard /api/analyze error:",
+
+      "PhishGuard analyze error:",
+
       err
     );
+
 
     return send(
       res,
       502,
       {
+
         error:
+
           err?.message ||
+
           "VirusTotal request failed."
       }
     );
