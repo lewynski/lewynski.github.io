@@ -1044,9 +1044,9 @@
               All local analysis happens in your browser. Optional VirusTotal checks are made directly from your device with your control. History stored locally only.
             </p>
 
-            <h3 style="color: var(--text-primary); margin-bottom: 12px;">Free & Open</h3>
+            <h3 style="color: var(--text-primary); margin-bottom: 12px;">Secure Backend</h3>
             <p style="color: var(--text-secondary);">
-              PhishGuard uses VirusTotal's free API tier (4 requests/minute) for threat intelligence. Get a free API key at virustotal.com
+              Your VirusTotal API key is stored securely on Vercel servers. Only threat analysis requests are sent to external APIs. Your data is never logged or retained.
             </p>
           </div>
         </div>
@@ -1065,8 +1065,7 @@
   // State management
   const state = {
     mode: 'url',
-    history: loadHistory(),
-    apiKey: localStorage.getItem('vt-api-key') || ''
+    history: loadHistory()
   };
 
   // DOM Elements
@@ -1268,6 +1267,7 @@
     });
   }
 
+  // Main scan function with Vercel API integration
   async function runScan() {
     const input = state.mode === 'url' ? urlInput.value.trim() : messageInput.value.trim();
 
@@ -1280,29 +1280,73 @@
     scanBtn.innerHTML = '<span>⏳</span><span>SCANNING...</span>';
     termClear();
 
-    const steps = state.mode === 'url'
-      ? ['Parsing URL...', 'Analyzing domain structure...', 'Checking security patterns...', 'Scanning for threats...']
-      : ['Analyzing message...', 'Checking urgency language...', 'Scanning for credential requests...', 'Computing threat score...'];
+    const steps = ['Analyzing locally...', 'Querying threat database...', 'Computing final score...'];
 
     for (const step of steps) {
       termLog(step);
-      await delay(200);
+      await delay(300);
     }
 
-    const result = state.mode === 'url' ? analyzeURL(input) : analyzeMessage(input);
+    // Local heuristic analysis
+    let result = state.mode === 'url' ? analyzeURL(input) : analyzeMessage(input);
+    let localScore = result.score;
 
-    termLog(`Detection complete: ${result.level.toUpperCase()} - ${result.score}/100`, result.level === 'critical' ? 'bad' : result.level === 'high' ? 'warn' : 'good');
+    // Remote VirusTotal check (URL mode only)
+    if (state.mode === 'url') {
+      try {
+        termLog('Contacting VirusTotal...');
+        const apiResponse = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: input, mode: 'url' })
+        });
+
+        if (apiResponse.ok) {
+          const vtResult = await apiResponse.json();
+          if (vtResult.vt_data) {
+            const malCount = vtResult.vt_data.malicious;
+            termLog(
+              malCount > 0
+                ? 'VirusTotal: ' + malCount + ' engines flagged this'
+                : 'VirusTotal: No detections',
+              malCount > 0 ? 'bad' : 'good'
+            );
+
+            // Blend scores: 60% local heuristics, 40% VirusTotal
+            result.score = Math.round((localScore * 0.6) + (vtResult.score * 0.4));
+            result.vt_data = vtResult.vt_data;
+
+            // Recalculate level based on blended score
+            result.level = result.score >= 70 ? 'critical' : result.score >= 45 ? 'high' : result.score >= 20 ? 'medium' : 'low';
+          }
+        } else {
+          const err = await apiResponse.json().catch(function () {
+            return {};
+          });
+          termLog('VirusTotal unavailable: ' + (err.error || 'Unknown error'), 'warn');
+        }
+      } catch (err) {
+        termLog('VirusTotal connection failed, using local analysis only', 'warn');
+      }
+    }
+
+    termLog(
+      'Detection complete: ' + result.level.toUpperCase() + ' - ' + result.score + '/100',
+      result.level === 'critical' ? 'bad' : result.level === 'high' ? 'warn' : 'good'
+    );
 
     renderResult(result);
     resultTime.textContent = new Date().toLocaleString();
 
+    // Save to history
     state.history.unshift({
       id: Date.now(),
       time: new Date().toISOString(),
       type: state.mode,
       target: input.slice(0, 100),
       score: result.score,
-      level: result.level
+      level: result.level,
+      vt_malicious: (result.vt_data && result.vt_data.malicious) || null
     });
     state.history = state.history.slice(0, 100);
     saveHistory();
