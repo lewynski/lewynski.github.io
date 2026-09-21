@@ -211,6 +211,146 @@
         .proj:hover .go .chev { transform: translateX(4px); }
         .go .ext { font-size: 11px; opacity: 0.7; }
 
+        /* ---------- Featured Project ---------- */
+        .featured-banner {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.15) 0%, 
+                rgba(57, 255, 159, 0.05) 100%);
+            border: 2px solid;
+            border-color: rgba(99, 102, 241, 0.3);
+            border-radius: 22px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-banner::before {
+            content: "NEW";
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 10px;
+            background: rgba(99, 102, 241, 0.8);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .featured-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(400px at 20% 50%, rgba(99, 102, 241, 0.1), transparent),
+                        radial-gradient(300px at 80% 20%, rgba(57, 255, 159, 0.05), transparent);
+            pointer-events: none;
+        }
+
+        .featured-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .featured-text h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--ink);
+        }
+
+        .featured-text p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            color: var(--ink-sub);
+        }
+
+        .featured-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--hairline);
+        }
+
+        .stat-item strong {
+            display: block;
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .stat-item span {
+            font-size: 11px;
+            color: var(--ink-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .featured-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1px solid var(--accent);
+            background: var(--accent);
+            color: #000;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s var(--ease);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(41, 151, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-outline:hover {
+            background: rgba(41, 151, 255, 0.1);
+        }
+
+        .featured-tech {
+            font-size: 13px;
+            color: var(--ink-sub);
+        }
+
+        .featured-tech strong {
+            color: var(--accent);
+        }
+
+        @media (max-width: 900px) {
+            .featured-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* ---------- Footer ---------- */
         .foot {
             border-top: 1px solid var(--hairline);
@@ -237,6 +377,11 @@
             .tally div { border-left: 0; padding: 0; }
             .proj-body { padding: 22px; }
             .plate { height: 140px; font-size: 34px; }
+            .featured-banner { padding: 20px; }
+            .featured-banner::before { top: 10px; right: 10px; }
+            .featured-text h2 { font-size: 24px; }
+            .featured-actions { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -271,7 +416,7 @@
                 all deployed, all open in a click. No mockups.
             </p>
             <div class="tally" data-reveal data-delay="3">
-                <div><strong>9</strong><span>Live projects</span></div>
+                <div><strong>10</strong><span>Live projects</span></div>
                 <div><strong>7</strong><span>AI-backed</span></div>
                 <div><strong>0</strong><span>Frameworks used</span></div>
             </div>
@@ -281,6 +426,63 @@
     <main class="gallery">
         <div class="shell">
             <div class="grid">
+
+                <!-- FEATURED: PhishGuard Pro -->
+                <div class="featured-banner" data-reveal>
+                    <div class="featured-content">
+                        <div class="featured-text">
+                            <h2>PhishGuard Pro</h2>
+                            <p>
+                                Advanced AI-powered threat detection combining local heuristic analysis with real-time malware scanning from 90+ security vendors. Detect phishing, malware, and suspicious URLs instantly.
+                            </p>
+                            <div class="featured-stats">
+                                <div class="stat-item">
+                                    <strong>90+</strong>
+                                    <span>Security Vendors</span>
+                                </div>
+                                <div class="stat-item">
+                                    <strong>0ms</strong>
+                                    <span>Local Analysis</span>
+                                </div>
+                                <div class="stat-item">
+                                    <strong>Real-time</strong>
+                                    <span>Threat Intel</span>
+                                </div>
+                                <div class="stat-item">
+                                    <strong>100%</strong>
+                                    <span>Private</span>
+                                </div>
+                            </div>
+                            <div class="featured-actions">
+                                <a href="phishguard-enhanced.html" class="btn">
+                                    <span>Launch App</span>
+                                    <span class="chev">&rsaquo;</span>
+                                </a>
+                                <a href="PHISHGUARD-SETUP-GUIDE.md" class="btn btn-outline" target="_blank">
+                                    <span>Setup Guide</span>
+                                    <i class="fas fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                            <div class="featured-tech">
+                                Built with <strong>VirusTotal API</strong> · <strong>Heuristic detection</strong> · <strong>Real-time scanning</strong>
+                            </div>
+                        </div>
+                        <div style="position: relative; z-index: 1;">
+                            <div style="
+                                height: 240px;
+                                background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(57, 255, 159, 0.1));
+                                border-radius: 16px;
+                                border: 1px solid rgba(99, 102, 241, 0.2);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 64px;
+                            ">
+                                ⚔️
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <a class="proj" href="projects/capysave.html" style="--tint: #2997ff;" data-reveal>
                     <div class="plate"><i class="fas fa-wallet"></i></div>
