@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jon Lewyn | Projects</title>
-    <meta name="description" content="Eight deployed computational tools and interactive applications built by Jon Lewyn Villaram Tanggaro.">
+    <meta name="description" content="Nine deployed computational tools and interactive applications built by Jon Lewyn Villaram Tanggaro.">
     <meta name="color-scheme" content="dark light">
     <meta name="theme-color" content="#000000">
 
@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Same token system as the homepage, resume, and certificates page.
-           Dark is the default, light is opt-in via [data-theme="light"]. */
         :root {
             --surface:      #000000;
             --surface-alt:  #101012;
@@ -161,7 +159,6 @@
         .gallery { padding: 40px 0 110px; }
         .grid { display: grid; gap: 22px; grid-template-columns: repeat(2, 1fr); }
 
-        /* The whole card is the link. One target, no competing button. */
         .proj {
             display: flex; flex-direction: column;
             background: var(--card);
@@ -172,8 +169,6 @@
         }
         .proj:hover { transform: translateY(-6px); box-shadow: var(--shadow-lift); text-decoration: none; }
 
-        /* Each project gets its own tinted plate. The hue is the only thing
-           that varies between cards, set per-card via --tint. */
         .plate {
             height: 168px; display: flex; align-items: center; justify-content: center;
             font-size: 42px; color: var(--tint, var(--accent));
@@ -208,7 +203,6 @@
             background: var(--chip); padding: 5px 11px; border-radius: 980px;
         }
 
-        /* Not a real link -- the card already is one. It just signals affordance. */
         .go {
             display: inline-flex; align-items: center; gap: 5px;
             font-size: 15px; color: var(--accent);
@@ -271,14 +265,14 @@
     <header class="masthead">
         <div class="shell">
             <p class="eyebrow" data-reveal>Projects</p>
-            <h1 data-reveal data-delay="1">Eight things<br>that actually run.</h1>
+            <h1 data-reveal data-delay="1">Nine things<br>that actually run.</h1>
             <p class="lead" data-reveal data-delay="2">
                 Computational tools, AI-backed databases, and browser applications &mdash;
                 all deployed, all open in a click. No mockups.
             </p>
             <div class="tally" data-reveal data-delay="3">
-                <div><strong>8</strong><span>Live projects</span></div>
-                <div><strong>6</strong><span>AI-backed</span></div>
+                <div><strong>9</strong><span>Live projects</span></div>
+                <div><strong>7</strong><span>AI-backed</span></div>
                 <div><strong>0</strong><span>Frameworks used</span></div>
             </div>
         </div>
@@ -403,6 +397,24 @@
                     </div>
                 </a>
 
+                <a class="proj" href="projects/acadex.html" style="--tint: #ff6482;" data-reveal>
+                    <div class="plate"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="proj-body">
+                        <p class="kind">Education &middot; hosted separately</p>
+                        <h3>Acadex</h3>
+                        <p class="proj-desc">
+                            Drop your lecture slides, PDFs, or handouts and get a scored
+                            reviewer with MCQs, identifications, enumerations, and matching
+                            &mdash; exportable as HTML or printable PDF.
+                        </p>
+                        <div class="stack"><span>Vercel</span><span>AI generation</span><span>File parsing</span></div>
+                        <span class="go">
+                            Open Acadex <span class="chev">&rsaquo;</span>
+                            <i class="fas fa-arrow-up-right-from-square ext" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                </a>
+
             </div>
         </div>
     </main>
@@ -434,9 +446,6 @@
         const themeBtn  = document.getElementById('theme-btn');
         const themeIcon = document.getElementById('theme-icon');
 
-        /* ---------- Appearance ----------
-           Dark is the default. Light is opt-in and stored under the same key
-           every other page uses, so the choice carries across the site. */
         function paintThemeIcon() {
             const light = root.getAttribute('data-theme') === 'light';
             themeIcon.className = light ? 'fas fa-moon' : 'fas fa-sun';
@@ -460,7 +469,6 @@
             paintThemeIcon();
         });
 
-        /* ---------- Scroll reveal ---------- */
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const revealables  = document.querySelectorAll('[data-reveal]');
 
@@ -477,7 +485,6 @@
             revealables.forEach(function (el) { io.observe(el); });
         }
 
-        /* ---------- Nav blur-in ---------- */
         let ticking = false;
         function onScrollFrame() {
             nav.classList.toggle('is-stuck', (window.scrollY || window.pageYOffset) > 12);
