@@ -834,7 +834,7 @@
         <div class="header">
           <div class="header-badge">Advanced Threat Intelligence</div>
           <h1>Detect Threats in Real-Time</h1>
-          <p>Analyze URLs and messages with AI-powered threat detection combined with local heuristics. Powered by VirusTotal's extensive malware database.</p>
+          <p>Analyze URLs and messages with local phishing heuristics plus VirusTotal reputation data.</p>
         </div>
 
         <div class="grid-2">
@@ -843,7 +843,7 @@
             <div class="panel-header">
               <div>
                 <div class="panel-title">Threat Scanner</div>
-                <div class="panel-meta">Advanced AI Detection</div>
+                <div class="panel-meta">Heuristics + VirusTotal</div>
               </div>
             </div>
             <div class="panel-body">
@@ -859,11 +859,11 @@
 
               <button class="btn btn-primary" id="scanBtn" style="width: 100%; justify-content: center;">
                 <span>▶</span>
-                <span>RUN AI SCAN</span>
+                <span>RUN THREAT SCAN</span>
               </button>
 
               <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
-                Uses local heuristics + VirusTotal API for real-time threat detection
+                Uses local heuristics + VirusTotal reputation data. The value shown is a risk score, not a probability.
               </p>
 
               <div class="terminal" id="terminal">
@@ -928,7 +928,7 @@
         <div class="header">
           <div class="header-badge">How It Works</div>
           <h1>Threat Detection Engine</h1>
-          <p>Our dual-layer approach combines local heuristics with AI-powered cloud detection</p>
+          <p>Our dual-layer approach combines local heuristics with VirusTotal reputation data</p>
         </div>
 
         <div class="panel">
@@ -945,7 +945,7 @@
               <li>✓ Credential request pattern matching</li>
             </ul>
 
-            <h3 style="color: var(--text-primary); margin-bottom: 16px;">AI-Powered VirusTotal Integration</h3>
+            <h3 style="color: var(--text-primary); margin-bottom: 16px;">VirusTotal Reputation Integration</h3>
             <ul style="color: var(--text-secondary); font-size: 13px; line-height: 1.8; margin-bottom: 24px;">
               <li>✓ Real-time malware detection from 90+ security vendors</li>
               <li>✓ File and domain reputation scanning</li>
@@ -956,7 +956,7 @@
 
             <div style="padding: 16px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; border-left: 4px solid var(--primary);">
               <p style="font-size: 13px; color: var(--text-secondary);">
-                <strong style="color: var(--text-primary);">About VirusTotal:</strong> Free AI-powered threat intelligence platform that checks files and URLs against 90+ antivirus engines and malware databases. Results updated in real-time.
+                <strong style="color: var(--text-primary);">About VirusTotal:</strong> VirusTotal aggregates verdicts from multiple security vendors and threat-intelligence sources. PhishGuard uses those verdict counts as one signal in its risk score.
               </p>
             </div>
           </div>
@@ -1036,7 +1036,7 @@
           <div class="panel-body">
             <h3 style="color: var(--text-primary); margin-bottom: 12px;">Dual-Layer Detection</h3>
             <p style="color: var(--text-secondary); margin-bottom: 16px;">
-              PhishGuard combines client-side heuristic analysis with VirusTotal's AI-powered threat intelligence network for comprehensive malware and phishing detection.
+              PhishGuard combines client-side phishing heuristics with VirusTotal vendor verdicts for a broader URL reputation check.
             </p>
 
             <h3 style="color: var(--text-primary); margin-bottom: 12px;">Privacy First</h3>
@@ -1144,60 +1144,136 @@
     let score = 0;
     let input = raw.trim();
 
-    if (!/^https?:\/\//i.test(input)) input = 'http://' + input;
+    if (!/^https?:\/\//i.test(input)) input = 'https://' + input;
 
     let u;
     try {
       u = new URL(input);
     } catch {
-      findings.push({ severity: 'critical', title: 'Invalid URL', desc: 'Could not parse as valid URL', weight: 30 });
-      return finalize(score + 30, findings);
+      findings.push({ severity: 'critical', title: 'Invalid URL', desc: 'Could not parse as a valid HTTP/HTTPS URL', weight: 35 });
+      return finalize(35, findings);
+    }
+
+    if (!['http:', 'https:'].includes(u.protocol)) {
+      findings.push({ severity: 'critical', title: 'Unsupported Protocol', desc: 'Only HTTP and HTTPS URLs are supported', weight: 35 });
+      return finalize(35, findings);
     }
 
     const host = u.hostname.toLowerCase();
-    const labels = host.split('.');
-    const suspiciousTlds = new Set(['xyz', 'top', 'click', 'tk', 'ml', 'cf', 'ga']);
-    const baitWords = ['verify', 'secure', 'update', 'login', 'account', 'suspend'];
-    const brands = ['google', 'paypal', 'apple', 'microsoft', 'amazon'];
+    const href = u.href.toLowerCase();
+    const labels = host.split('.').filter(Boolean);
+    const tld = labels[labels.length - 1] || '';
 
-    if (u.protocol !== 'https:') {
-      findings.push({ severity: 'high', title: 'No HTTPS', desc: 'Not using secure HTTPS protocol', weight: 12 });
-      score += 12;
-    }
+    const suspiciousTlds = new Set([
+      'xyz', 'top', 'click', 'work', 'support', 'live', 'buzz', 'monster',
+      'rest', 'cam', 'gq', 'tk', 'ml', 'cf', 'ga', 'loan', 'zip', 'mov'
+    ]);
 
-    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) {
-      findings.push({ severity: 'critical', title: 'IP Address Host', desc: 'Using IP instead of domain name', weight: 25 });
-      score += 25;
-    }
+    const shorteners = ['bit.ly', 'tinyurl.com', 't.co', 'cutt.ly', 'is.gd', 'rebrand.ly'];
 
-    if (host.includes('xn--')) {
-      findings.push({ severity: 'high', title: 'Punycode Domain', desc: 'Internationalized domain detected', weight: 20 });
-      score += 20;
-    }
+    const brandDomains = {
+      google: ['google.com'],
+      paypal: ['paypal.com'],
+      apple: ['apple.com'],
+      microsoft: ['microsoft.com', 'live.com', 'office.com'],
+      amazon: ['amazon.com'],
+      gcash: ['gcash.com'],
+      maya: ['maya.ph'],
+      bdo: ['bdo.com.ph'],
+      bpi: ['bpi.com.ph'],
+      unionbank: ['unionbankph.com'],
+      shopee: ['shopee.ph'],
+      lazada: ['lazada.com.ph'],
+      facebook: ['facebook.com'],
+      instagram: ['instagram.com'],
+      netflix: ['netflix.com']
+    };
 
-    if (suspiciousTlds.has(labels[labels.length - 1])) {
-      findings.push({ severity: 'high', title: 'Suspicious TLD', desc: `Domain uses .${labels[labels.length - 1]} TLD`, weight: 14 });
-      score += 14;
-    }
+    const baitWords = [
+      'verify', 'verification', 'secure', 'security', 'update', 'login',
+      'signin', 'account', 'suspend', 'unlock', 'recover', 'confirm',
+      'billing', 'payment', 'wallet', 'bonus', 'reward', 'claim'
+    ];
 
-    const brandFound = brands.find(b => host.includes(b));
-    if (brandFound && host !== `${brandFound}.com`) {
-      findings.push({ severity: 'high', title: 'Brand Impersonation', desc: `Contains "${brandFound}" but not official domain`, weight: 22 });
-      score += 22;
-    }
+    const isHostOrSubdomain = (h, d) => h === d || h.endsWith('.' + d);
 
-    if (labels.length >= 5) {
-      findings.push({ severity: 'high', title: 'Excessive Subdomains', desc: `${labels.length} domain labels detected`, weight: 10 });
+    if (u.protocol === 'http:') {
+      findings.push({ severity: 'medium', title: 'Unencrypted HTTP', desc: 'The address uses HTTP instead of HTTPS', weight: 10 });
       score += 10;
     }
 
-    if (u.href.length > 120) {
-      findings.push({ severity: 'medium', title: 'Very Long URL', desc: `URL is ${u.href.length} characters`, weight: 8 });
+    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) {
+      findings.push({ severity: 'critical', title: 'IP Address Host', desc: 'The link uses a raw IP address instead of a normal domain name', weight: 26 });
+      score += 26;
+    }
+
+    if (host.includes('xn--')) {
+      findings.push({ severity: 'high', title: 'Punycode Domain', desc: 'Internationalized/punycode label detected', weight: 18 });
+      score += 18;
+    }
+
+    if (suspiciousTlds.has(tld)) {
+      findings.push({ severity: 'medium', title: 'Higher-Risk TLD Pattern', desc: `The .${tld} suffix is on the local caution list`, weight: 10 });
+      score += 10;
+    }
+
+    if (shorteners.some(domain => isHostOrSubdomain(host, domain))) {
+      findings.push({ severity: 'high', title: 'URL Shortener', desc: 'The final destination is hidden behind a shortening service', weight: 18 });
+      score += 18;
+    }
+
+    const brand = Object.keys(brandDomains).find(name => host.includes(name));
+    if (brand) {
+      const official = brandDomains[brand].some(domain => isHostOrSubdomain(host, domain));
+      if (!official) {
+        findings.push({ severity: 'critical', title: 'Possible Brand Impersonation', desc: `Hostname contains "${brand}" but does not match the known ${brand} domain pattern`, weight: 28 });
+        score += 28;
+      }
+    }
+
+    const baitHits = baitWords.filter(word => host.includes(word));
+    if (baitHits.length) {
+      const weight = Math.min(18, 6 + baitHits.length * 3);
+      findings.push({ severity: 'high', title: 'Security/Account Bait in Hostname', desc: `Detected: ${baitHits.slice(0, 5).join(', ')}`, weight });
+      score += weight;
+    }
+
+    if (labels.length >= 5) {
+      findings.push({ severity: 'medium', title: 'Excessive Subdomains', desc: `${labels.length} domain labels detected`, weight: 9 });
+      score += 9;
+    }
+
+    const hyphenCount = (host.match(/-/g) || []).length;
+    if (hyphenCount >= 3) {
+      findings.push({ severity: 'medium', title: 'Hyphen-Heavy Hostname', desc: `${hyphenCount} hyphens detected in the hostname`, weight: 8 });
       score += 8;
     }
 
+    if (u.username || u.password || href.includes('@')) {
+      findings.push({ severity: 'critical', title: 'Obfuscated URL Authority', desc: 'Username/password or @ syntax may hide the real destination', weight: 22 });
+      score += 22;
+    }
+
+    if (href.length > 160) {
+      findings.push({ severity: 'medium', title: 'Very Long URL', desc: `URL is ${href.length} characters`, weight: 8 });
+      score += 8;
+    } else if (href.length > 100) {
+      findings.push({ severity: 'low', title: 'Long URL', desc: `URL is ${href.length} characters`, weight: 3 });
+      score += 3;
+    }
+
+    if (/%[0-9a-f]{2}/i.test(href)) {
+      findings.push({ severity: 'medium', title: 'Encoded Characters', desc: 'Percent-encoded characters were detected', weight: 5 });
+      score += 5;
+    }
+
+    if (u.port && !['80', '443'].includes(u.port)) {
+      findings.push({ severity: 'medium', title: 'Non-Standard Port', desc: `URL explicitly uses port ${u.port}`, weight: 6 });
+      score += 6;
+    }
+
     if (findings.length === 0) {
-      findings.push({ severity: 'low', title: 'No Major Issues', desc: 'URL passed local heuristic checks', weight: 0 });
+      findings.push({ severity: 'low', title: 'No Major Local Indicators', desc: 'URL passed the browser-side heuristic checks. VirusTotal is checked separately.', weight: 0 });
     }
 
     return finalize(Math.min(score, 100), findings);
@@ -1236,6 +1312,19 @@
     return { score, level, findings: findingsList };
   }
 
+  // Fuse independent signals without reducing an already-strong warning.
+  // This is a heuristic risk score, not a probability.
+  function combineScores(localScore, vtScore) {
+    const local = Math.max(0, Math.min(100, Number(localScore) || 0));
+    const vt = Math.max(0, Math.min(100, Number(vtScore) || 0));
+    const combined = 100 - ((100 - local) * (100 - vt) / 100);
+    return Math.round(Math.max(local, vt, combined));
+  }
+
+  function levelFromScore(score) {
+    return score >= 70 ? 'critical' : score >= 45 ? 'high' : score >= 20 ? 'medium' : 'low';
+  }
+
   function riskColor(level) {
     return { critical: 'critical', high: 'high', medium: 'medium', low: 'low' }[level] || 'low';
   }
@@ -1249,7 +1338,7 @@
       critical: 'Critical threat detected. Do not interact with this target.',
       high: 'High-risk indicators found. Verify before proceeding.',
       medium: 'Some suspicious indicators detected. Exercise caution.',
-      low: 'No major indicators found. Likely safe but use caution.'
+      low: 'No major indicators found. No strong indicators were found by the available checks. A low score is not a guarantee of safety.'
     }[result.level];
 
     findings.innerHTML = '';
@@ -1295,38 +1384,54 @@
     if (state.mode === 'url') {
       try {
         termLog('Contacting VirusTotal...');
+
         const apiResponse = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: input, mode: 'url' })
+          body: JSON.stringify({ url: input })
         });
 
-        if (apiResponse.ok) {
-          const vtResult = await apiResponse.json();
-          if (vtResult.vt_data) {
-            const malCount = vtResult.vt_data.malicious;
-            termLog(
-              malCount > 0
-                ? 'VirusTotal: ' + malCount + ' engines flagged this'
-                : 'VirusTotal: No detections',
-              malCount > 0 ? 'bad' : 'good'
-            );
-
-            // Blend scores: 60% local heuristics, 40% VirusTotal
-            result.score = Math.round((localScore * 0.6) + (vtResult.score * 0.4));
-            result.vt_data = vtResult.vt_data;
-
-            // Recalculate level based on blended score
-            result.level = result.score >= 70 ? 'critical' : result.score >= 45 ? 'high' : result.score >= 20 ? 'medium' : 'low';
-          }
-        } else {
-          const err = await apiResponse.json().catch(function () {
-            return {};
-          });
-          termLog('VirusTotal unavailable: ' + (err.error || 'Unknown error'), 'warn');
+        let vtResult = {};
+        try {
+          vtResult = await apiResponse.json();
+        } catch {
+          vtResult = {};
         }
+
+        if (!apiResponse.ok) {
+          throw new Error(vtResult.error || `HTTP ${apiResponse.status}`);
+        }
+
+        const stats = vtResult.vt_data || {};
+        const malicious = Number(stats.malicious || 0);
+        const suspicious = Number(stats.suspicious || 0);
+        const harmless = Number(stats.harmless || 0);
+        const undetected = Number(stats.undetected || 0);
+        const total = Number(stats.total || (malicious + suspicious + harmless + undetected));
+        const vtScore = Number(vtResult.risk_score ?? vtResult.score ?? 0);
+
+        termLog(
+          `VirusTotal verdicts: ${malicious} malicious, ${suspicious} suspicious, ${harmless} harmless, ${undetected} undetected`,
+          malicious > 0 ? 'bad' : suspicious > 0 ? 'warn' : 'good'
+        );
+        termLog(`VirusTotal risk score: ${vtScore}/100`);
+
+        result.score = combineScores(localScore, vtScore);
+        result.level = levelFromScore(result.score);
+        result.vt_data = stats;
+
+        result.findings.unshift({
+          severity: malicious >= 3 ? 'critical' : malicious >= 1 ? 'high' : suspicious >= 1 ? 'medium' : 'low',
+          title: 'VirusTotal Vendor Verdicts',
+          desc: total > 0
+            ? `${malicious} malicious + ${suspicious} suspicious verdict(s) out of ${total} reported results`
+            : 'VirusTotal returned no usable verdict totals',
+          weight: vtScore
+        });
+
       } catch (err) {
-        termLog('VirusTotal connection failed, using local analysis only', 'warn');
+        termLog('VirusTotal unavailable: ' + err.message, 'warn');
+        termLog('Using the local heuristic score unchanged. No default/fake score was added.', 'warn');
       }
     }
 
@@ -1353,7 +1458,7 @@
     refreshStats();
 
     scanBtn.disabled = false;
-    scanBtn.innerHTML = '<span>▶</span><span>RUN AI SCAN</span>';
+    scanBtn.innerHTML = '<span>▶</span><span>RUN THREAT SCAN</span>';
   }
 
   scanBtn.addEventListener('click', runScan);
